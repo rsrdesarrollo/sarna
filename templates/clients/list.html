@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block body %}
+
+    <div class="container" role="main">
+        <div class="col-lg-10 col-lg-offset-1">
+            <div class="page-header">
+                <h2>Clients
+                    <a href="{{ url_for('.new') }}" class="btn btn-primary btn-success pull-right">
+                        <span class="glyphicon glyphicon-plus"></span> New Client
+                    </a>
+                </h2>
+            </div>
+        </div>
+        <div class="col-lg-10 col-lg-offset-1">
+            {% if clients %}
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <th>Name</th>
+                    <th style="width: 20%">Action</th>
+                    </thead>
+                    <tbody>
+                    {% for client in clients %}
+                        <tr>
+                            <td>{{ client.long_name }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a class="need-confirm btn btn-danger" href="{{ url_for('.delete', client_id=client.id) }}">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </a>
+                                    <a class="btn btn-default" href="{{ url_for('.details_client', client_id=client.id) }}">
+                                        <span class="glyphicon glyphicon-edit"></span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <h4 class="text-center">No clients!</h4>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

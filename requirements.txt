@@ -1,0 +1,6 @@
+docxtpl
+pony
+cvsslib
+Flask-WTF
+jinja2
+flask
