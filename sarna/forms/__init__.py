@@ -1,15 +1,38 @@
 from flask_wtf import FlaskForm
 from wtforms.fields import StringField, SelectField, IntegerField
 from wtforms.validators import DataRequired
+from pony.orm.core import Entity, Attribute, Required
+
+from sarna.model.aux import Choice
+from sarna.model import Client, Assessment
+
+class EntityForm(type):
+    def __new__(cls, entity: Entity):
+        class Form(FlaskForm):
+            pass
+
+        for k, _ in entity._adict_.items():
+            field: Attribute = getattr(entity, k)
+            if field.is_basic and not field.is_pk:
+                validators = []
+                if isinstance(field, Required):
+                    validators.append(DataRequired())
+
+                t = None
+                if field.py_type == str:
+                    t = StringField(validators=validators)
+                elif issubclass(field.py_type, Choice):
+                    lable = k[0].upper() + k[1:]
+                    t = SelectField(" ".join(lable.split('_')), validators=validators, choices=field.py_type.to_tuple())
+                if t is not None:
+                    setattr(Form, k, t)
+
+        return Form
 
 
-class ClientForm(FlaskForm):
-    short_name = StringField(validators=[DataRequired()])
-    long_name = StringField(validators=[DataRequired()])
+class ClientForm(EntityForm(Client)):
+    pass
 
 
-# TODO: Externalise constants choices.
-class AssessmentForm(FlaskForm):
-    lang = SelectField("Language", validators=[DataRequired()], choices=(('en', 'English'), ('es', 'Spanish')))
-    type = SelectField("Type", validators=[DataRequired()], choices=(('web', 'Web'), ('ext', 'External')))
-    platform = StringField(validators=[DataRequired()])
+class AssessmentForm(EntityForm(Assessment)):
+    pass

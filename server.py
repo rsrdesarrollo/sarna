@@ -1,18 +1,18 @@
 import os
 from flask_wtf.csrf import CSRFProtect
 from flask import Flask, render_template
-from sarna.model import db
+from sarna.model import init_database
 from sarna.routes import clients, index, findings, users, assessments
 from secrets import token_urlsafe
 
-db.bind(provider='sqlite', filename='/tmp/database.sqlite', create_db=True)
-db.generate_mapping(create_tables=True)
+init_database()
 
 BASE_DIR = os.path.dirname(__file__)
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
 app = Flask(__name__)
+
 
 def error_handler(err):
     return render_template('error.html', error=err.name), err.code
@@ -37,7 +37,7 @@ if __name__ == '__main__':
         SECRET_KEY=token_urlsafe(64)
     )
 
-    extra_files=["templates"]
+    extra_files = ["templates"]
     for dirname, dirs, files in os.walk("templates"):
         for file in files:
             extra_files.append(os.path.join(dirname, file))
@@ -45,4 +45,3 @@ if __name__ == '__main__':
     app.run(
         extra_files=extra_files
     )
-

@@ -1,0 +1,61 @@
+{% macro render_field(field) -%}
+
+{% set with_label = kwargs.pop('with_label', True) %}
+{% set placeholder = kwargs.pop('placeholder', field.label.text) %}
+{% set class_ = kwargs.pop('class_', 'form-control') %}
+
+{% if field.flags.required %}
+{% set class_ = class_ + ' required' %}
+{% endif %}
+
+<div class="form-group {% if field.errors %}has-error{% endif %}">
+
+    {% if with_label and field.type != 'CSRFTokenField' %}
+    <label for="{{ field.id }}"
+           class="control-label{% if field.flags.required %} required{% endif %}">
+        {{ field.label.text }}{% if field.flags.required %}*{% endif %}
+    </label>
+    {% endif %}
+
+    {% if field.type == 'BooleanField' %}
+    <div class="checkbox">
+        <label>
+            {{ field(class_=class_, **kwargs) }}
+            {{ field.label.text|safe }}
+        </label>
+    </div>
+    {% else %}
+
+    {% if field.type in ( 'StringField', 'TextField', 'TextAreaField', 'PasswordField',
+                         'IntegerField') %}
+
+    {% set class_ = class_ + ' input-xlarge' %}
+
+    {% elif field.type == 'FileField' %}
+
+    {% set class_ = class_ + ' input-file' %}
+
+    {% endif %}
+
+    {% if field.type == 'SelectField' %}
+
+    {{ field(class_=class_, **kwargs) }}
+
+    {% else %}
+
+    {{ field(class_=class_, placeholder=placeholder, **kwargs) }}
+
+    {% endif %}
+
+    {% endif %}
+
+    {% if field.errors %}
+    <div class="alert alert-danger" role="alert">{{ field.errors|join(', ') }}</div>
+    {% endif %}
+
+    {% if field.description %}
+    <p class="help-block">{{ field.description|safe }}</p>
+    {% endif %}
+
+</div>
+{%- endmacro %}
