@@ -6,6 +6,7 @@ from pony.orm.core import Entity, Attribute, Required
 from sarna.model.aux import Choice
 from sarna.model import Client, Assessment
 
+
 class EntityForm(type):
     def __new__(cls, entity: Entity):
         class Form(FlaskForm):
@@ -22,8 +23,13 @@ class EntityForm(type):
                 if field.py_type == str:
                     t = StringField(validators=validators)
                 elif issubclass(field.py_type, Choice):
-                    lable = k[0].upper() + k[1:]
-                    t = SelectField(" ".join(lable.split('_')), validators=validators, choices=field.py_type.to_tuple())
+                    label = k[0].upper() + k[1:]
+                    t = SelectField(
+                        " ".join(label.split('_')),
+                        validators=validators,
+                        choices=field.py_type.choices(),
+                        coerce=field.py_type.coerce
+                    )
                 if t is not None:
                     setattr(Form, k, t)
 

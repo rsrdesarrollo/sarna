@@ -1,30 +1,12 @@
+{% from "macros.html" import render_form %}
 {% extends "base.html" %}
 {% block body %}
 
-<div class="container" role="main">
+    <div class="container" role="main">
 
-    <div class="col-lg-10 col-lg-offset-1">
-        <h1>New client</h1>
-        {% for field, errors in form.errors.items() %}
-        {% for error in errors %}
-        <div class="alert alert-danger" role="alert">
-            Error in field {{ field }}: {{ error }}
+        <div class="col-lg-10 col-lg-offset-1">
+            <h1>New client</h1>
+            {{ render_form(form) }}
         </div>
-        {% endfor %}
-        {% endfor %}
-        <form method="post">
-            {{ form.csrf_token }}
-            {% if form.csrf_token.errors %}
-            <div class="alert alert-danger" role="alert">You have submitted an invalid CSRF token</div>
-            {% endif %}
-            <div class="form-group {{'has-error' if form.short_name.errors}}">
-                {{ form.short_name.label }} {{ form.short_name(class_="form-control") }}
-            </div>
-            <div class="form-group {{'has-error' if form.long_name.errors}}">
-                {{ form.long_name.label }} {{ form.long_name(class_="form-control") }}
-            </div>
-            <button type="submit" class="btn btn-success btn-block">Submit</button>
-        </form>
     </div>
-</div>
 {% endblock %}

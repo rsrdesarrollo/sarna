@@ -12,16 +12,20 @@ blueprint = Blueprint('assessments', __name__)
 @blueprint.route('/')
 @db_session()
 def index():
-    pass
+    context = dict(
+        route=ROUTE_NAME,
+        assessments=select(assessment for assessment in Assessment)[:]
+    )
+    return render_template('assessments/list.html', **context)
 
 @blueprint.route('/<assessment_id>')
 @db_session()
-def details():
+def edit(assessment_id):
     pass
 
 @blueprint.route('/<assessment_id>/delete')
 @db_session()
-def delete():
+def delete(assessment_id):
     pass
 
 @blueprint.route('/new')

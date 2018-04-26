@@ -47,7 +47,7 @@ def delete(client_id: int):
 
 @blueprint.route('/<client_id>', methods=('POST', 'GET'))
 @db_session()
-def details_client(client_id: int):
+def edit(client_id: int):
     client = Client[client_id]
     form = ClientForm(**client.to_dict())
     context = dict(
@@ -80,5 +80,5 @@ def add_assessment(client_id: int):
         data.pop('client_id', None)
 
         Assessment(client=client, **data)
-        return redirect(url_for('.details_client', client_id=client_id))
+        return redirect(url_for('.edit', client_id=client_id))
     return render_template('clients/add_assessment.html', **context)

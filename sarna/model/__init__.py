@@ -1,7 +1,7 @@
 from datetime import datetime, date
 from pony.orm import *
-from .aux import Language, AssessmentStatus, AssessmentType, FindingStatus, FindingType
-from .aux import ChoiceStrConverter
+from .aux import Language, AssessmentStatus, AssessmentType, FindingStatus, FindingType, Score
+from .aux import ChoiceEnumConverter
 
 db = Database()
 
@@ -19,10 +19,10 @@ class Assessment(db.Entity):
     id = PrimaryKey(int, auto=True)
     name = Required(str, 32)
     reports = Set('Report')
-    lang = Required(Language, 3)
-    type = Required(AssessmentType, 3)
+    lang = Required(Language)
+    type = Required(AssessmentType)
     platform = Required(str, 64)
-    status = Required(AssessmentStatus, 3)
+    status = Required(AssessmentStatus)
     client = Required(Client)
     actives = Set('Active')
     findings = Set('Finding')
@@ -47,22 +47,22 @@ class FindingTemplate(db.Entity):
     id = PrimaryKey(int, auto=True)
     langs = Required(Json)  # list of langs
     title = Required(Json)  # locale text
-    type = Required(FindingType, 3)
+    type = Required(FindingType)
     definition = Required(Json)  # locale text
     solutions = Set('Solution')
     references = Required(Json)  # locale text
-    tech_risk = Required(int, min=0, max=4)  # [0 to 4]
-    dissemination = Required(int, min=0, max=4)  # [0 to 4]
-    solution_complexity = Required(int, min=0, max=4)  # [0 to 4]
+    tech_risk = Required(Score)  # [0 to 4]
+    dissemination = Required(Score)  # [0 to 4]
+    solution_complexity = Required(Score)  # [0 to 4]
 
 
 class Finding(FindingTemplate):
     affected_resources = Set('AffectedResource')
-    status = Required(FindingStatus, 3)
+    status = Required(FindingStatus)
     assessment = Required(Assessment)
     description = Optional(Json, lazy=True)  # locale text
-    business_risk = Optional(int, min=0, max=4)  # [0 to 4]
-    exploitability = Optional(int, min=0, max=4)  # [0 to 4]
+    business_risk = Optional(Score)  # [0 to 4]
+    exploitability = Optional(Score)  # [0 to 4]
     cvss_v3_vector = Optional(str, 124)
     cvss_score = Optional(float)
 
@@ -86,7 +86,7 @@ class Template(db.Entity):
     reports = Set(Report)
     description = Optional(str, 128)
     clients = Set(Client)
-    type = Required(str, 5)  # Choice
+    # type = Required(str, 5)  # Choice
 
 
 class Solution(db.Entity):
@@ -119,10 +119,12 @@ class User(db.Entity):
 
 
 def init_database():
-    db.bind(provider='sqlite', filename='/tmp/database.sqlite', create_db=True)
+    from os import path
 
-    for cls in (Language, AssessmentStatus, AssessmentType, FindingStatus, FindingType):
-        db.provider.converter_classes.append((cls, ChoiceStrConverter(cls)))
+    db.bind(provider='sqlite', filename=path.abspath('./database/database.sqlite'), create_db=True)
+
+    for cls in (Language, AssessmentStatus, AssessmentType, FindingStatus, FindingType, Score):
+        db.provider.converter_classes.append((cls, ChoiceEnumConverter))
 
     db.generate_mapping(create_tables=True)
 

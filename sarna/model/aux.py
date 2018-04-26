@@ -1,78 +1,73 @@
-from pony.orm.dbapiprovider import StrConverter
-import inspect
-
-Scores = ['Info', 'Low', 'Medium', 'High', 'Critical']
+from pony.orm.dbapiprovider import IntConverter
+from enum import Enum
 
 
-class Choice:
+class Choice(Enum):
     @classmethod
-    def _members(cls):
-
-        return (
-            sorted((
-                item for item in inspect.getmembers(
-                    cls,
-                    lambda x: not inspect.isroutine(x)
-                ) if not item[0].startswith('_')),
-                key=lambda x: x[1][1]
-            )
-        )
+    def choices(cls):
+        return tuple((elem, elem.name.replace("_", " ")) for elem in cls)
 
     @classmethod
-    def to_tuple(cls):
-        ret = tuple((pair[0],pair[1][0]) for pair in cls._members() if not pair[0].startswith('_'))
-        return ret
+    def coerce(cls, item):
+        if item is None:
+            return None
 
-    @classmethod
-    def keys(cls):
-        yield from (pair[0] for pair in cls._members() if not pair[0].startswith('_'))
+        return cls[item.replace(" ", "_")] if not isinstance(item, cls) else item
 
-    @classmethod
-    def values(cls):
-        yield from (pair[1][0] for pair in cls._members() if not pair[0].startswith('_'))
+    def __str__(self):
+        return self.name.replace("_", " ")
+
+class Score(Choice):
+    Info = 1
+    Low = 2
+    Medium = 3
+    High = 4
+    Critical = 5
 
 
 class Language(Choice):
-    esp = ("Spanish", 0)
-    eng = ("English", 1)
+    Spanish = 1
+    English = 2
 
 
 class AssessmentType(Choice):
-    web = ("Web", 0)
-    ext = ("External", 1)
-    mob = ("Mobile", 1)
-    ios = ("iOS", 1)
-    apk = ("Android", 1)
-    wif = ("WiFi", 1)
+    Web = 1
+    External_pentest = 2
+    Mobile = 3
+    iOS = 4
+    Android = 5
+    WiFi = 6
 
 
 class FindingType(Choice):
-    web = ("Web", 1)
-    owa = ("OWASP", 1)
-    inf = ("Infra", 1)
-    cfg = ("Config", 1)
+    Web = 1
+    OWASP = 2
+    Infra = 3
+    Config = 4
 
 
 class FindingStatus(Choice):
-    pen = ("Pending", 0)
-    rev = ("Reviewed", 1)
-    con = ("Confirmed", 2)
-    fpo = ("False Positive", 3)
-    oth = ("Other", 9)
+    Pending = 1
+    Reviewed = 2
+    Confirmed = 3
+    False_Positive = 4
+    Other = 5
 
 
 class AssessmentStatus(Choice):
-    opn = ("Open", 0)
-    clo = ("Closed", 1)
-    arc = ("Archived", 2)
+    Open = 1
+    Closed = 2
+    Archived = 3
 
 
-class ChoiceStrConverter(type):
-    def __new__(cls, choice: Choice):
-        class _ChoiceStrConverter(StrConverter):
-            def validate(self, val, obj=None):
-                if val not in choice.keys():
-                    raise ValueError('Value not in: {}'.format(",".join(choice.keys())))
-                return val
+class ChoiceEnumConverter(IntConverter):
+    def validate(self, val, obj=None):
+        if not isinstance(val, Enum):
+            raise ValueError('Must be an Enum.  Got {}'.format(type(val)))
+        return val
 
-        return _ChoiceStrConverter
+    def sql2py(self, val):
+        return self.py_type(val)
+
+    def py2sql(self, val):
+        return val.value
