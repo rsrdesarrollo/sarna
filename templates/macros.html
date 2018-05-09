@@ -21,30 +21,22 @@
             <div class="checkbox">
                 <label>
                     {{ field(class_=class_, **kwargs) }}
-                    {{ field.label.text|safe }}
                 </label>
             </div>
         {% else %}
 
-            {% if field.type in ( 'StringField', 'TextField', 'TextAreaField', 'PasswordField',
-                         'IntegerField') %}
-
+            {% if field.type in ( 'StringField', 'TextField', 'TextAreaField', 'PasswordField', 'IntegerField') %}
                 {% set class_ = class_ + ' input-xlarge' %}
-
             {% elif field.type == 'FileField' %}
-
                 {% set class_ = class_ + ' input-file' %}
-
+            {% elif field.type == 'DateField' %}
+                {% set class_ = class_ + ' input-xlarge datepicker' %}
             {% endif %}
 
-            {% if field.type == 'SelectFie{% macro render_field(field) -%}ld' %}
-
+            {% if field.type == 'SelectField' %}
                 {{ field(class_=class_, **kwargs) }}
-
             {% else %}
-
                 {{ field(class_=class_, placeholder=placeholder, **kwargs) }}
-
             {% endif %}
 
         {% endif %}
@@ -68,5 +60,12 @@
         {% endfor %}
         <button type="submit" class="btn btn-success btn-block">Submit</button>
     </form>
+
+{%- endmacro %}
+
+{% macro render_score_label(score) %}
+    {% set class = ['', 'info', 'success', 'warning', 'danger', 'critical'][score.value] %}
+
+    <span class="label label-{{ class }}">{{ score.name }}</span>
 
 {%- endmacro %}

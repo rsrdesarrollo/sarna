@@ -11,40 +11,61 @@
     <link href="/static/css/jquery-ui.min.css" rel="stylesheet">
     <link href="/static/css/jquery-ui.structure.min.css" rel="stylesheet">
     <link href="/static/css/jquery-ui.theme.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"
+            integrity="sha256-XF29CBwU1MWLaGEnsELogU6Y6rcc5nCkhhx89nFMIDQ="
+            crossorigin="anonymous">
+    </script>
+
+    <link href="/static/css/fontawesome-all.min.css" rel="stylesheet">
 
     <script src="/static/js/main.js"></script>
+    <link href="/static/css/main.css" rel="stylesheet">
 </head>
 <body>
 
-    <div id="dialog-confirm" title="Action confirmation" style="display: none">
-      <h4>Are you sure? <span class="label label-warning"> Warning</span></h4>
-    </div>
+<div id="dialog-confirm" title="Action confirmation" style="display: none">
+    <h4>Are you sure? <span class="label label-warning"> Warning</span></h4>
+</div>
 
-    {% block navbar %}
+{% block navbar %}
     <nav class="navbar navbar-inverse">
-    <div class="container">
-        <div class="navbar-header">
-            <a href="/" class="navbar-brand">SARNA</a>
+        <div class="container">
+            <div class="navbar-header">
+                <a href="/" class="navbar-brand">SARNA</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+                <ul class="nav navbar-nav">
+                    {% block navitems %}
+                        <li class="{{ 'active' if route == 'index' }}"><a href={{ url_for('index.index') }}>Home</a>
+                        </li>
+                        <li class="{{ 'active' if route == 'clients' }}"><a href="{{ url_for('clients.index') }}">Clients</a>
+                        </li>
+                        <li class="{{ 'active' if route == 'assessments' }}"><a
+                                href="{{ url_for('assessments.index') }}">Assessments</a></li>
+                        <li class="{{ 'active' if route == 'findings' }}"><a href="{{ url_for('findings.index') }}">Findings
+                            Database</a></li>
+                        <li class="{{ 'active' if route == 'users' }}"><a href="{{ url_for('users.index') }}">Users</a>
+                        </li>
+                    {% endblock %}
+                </ul>
+                {% if username %}
+                    <p class="navbar-text navbar-right">Signed in as {{ username }}</p>
+                {% else %}
+                    <a role="button" href="#" class="btn btn-success navbar-btn navbar-right">Log in</a>
+                {% endif %}
+            </div>
         </div>
-        <div class="collapse navbar-collapse" id="navbar">
-            <ul class="nav navbar-nav">
-                {% block navitems %}
-                <li class="{{'active' if route == 'index'}}"><a href={{ url_for('index.index') }}>Home</a></li>
-                <li class="{{'active' if route == 'clients'}}"><a href="{{ url_for('clients.index') }}">Clients</a></li>
-                <li class="{{'active' if route == 'assessments'}}"><a href="{{ url_for('assessments.index') }}">Assessments</a></li>
-                <li class="{{'active' if route == 'findings'}}"><a href="{{ url_for('findings.index') }}">Findings Database</a></li>
-                <li class="{{'active' if route == 'users'}}"><a href="{{ url_for('users.index') }}">Users</a></li>
-                {% endblock %}
-            </ul>
-            {% if username %}
-            <p class="navbar-text navbar-right">Signed in as {{username}}</p>
-            {% else %}
-            <a role="button" href="#" class="btn btn-success navbar-btn navbar-right">Log in</a>
-            {% endif %}
-        </div>
-    </div>
     </nav>
-    {% endblock %}
+{% endblock %}
+<div class="container" role="main">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
     {% block body %}{% endblock %}
+</div>
 </body>
 </html>

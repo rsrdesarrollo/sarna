@@ -15,7 +15,7 @@ blueprint = Blueprint('clients', __name__)
 def index():
     context = dict(
         route=ROUTE_NAME,
-        clients=select(client for client in Client)[:]
+        clients=select(client for client in Client)
     )
     return render_template('clients/list.html', **context)
 
@@ -49,7 +49,9 @@ def delete(client_id: int):
 @db_session()
 def edit(client_id: int):
     client = Client[client_id]
-    form = ClientForm(**client.to_dict())
+
+    form_data = request.form.to_dict() or client.to_dict()
+    form = ClientForm(**form_data)
     context = dict(
         route=ROUTE_NAME,
         form=form,
@@ -58,7 +60,7 @@ def edit(client_id: int):
     if form.validate_on_submit():
         data = dict(form.data)
         data.pop('csrf_token', None)
-        Client[client_id].set(**data)
+        client.set(**data)
         return redirect(url_for('.index'))
     return render_template('clients/details.html', **context)
 
@@ -77,7 +79,6 @@ def add_assessment(client_id: int):
     if form.validate_on_submit():
         data = dict(form.data)
         data.pop('csrf_token', None)
-        data.pop('client_id', None)
 
         Assessment(client=client, **data)
         return redirect(url_for('.edit', client_id=client_id))

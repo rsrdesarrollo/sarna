@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+    <div class="container" role="main">
+
+        <div class="row">
+            <div class="col-xs-1" style="padding-top: 50px;">
+                <div class="btn-group-vertical text-center">
+                    <a href="{{ url_for('.summary', assessment_id=assessment.id) }}"
+                       class="btn btn-lg btn-default{% if endpoint=='summary' %} btn-info{% endif %}">
+                        <span class="fa fa-tachometer-alt"></span>
+                    </a>
+
+                    <a href="{{ url_for('.findings', assessment_id=assessment.id) }}"
+                       class="btn btn-lg btn-default{% if endpoint=='findings' %} btn-warning{% endif %}">
+                        <span class="fa fa-fire"></span>
+                    </a>
+
+                    <a href="{{ url_for('.add_findings', assessment_id=assessment.id) }}"
+                       class="btn btn-lg btn-default {% if endpoint=='add_findings' %}btn-success{% endif %}">
+                        <span class="fa fa-plus"></span>
+                    </a>
+                    <a href="{{ url_for('.actives', assessment_id=assessment.id) }}"
+                       class="btn btn-lg btn-default {% if endpoint=='actives' %}btn-primary{% endif %}">
+                        <span class="fa fa-server"></span>
+                    </a>
+                    <a href="{{ url_for('.evidences', assessment_id=assessment.id) }}"
+                       class="btn btn-lg btn-default {% if endpoint=='evidences' %}btn-purple{% endif %}">
+                        <span class="fa fa-images"></span>
+                    </a>
+
+                    <a href="{{ url_for('.reports', assessment_id=assessment.id) }}"
+                       class="btn btn-lg btn-default {% if endpoint=='reports' %}btn-cyan{% endif %}">
+                        <span class="fa fa-file-alt"></span>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-10" style="border: 1px;">
+                <div class="page-header">
+                    <h1>{{ assessment.name }}
+                    </h1>
+                </div>
+                <div class="row">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+{% endblock %}

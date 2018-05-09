@@ -1,0 +1,109 @@
+label-critical {
+    background-color: #222
+}
+
+/*Custom custom_checkbox*/
+/* The container */
+.custom_checkbox {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    min-height: 23px;
+}
+
+/* Hide the browser's default custom_checkbox */
+.custom_checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Create a custom custom_checkbox */
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 23px;
+    width: 23px;
+    background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.custom_checkbox:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+/* When the custom_checkbox is checked, add a blue background */
+.custom_checkbox input:checked ~ .checkmark {
+    background-color: #607d8b;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the checkmark when checked */
+.custom_checkbox input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the checkmark/indicator */
+.custom_checkbox .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+#table_data td {
+    vertical-align: middle;
+}
+
+.dropdown-buttons.dropdown-menu{
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+    min-width: 120px;
+}
+
+.dropdown-buttons .btn {
+    border-radius: 0px;
+}
+
+.btn-purple {
+    color: #fff;
+    background-color: #673AB7;
+    border-color: #6036ab;
+}
+
+.btn-purple:hover {
+    color: #fff;
+    background-color: #482882;
+    border-color: #452879;
+}
+
+.btn-cyan {
+    color: #fff;
+    background-color: #67b7b7;
+    border-color: #16a2ab;
+}
+
+.btn-cyan:hover {
+    color: #fff;
+    background-color: #319795;
+    border-color: #138e97;
+}

@@ -1,11 +1,22 @@
-from pony.orm.dbapiprovider import IntConverter
+from pony.orm.dbapiprovider import IntConverter, Json
 from enum import Enum
+
+
+class LocaleText(Json):
+    pass
 
 
 class Choice(Enum):
     @classmethod
     def choices(cls):
-        return tuple((elem, elem.name.replace("_", " ")) for elem in cls)
+        return tuple(cls.choice(elem) for elem in cls)
+
+    @classmethod
+    def choice(cls, elem):
+        if isinstance(elem, cls):
+            return elem, elem.name.replace("_", " ")
+        else:
+            return cls[elem], cls[elem].name.replace("_", " ")
 
     @classmethod
     def coerce(cls, item):
@@ -16,6 +27,7 @@ class Choice(Enum):
 
     def __str__(self):
         return self.name.replace("_", " ")
+
 
 class Score(Choice):
     Info = 1

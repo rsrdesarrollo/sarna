@@ -1,7 +1,6 @@
 from datetime import datetime, date
 from pony.orm import *
-from .aux import Language, AssessmentStatus, AssessmentType, FindingStatus, FindingType, Score
-from .aux import ChoiceEnumConverter
+from .aux import *
 
 db = Database()
 
@@ -35,6 +34,30 @@ class Assessment(db.Entity):
     estimated_hours = Optional(int)
     effective_hours = Optional(int)
 
+    def _aggregate_score(self, field):
+        return [
+            count(f for f in self.findings if getattr(f, field) == Score.Info),
+            count(f for f in self.findings if getattr(f, field) == Score.Low),
+            count(f for f in self.findings if getattr(f, field) == Score.Medium),
+            count(f for f in self.findings if getattr(f, field) == Score.High),
+            count(f for f in self.findings if getattr(f, field) == Score.Critical)
+        ]
+
+    def aggregate_finding_status(self):
+        return [
+            count(f for f in self.findings if f.status == FindingStatus.Pending),
+            count(f for f in self.findings if f.status == FindingStatus.Reviewed),
+            count(f for f in self.findings if f.status == FindingStatus.Confirmed),
+            count(f for f in self.findings if f.status == FindingStatus.False_Positive),
+            count(f for f in self.findings if f.status == FindingStatus.Other)
+        ]
+
+    def aggregate_technical_risk(self):
+        return self._aggregate_score('tech_risk')
+
+    def aggregate_business_risk(self):
+        return self._aggregate_score('business_risk')
+
 
 class Report(db.Entity):
     id = PrimaryKey(int, auto=True)
@@ -45,26 +68,80 @@ class Report(db.Entity):
 
 class FindingTemplate(db.Entity):
     id = PrimaryKey(int, auto=True)
-    langs = Required(Json)  # list of langs
-    title = Required(Json)  # locale text
+    name = Required(str, 64)
     type = Required(FindingType)
-    definition = Required(Json)  # locale text
-    solutions = Set('Solution')
-    references = Required(Json)  # locale text
     tech_risk = Required(Score)  # [0 to 4]
     dissemination = Required(Score)  # [0 to 4]
     solution_complexity = Required(Score)  # [0 to 4]
+    solutions = Set('Solution')
+    translations = Set('FindingTemplateTranslation')
+
+    findings = Set('Finding')
+
+    @property
+    def langs(self):
+        return [t.lang for t in self.translations]
 
 
-class Finding(FindingTemplate):
-    affected_resources = Set('AffectedResource')
-    status = Required(FindingStatus)
-    assessment = Required(Assessment)
-    description = Optional(Json, lazy=True)  # locale text
+class FindingTemplateTranslation(db.Entity):
+    lang = Required(Language)
+    title = Required(str)
+    definition = Required(LongStr)
+    references = Required(LongStr)
+    finding = Required(FindingTemplate)
+    PrimaryKey(finding, lang)
+
+
+class Finding(db.Entity):
+    id = PrimaryKey(int, auto=True)
+    name = Required(str, 64)
+    type = Required(FindingType)
+
+    tech_risk = Required(Score)  # [0 to 4]
     business_risk = Optional(Score)  # [0 to 4]
     exploitability = Optional(Score)  # [0 to 4]
+    dissemination = Required(Score)  # [0 to 4]
+    solution_complexity = Required(Score)  # [0 to 4]
+
+    template = Optional(FindingTemplate)
+
+    title = Required(str)
+    definition = Required(LongStr)
+    references = Required(LongStr)
+
+    affected_resources = Set('AffectedResource')
+    status = Required(FindingStatus, default=FindingStatus.Pending)
+    assessment = Required(Assessment, index=True)
+
+    description = Optional(LongStr)
+    solution = Optional(LongStr)
+
     cvss_v3_vector = Optional(str, 124)
     cvss_score = Optional(float)
+
+    @classmethod
+    def build_from_template(cls, template: FindingTemplate, assessment: Assessment):
+        lang = assessment.lang
+        translation: FindingTemplateTranslation = None
+        for t in template.translations:
+            translation = t
+            if t.lang == lang:
+                break
+
+        return Finding(
+            name=template.name,
+            type=template.type,
+            tech_risk=template.tech_risk,
+            dissemination=template.dissemination,
+            solution_complexity=template.solution_complexity,
+            template=template,
+
+            title=translation.title,
+            definition=translation.definition,
+            references=translation.references,
+
+            assessment=assessment
+        )
 
 
 class Active(db.Entity):
@@ -90,10 +167,11 @@ class Template(db.Entity):
 
 
 class Solution(db.Entity):
-    id = PrimaryKey(int, auto=True)
-    context = Optional(str, 32, default='generic')
-    text = Optional(Json)  # locale text
+    name = Required(str, 32)
+    lang = Required(Language)
+    text = Required(LongStr)
     finding_template = Required(FindingTemplate)
+    PrimaryKey(finding_template, name)
 
 
 class Image(db.Entity):

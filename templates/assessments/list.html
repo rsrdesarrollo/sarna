@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block body %}
-
     <div class="container" role="main">
         <div class="col-lg-10 col-lg-offset-1">
             <div class="page-header">
@@ -9,21 +8,19 @@
         </div>
         <div class="col-lg-10 col-lg-offset-1">
             {% if assessments %}
-                <table class="table table-striped table-hover">
+                <table id="table_data" class="table table-striped table-hover">
                     <thead>
-                    <th class="hidden">id</th>
                     <th>Client</th>
                     <th>Name</th>
                     <th>Platform</th>
                     <th>Type</th>
                     <th>Language</th>
                     <th>Status</th>
-                    <th style="width: 12%">Action</th>
+                    <th class="text-right">Actions</th>
                     </thead>
                     <tbody>
                     {% for assessment in assessments %}
                         <tr>
-                            <td class="hidden">{{ assessment.id }}</td>
                             <td>{{ assessment.client.short_name }}</td>
                             <td>{{ assessment.name }}</td>
                             <td>{{ assessment.platform }}</td>
@@ -31,12 +28,22 @@
                             <td>{{ assessment.lang }}</td>
                             <td>{{ assessment.status }}</td>
                             <td>
-                                <div class="btn-group">
-                                    <a class="need-confirm btn btn-danger" href="{{ url_for('.delete', assessment_id=assessment.id) }}">
+                                <div class="btn-group pull-right">
+                                    <a class="need-confirm btn btn-danger" title="Delete Assessment"
+                                       href="{{ url_for('.delete', assessment_id=assessment.id) }}">
                                         <span class="glyphicon glyphicon-trash"></span>
                                     </a>
-                                    <a class="btn btn-default" href="{{ url_for('.edit', assessment_id=assessment.id) }}">
+                                    <a class="btn btn-default" title="Edit Assessment"
+                                       href="{{ url_for('.edit', assessment_id=assessment.id) }}">
                                         <span class="glyphicon glyphicon-edit"></span>
+                                    </a>
+                                    <a class="btn btn-info" title="Assessment Panel"
+                                       href="{{ url_for('.summary', assessment_id=assessment.id) }}">
+                                        <span class="glyphicon glyphicon-dashboard"></span>
+                                    </a>
+                                    <a class="btn btn-success" title="Add findings to assessment"
+                                       href="{{ url_for('.add_findings', assessment_id=assessment.id) }}">
+                                        <span class="glyphicon glyphicon-plus"></span>
                                     </a>
                                 </div>
                             </td>
@@ -45,7 +52,8 @@
                     </tbody>
                 </table>
             {% else %}
-                <h4 class="text-center">No assessments!</h4>
+                <h3 style="padding: 50px;" class="text-center">You have no assigned assessments</h3>
+                <img style="max-height: 400px; opacity: 0.8;" src="/static/img/never_say_not_to_coffee.svg">
             {% endif %}
         </div>
     </div>
