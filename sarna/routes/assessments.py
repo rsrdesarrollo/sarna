@@ -159,16 +159,18 @@ def add_finding(assessment_id, finding_id):
 def edit_add_finding(assessment_id, finding_id):
     assessment = Assessment[assessment_id]
     template = FindingTemplate[finding_id]
-    form = FindingEditForm()
 
-    context = dict(
-        route=ROUTE_NAME,
-        endpoint=request.url_rule.endpoint.split('.')[-1],
-        assessment=assessment,
-        form=form
-    )
+    finding = Finding.build_from_template(template, assessment)
 
-    return render_template('assessments/panel/edit_finding.html', **context)
+    try:
+        commit()
+    except:
+        flash('Error ading finding {}'.format(finding.name), 'danger')
+        return redirect(url_for('add_findings', assessment_id=assessment.id))
+
+    flash('Finding {} added successfully'.format(finding.name), 'success')
+
+    return redirect(url_for('.edit_finding', assessment_id=assessment.id, finding_id=finding.id))
 
 
 @blueprint.route('/<assessment_id>/bulk_action', methods=("POST",))
