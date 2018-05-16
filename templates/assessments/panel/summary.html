@@ -2,11 +2,10 @@
 
 {% from "macros.html" import render_form %}
 {% block content %}
-
     <div class="row">
         <div class="col-md-12">
             <h1 class="text-center text-uppercase text-info">
-                <span class="label label-info">
+                <span class="badge badge-info">
                     {{ assessment.findings.count() }}
                 </span>
             </h1>
@@ -15,78 +14,78 @@
         </div>
     </div>
     {% if assessment.findings.count() > 0 %}
-        <div class="row">
-            <div class="col-md-6 col-md-offset-3">
-                <h3 class="text-center">Findings Status</h3>
+        <div class="row mt-2">
+            <div class="col-md-6 offset-3">
+                <h5 class="text-center">Findings Status</h5>
                 <canvas id="findings_status_chart"></canvas>
             </div>
         </div>
         <div class="row">
-            <div class="col-md-4 col-md-offset-1">
-                <h3 class="text-center">Technical Risk</h3>
+            <div class="col-md-4 offset-1">
+                <h5 class="text-center">Technical Risk</h5>
                 <canvas id="tech_risk_chart"></canvas>
             </div>
-            <div class="col-md-4 col-md-offset-2">
-                <h3 class="text-center">Business Risk</h3>
+            <div class="col-md-4 offset-2">
+                <h5 class="text-center">Business Risk</h5>
                 <canvas id="bus_risk_chart"></canvas>
             </div>
         </div>
 
+        <script>
+            var ctx_tech_risk = document.getElementById('tech_risk_chart').getContext('2d');
+            var ctx_bus_risk = document.getElementById('bus_risk_chart').getContext('2d');
+            var ctx_find = document.getElementById('findings_status_chart').getContext('2d');
+            var backgrounds = [
+                '#5bc0de',
+                '#5cb85c',
+                '#f0ad4e',
+                '#d9534f',
+                '#222'
+            ];
+            var options = {
+                legend: {display: false},
+                scales: {
+                    yAxes: [{ticks: {min: 0}}]
+                }
+            };
+            new Chart(ctx_tech_risk, {
+                type: 'bar',
+                data: {
+                    labels: ["Info", "Low", "Medium", "High", "Critical"],
+                    datasets: [{
+                        backgroundColor: backgrounds,
+                        data: {{ assessment.aggregate_technical_risk() | tojson }}
+                    }]
+                },
+                options: options
+            });
+            new Chart(ctx_bus_risk, {
+                type: 'bar',
+                data: {
+                    labels: ["Info", "Low", "Medium", "High", "Critical"],
+                    datasets: [{
+                        backgroundColor: backgrounds,
+                        data: {{ assessment.aggregate_business_risk() | tojson }}
+                    }]
+                },
+                options: options
+            });
+            new Chart(ctx_find, {
+                type: 'pie',
+                data: {
+                    labels: ["Pending", "Reviewed", "Confirmed", "False Positive", "Other"],
+                    datasets: [{
+                        backgroundColor: [
+                            '#d9534f',
+                            '#f0ad4e',
+                            '#5cb85c',
+                            '#5bc0de',
+                            '#222'
+                        ],
+                        data: {{ assessment.aggregate_finding_status() | tojson }}
+                    }]
+                }
+            });
+        </script>
     {% endif %}
-    <script>
-        var ctx_tech_risk = document.getElementById('tech_risk_chart').getContext('2d');
-        var ctx_bus_risk = document.getElementById('bus_risk_chart').getContext('2d');
-        var ctx_find = document.getElementById('findings_status_chart').getContext('2d');
-        var backgrounds = [
-            '#5bc0de',
-            '#5cb85c',
-            '#f0ad4e',
-            '#d9534f',
-            '#222'
-        ];
-        var options = {
-            legend: {display: false},
-            scales: {
-                yAxes: [{ticks: {min: 0}}]
-            }
-        };
-        new Chart(ctx_tech_risk, {
-            type: 'bar',
-            data: {
-                labels: ["Info", "Low", "Medium", "High", "Critical"],
-                datasets: [{
-                    backgroundColor: backgrounds,
-                    data: {{ assessment.aggregate_technical_risk() | tojson }}
-                }]
-            },
-            options: options
-        });
-        new Chart(ctx_bus_risk, {
-            type: 'bar',
-            data: {
-                labels: ["Info", "Low", "Medium", "High", "Critical"],
-                datasets: [{
-                    backgroundColor: backgrounds,
-                    data: {{ assessment.aggregate_business_risk() | tojson }}
-                }]
-            },
-            options: options
-        });
-        new Chart(ctx_find, {
-            type: 'pie',
-            data: {
-                labels: ["Pending", "Reviewed", "Confirmed", "False Positive", "Other"],
-                datasets: [{
-                    backgroundColor: [
-                        '#d9534f',
-                        '#f0ad4e',
-                        '#5cb85c',
-                        '#5bc0de',
-                        '#222'
-                    ],
-                    data: {{ assessment.aggregate_finding_status() | tojson }}
-                }]
-            }
-        });
-    </script>
 {% endblock %}

@@ -9,7 +9,7 @@ import datetime
 
 
 class EntityForm(type):
-    def __new__(cls, entity: Entity, skip_attrs={}, custom_validators=dict()):
+    def __new__(cls, entity: Entity, skip_attrs={}, custom_validators=dict(), skip_pk=True):
         class Form(FlaskForm):
             pass
 
@@ -18,7 +18,10 @@ class EntityForm(type):
                 continue
 
             field: Attribute = getattr(entity, k)
-            if field.is_basic and not field.is_pk and not field.is_discriminator:
+            if skip_pk and field.is_pk:
+                continue
+
+            if field.is_basic and not field.is_discriminator:
                 vals = []
                 required = isinstance(field, Required)
 
@@ -121,5 +124,20 @@ FINDINGS
 """
 
 
-class FindingCreateNewForm(EntityForm(Finding, skip_attrs={'name', 'type'})):
+class FindingEditForm(EntityForm(Finding, skip_attrs={'name', 'type'})):
     pass
+
+
+"""
+ACTIVES
+"""
+
+
+class ActiveCreateNewForm(
+    EntityForm(Active, skip_pk=False),
+    EntityForm(AffectedResource)
+):
+    pass
+
+class ActiveCreateBulkForm(FlaskForm):
+    TextAreaField(validators=[validators.DataRequired()], description="List of actives. One per line.")

@@ -1,55 +1,52 @@
 {% extends "assessments/panel/panel_base.html" %}
 
 {% from "macros.html" import render_form, render_score_label %}
-{% block content %}
+
+{% block body %}
+    <form action="{{ url_for('.bulk_action_finding', assessment_id=assessment.id) }}" method="post">
+        {{ super() }}
+    </form>
+{% endblock %}
+{% block action_buttons %}
     {% if findings %}
-        <form action="{{ url_for('.bulk_action_finding', assessment_id=assessment.id) }}" method="post">
-            {{ form.csrf_token }}
-            <div class="row col-lg-12">
-                <div class="btn-group pull-right" role="group">
-                    <button type="submit" class="btn btn-danger need-confirm" value="delete" name="action">
-                        <span class="glyphicon glyphicon-trash"></span>
+        <div class="btn-group float-right" role="group">
+            <button type="submit" class="btn btn-danger need-confirm" value="delete" name="action">
+                <span class="fa fa-trash"></span>
+            </button>
+            <div class="btn-group">
+                <button class="btn btn-info dropdown-toggle" type="button" id="status_dropdown"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    Set Status
+                </button>
+                <div class="dropdown-menu" aria-labelledby="status_dropdown">
+                    <button class="dropdown-item bg-warning" type="submit" name="action"
+                            value="status_pending"> Pending
                     </button>
-                    <div class="dropdown btn-group">
-                        <button class="btn btn-info dropdown-toggle" type="button" id="status_dropdown"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            Set Status
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-buttons" aria-labelledby="status_dropdown"
-                            style="padding: 0px; margin: 0px;">
-                            <li>
-                                <button class="btn btn-warning btn-block" type="submit" name="action"
-                                        value="status_pending"> Pending
-                                </button>
-                            </li>
-                            <li>
-                                <button class="btn btn-primary btn-block" type="submit" name="action"
-                                        value="status_reviewed"> Reviewed
-                                </button>
-                            </li>
-                            <li>
-                                <button class="btn btn-success btn-block" type="submit" name="action"
-                                        value="status_confirmed"> Confirmed
-                                </button>
-                            </li>
-                            <li>
-                                <button class="btn btn-danger btn-block" type="submit" name="action"
-                                        value="status_false_positive">False Positive
-                                </button>
-                            </li>
-                            <li>
-                                <button class="btn btn-default btn-block" type="submit" name="action"
-                                        value="status_other">Other
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
+                    <button class="dropdown-item bg-primary" type="submit" name="action"
+                            value="status_reviewed"> Reviewed
+                    </button>
+                    <button class="dropdown-item bg-success" type="submit" name="action"
+                            value="status_confirmed"> Confirmed
+                    </button>
+                    <button class="dropdown-item bg-danger" type="submit" name="action"
+                            value="status_false_positive">False Positive
+                    </button>
+                    <button class="dropdown-item bg-secondary" type="submit" name="action"
+                            value="status_other">Other
+                    </button>
                 </div>
             </div>
-            <div class="row col-lg-12">
-                <table id="table_data" class="table table-striped table-hover">
-                    <thead>
+        </div>
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col">
+            {% if findings %}
+
+                {{ form.csrf_token }}
+                <table id="table_data" class="table table-striped">
+                    <thead class="thead-dark">
                     <th>
                         <label class="custom_checkbox">
                             <input type="checkbox" id="all_checked" name="finding:all">
@@ -78,15 +75,15 @@
                             <td>{{ render_score_label(finding.business_risk) }}</td>
                             <td>{{ finding.status }}</td>
                             <td>
-                                <div class="btn-group pull-right">
+                                <div class="btn-group float-right">
                                     <a class="btn btn-danger need-confirm"
                                        href="{{ url_for('.delete_findings', assessment_id=assessment.id, finding_id=finding.id) }}">
-                                        <span class="glyphicon glyphicon-trash"></span>
+                                        <span class="fa fa-trash"></span>
                                     </a>
 
-                                    <a class="btn btn-default"
-                                       href="{{ url_for('.edit_findings', assessment_id=assessment.id, finding_id=finding.id) }}">
-                                        <span class="glyphicon glyphicon-edit"></span>
+                                    <a class="btn btn-secondary"
+                                       href="{{ url_for('.edit_finding', assessment_id=assessment.id, finding_id=finding.id) }}">
+                                        <span class="fa fa-pencil-alt"></span>
                                     </a>
                                 </div>
                             </td>
@@ -94,12 +91,14 @@
                     {% endfor %}
                     </tbody>
                 </table>
-            </div>
-        </form>
-    {% else %}
-        <div class="row col-lg-12">
-            <h4 class="text-center">No findings in this assessment</h4>
-            <h5 class="text-center"><a href="{{ url_for('.add_findings', assessment_id=assessment.id) }}">You can add some findings here!</a></h5>
+            {% else %}
+                <h4 class="text-center">No findings in this assessment</h4>
+                <h5 class="text-center">
+                    <a href="{{ url_for('.add_findings', assessment_id=assessment.id) }}">
+                        You can add some findings here!
+                    </a>
+                </h5>
+            {% endif %}
         </div>
-    {% endif %}
+    </div>
 {% endblock %}

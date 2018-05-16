@@ -1,0 +1,62 @@
+{% extends "assessments/panel/panel_base.html" %}
+
+{% from "macros.html" import render_form, render_score_label %}
+
+{% block scripts %}
+
+    <script src="/static/js/fuse.min.js"></script>
+    <link href="/static/css/fuzzycomplete.min.css" rel="stylesheet">
+    <script src="/static/js/fuzzycomplete.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            {% if actives %}
+
+                <table id="table_data" class="table">
+                    <thead class="thead-dark">
+                    <th>Name</th>
+                    <th>Resources</th>
+                    <th>#</th>
+                    </thead>
+                    <tbody>
+                    {% for active in actives %}
+                        <tr>
+                            <td rowspan="{{ active.affected_resources.count() }}">{{ active.name }}</td>
+
+                            {% for resource in active.affected_resources %}
+                                <td>{{ resource.route }}</td>
+                                <td><a>{{ resource.findings.count() }}</a></td>
+                                </tr>
+                            {% else %}
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                </tr>
+                            {% endfor %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <h4 class="text-center mt-5">No actives in this assessment</h4>
+
+            {% endif %}
+        </div>
+        <div class="col">
+            <h3>Add Active</h3>
+            {{ render_form(form) }}
+            <script>
+                var fuseOptions = {keys: ["name"]};
+                var options = {display: "name", key: "name", fuseOptions: fuseOptions};
+                var actives = {{ actives_dict|tojson }};
+                $(document).ready(function () {
+                    $("#name").fuzzyComplete(
+                        actives,
+                        options
+                    );
+                });
+            </script>
+        </div>
+    </div>
+{% endblock %}

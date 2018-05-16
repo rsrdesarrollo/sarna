@@ -1,5 +1,14 @@
-label-critical {
-    background-color: #222
+.md-preview img{
+    width: 70%;
+}
+
+.hidden{
+    display: none;
+}
+
+.badge-critical {
+    background-color: #222;
+    color: white;
 }
 
 /*Custom custom_checkbox*/
@@ -7,14 +16,15 @@ label-critical {
 .custom_checkbox {
     display: block;
     position: relative;
-    padding-left: 35px;
+    padding-left: 15px;
     cursor: pointer;
-    font-size: 22px;
+    font-size: 20px;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    min-height: 23px;
+    min-height: 20px;
+    margin: 0px;
 }
 
 /* Hide the browser's default custom_checkbox */
@@ -29,14 +39,14 @@ label-critical {
     position: absolute;
     top: 0;
     left: 0;
-    height: 23px;
-    width: 23px;
-    background-color: #eee;
+    height: 20px;
+    width: 20px;
+    background-color: #838383;
 }
 
 /* On mouse-over, add a grey background color */
 .custom_checkbox:hover input ~ .checkmark {
-    background-color: #ccc;
+    background-color: #525252;
 }
 
 /* When the custom_checkbox is checked, add a blue background */
@@ -73,7 +83,7 @@ label-critical {
     vertical-align: middle;
 }
 
-.dropdown-buttons.dropdown-menu{
+.dropdown-buttons.dropdown-menu {
     margin: 0px;
     padding: 0px;
     border: 0px;
@@ -106,4 +116,49 @@ label-critical {
     color: #fff;
     background-color: #319795;
     border-color: #138e97;
+}
+
+.squared.btn-group-vertical > .btn {
+    border-radius: 0px;
+}
+
+/*Sidebar*/
+#page-content {
+    width: calc(100% - 57px);
+    height: calc(100% - 56px);
+    position: absolute;
+    left: 57px;
+    top: 56px;
+}
+
+#sidebar {
+    z-index: -1;
+    position: fixed;
+    width: 56.5px;
+    padding-top: 56px;
+    height: 100%;
+    overflow-y: auto;
+    background: #000;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#sidebar .btn-group-vertical {
+    width: 100%;
+}
+
+#topbar {
+    z-index: 1000;
+    position: fixed;
+    width: 100%;
+    height: 56px;
+    overflow-y: auto;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+    padding: 0px;
+    margin: 0px;
 }

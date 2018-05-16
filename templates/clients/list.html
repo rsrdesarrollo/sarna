@@ -1,40 +1,30 @@
-{% extends "base.html" %}
+{% extends "clients/base.html" %}
 {% block body %}
-
-    <div class="container" role="main">
-        <div class="col-lg-10 col-lg-offset-1">
-            <div class="page-header">
-                <h2>Clients
-                    <a href="{{ url_for('.new') }}" class="btn btn-primary btn-success pull-right">
-                        <span class="glyphicon glyphicon-plus"></span> New Client
-                    </a>
-                </h2>
-            </div>
-        </div>
-        <div class="col-lg-10 col-lg-offset-1">
+    <div class="row mt-3">
+        <div class="col-lg-12">
             {% if clients %}
-                <table id="table_data" class="table table-striped table-hover">
-                    <thead>
+                <table id="table_data" class="table table-striped">
+                    <thead class="thead-dark">
                     <th>Name</th>
-                    <th style="width: 20%">Actions</th>
+                    <th style="width: 20%" class="text-right">Actions</th>
                     </thead>
                     <tbody>
                     {% for client in clients %}
                         <tr>
                             <td>{{ client.long_name }}</td>
                             <td>
-                                <div class="btn-group">
+                                <div class="btn-group float-right">
                                     <a class="need-confirm btn btn-danger" title="Delete Client"
                                        href="{{ url_for('.delete', client_id=client.id) }}">
-                                        <span class="glyphicon glyphicon-trash"></span>
+                                        <span class="fa fa-trash"></span>
                                     </a>
-                                    <a class="btn btn-default" title="Edit Client"
+                                    <a class="btn btn-secondary" title="Edit Client"
                                        href="{{ url_for('.edit', client_id=client.id) }}">
-                                        <span class="glyphicon glyphicon-edit"></span>
+                                        <span class="fa fa-pencil-alt"></span>
                                     </a>
                                     <a class="btn btn-success" title="Add Assessment"
                                        href="{{ url_for('.add_assessment', client_id=client.id) }}">
-                                        <span class="glyphicon glyphicon-plus"></span>
+                                        <span class="fa fa-plus"></span>
                                     </a>
 
                                 </div>

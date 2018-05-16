@@ -4,3 +4,5 @@ cvsslib
 Flask-WTF
 jinja2
 flask
+uuid
+python-magic

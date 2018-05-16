@@ -8,8 +8,10 @@
         {% set class_ = class_ + ' required' %}
     {% endif %}
 
-    <div class="form-group {% if field.errors %}has-error{% endif %}">
-
+    <div class="form-group">
+        {% if field.errors %}
+            {% set class_ = class_ + ' is-invalid' %}
+        {% endif %}
         {% if with_label and field.type != 'CSRFTokenField' %}
             <label for="{{ field.id }}"
                    class="control-label{% if field.flags.required %} required{% endif %}">
@@ -41,13 +43,16 @@
 
         {% endif %}
 
-        {% if field.errors %}
-            <div class="alert alert-danger" role="alert">{{ field.errors|join(', ') }}</div>
+        {% if field.description %}
+            <small class="text-muted">
+                {{ field.description|safe }}
+            </small>
         {% endif %}
 
-        {% if field.description %}
-            <p class="help-block">{{ field.description|safe }}</p>
+        {% if field.errors %}
+            <div class="invalid-feedback">{{ field.errors|join(', ') }}</div>
         {% endif %}
+
 
     </div>
 {%- endmacro %}
@@ -66,6 +71,6 @@
 {% macro render_score_label(score) %}
     {% set class = ['', 'info', 'success', 'warning', 'danger', 'critical'][score.value] %}
 
-    <span class="label label-{{ class }}">{{ score.name }}</span>
+    <span class="badge badge-{{ class }}">{{ score.name }}</span>
 
 {%- endmacro %}

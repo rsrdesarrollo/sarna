@@ -1,11 +1,11 @@
-{% extends "base.html" %}
+{% extends "findings/base.html" %}
 
 {% from "macros.html" import render_form %}
 {% block body %}
 
-    <div class="container" role="main">
+    <div class="row mt-3 pl-3">
 
-        <div class="col-lg-10 col-lg-offset-1">
+        <div class="col-lg-5">
             <h1>Solution for {{ finding.name }}</h1>
             {{ render_form(form) }}
         </div>

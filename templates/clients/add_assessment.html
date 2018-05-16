@@ -1,12 +1,12 @@
-{% extends "base.html" %}
+{% extends "clients/base.html" %}
 
 {% from "macros.html" import render_form %}
 {% block body %}
 
-    <div class="container" role="main">
+    <div class="row mt-4 mx-3">
 
-        <div class="col-lg-10 col-lg-offset-1">
-            <h1>New assessment for {{ client.short_name }}</h1>
+        <div class="col">
+            <h2>New assessment for {{ client.short_name }}</h2>
             {{ render_form(form) }}
         </div>
     </div>

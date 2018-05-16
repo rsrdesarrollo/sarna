@@ -1,0 +1,82 @@
+{% extends "assessments/panel/panel_base.html" %}
+
+{% from "macros.html" import render_form, render_score_label %}
+{% block scripts %}
+
+    <link href="/static/css/dropzone.css" rel="stylesheet">
+    <script type="application/javascript" src="/static/js/dropzone.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var template = $('#template');
+            template.removeAttr('id');
+            template.wrap('<div></div>');
+
+            var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
+                url: "{{ url_for('.evidences', assessment_id=assessment.id) }}", // Set the url
+                thumbnailWidth: null,
+                thumbnailHeight: null,
+                parallelUploads: 20,
+                previewTemplate: template.parent().html(),
+                autoQueue: true, // Make sure the files aren't queued until manually added
+                previewsContainer: "#previews", // Define the container to display the previews
+                clickable: ".fileinput", // Define the element that should be used as click trigger to select files.
+                headers: {
+                    'X-CSRFToken': "{{ csrf_token() }}"
+                }
+            });
+
+            template.unwrap().remove();
+            myDropzone.on("complete", function (file) {
+                $(file.previewElement).find('.progress').fadeOut();
+            });
+            // myDropzone.on("addedfile", function (file) {
+            //     // Hookup the start button
+            //     myDropzone.enqueueFile(file);
+            // });
+
+
+            // myDropzone.on("sending", function (file) {
+            //     // Show the total progress bar when upload starts
+            //     document.querySelector("#total-progress").style.opacity = "1";
+            //     // And disable the start button
+            //     file.previewElement.querySelector(".start").setAttribute("disabled", "disabled");
+            // });
+
+            // Hide the total progress bar when nothing's uploading anymore
+            // myDropzone.on("queuecomplete", function (progress) {
+            //     document.querySelector("#total-progress").style.opacity = "0";
+            // });
+        });
+    </script>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12 text-center"><h4>Drop something or click <a href="#" class="fileinput">Here</a></h4></div>
+    </div>
+
+
+    <div class="row mx-2" id="previews">
+        {% for image in assessment.images %}
+            <div class="col-md-4 border-secondary border">
+                <strong>{{ image.name }}</strong>
+                <a target="_blank"
+                   href="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=image.name) }}">
+                    <img style="width: 100%"
+                         src="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=image.name) }}"/>
+                </a>
+            </div>
+        {% endfor %}
+
+        <div class="col-md-4 border-secondary border" id="template">
+            <strong data-dz-name></strong>
+            <span class="card-text" data-dz-size></span>
+            <strong class="error text-danger" data-dz-errormessage></strong>
+            <img style="width: 100%" data-dz-thumbnail/>
+            <div class="progress" role="progressbar" aria-valuemin="0"
+                 aria-valuemax="100" aria-valuenow="0">
+                <div class="progress-bar progress-bar-success" style="width:0%;"
+                     data-dz-uploadprogress></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

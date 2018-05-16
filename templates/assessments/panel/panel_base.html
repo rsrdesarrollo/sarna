@@ -1,52 +1,48 @@
 {% extends "base.html" %}
 
+{% block left_actions %}
+    <div class="btn-group-vertical text-center squared">
+        <a href="{{ url_for('.summary', assessment_id=assessment.id) }}"
+           class="btn btn-lg {% if endpoint=='summary' %}btn-info{% else %}btn-dark{% endif %}">
+            <span class="fa fa-tachometer-alt"></span>
+        </a>
+
+        <a href="{{ url_for('.findings', assessment_id=assessment.id) }}"
+           class="btn btn-lg {% if endpoint=='findings' %} btn-warning{% else %}btn-dark{% endif %}">
+            <span class="fa fa-fire"></span>
+        </a>
+
+        <a href="{{ url_for('.add_findings', assessment_id=assessment.id) }}"
+           class="btn btn-lg {% if endpoint=='add_findings' %}btn-success{% else %}btn-dark{% endif %}">
+            <span class="fa fa-plus"></span>
+        </a>
+        <a href="{{ url_for('.actives', assessment_id=assessment.id) }}"
+           class="btn btn-lg {% if endpoint=='actives' %}btn-primary{% else %}btn-dark{% endif %}">
+            <span class="fa fa-server"></span>
+        </a>
+        <a href="{{ url_for('.evidences', assessment_id=assessment.id) }}"
+           class="btn btn-lg {% if endpoint=='evidences' %}btn-purple{% else %}btn-dark{% endif %}">
+            <span class="fa fa-images"></span>
+        </a>
+
+        <a href="{{ url_for('.reports', assessment_id=assessment.id) }}"
+           class="btn btn-lg {% if endpoint=='reports' %}btn-secondary{% else %}btn-dark{% endif %}">
+            <span class="fa fa-file-alt"></span>
+        </a>
+    </div>
+{% endblock %}
 {% block body %}
 
-    <div class="container" role="main">
 
-        <div class="row">
-            <div class="col-xs-1" style="padding-top: 50px;">
-                <div class="btn-group-vertical text-center">
-                    <a href="{{ url_for('.summary', assessment_id=assessment.id) }}"
-                       class="btn btn-lg btn-default{% if endpoint=='summary' %} btn-info{% endif %}">
-                        <span class="fa fa-tachometer-alt"></span>
-                    </a>
-
-                    <a href="{{ url_for('.findings', assessment_id=assessment.id) }}"
-                       class="btn btn-lg btn-default{% if endpoint=='findings' %} btn-warning{% endif %}">
-                        <span class="fa fa-fire"></span>
-                    </a>
-
-                    <a href="{{ url_for('.add_findings', assessment_id=assessment.id) }}"
-                       class="btn btn-lg btn-default {% if endpoint=='add_findings' %}btn-success{% endif %}">
-                        <span class="fa fa-plus"></span>
-                    </a>
-                    <a href="{{ url_for('.actives', assessment_id=assessment.id) }}"
-                       class="btn btn-lg btn-default {% if endpoint=='actives' %}btn-primary{% endif %}">
-                        <span class="fa fa-server"></span>
-                    </a>
-                    <a href="{{ url_for('.evidences', assessment_id=assessment.id) }}"
-                       class="btn btn-lg btn-default {% if endpoint=='evidences' %}btn-purple{% endif %}">
-                        <span class="fa fa-images"></span>
-                    </a>
-
-                    <a href="{{ url_for('.reports', assessment_id=assessment.id) }}"
-                       class="btn btn-lg btn-default {% if endpoint=='reports' %}btn-cyan{% endif %}">
-                        <span class="fa fa-file-alt"></span>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-10" style="border: 1px;">
-                <div class="page-header">
-                    <h1>{{ assessment.name }}
-                    </h1>
-                </div>
-                <div class="row">
-                    {% block content %}{% endblock %}
-                </div>
-            </div>
-
+    <div class="row pl-2 mt-2">
+        <div class="col">
+            <h2>{{ assessment.name }}
+            </h2>
         </div>
-
+        <div class="col-sm-3 mr-3">
+            {% block action_buttons %}{% endblock %}
+        </div>
     </div>
+    {% block content %}
+    {% endblock %}
 {% endblock %}

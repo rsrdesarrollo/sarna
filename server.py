@@ -1,9 +1,9 @@
 import os
-from flask_wtf.csrf import CSRFProtect
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from sarna.model import init_database
 from sarna.routes import clients, index, findings, users, assessments
 from secrets import token_urlsafe
+from sarna import csrf
 
 init_database()
 
@@ -15,7 +15,10 @@ app = Flask(__name__)
 
 
 def error_handler(err):
-    return render_template('error.html', error=err.name), err.code
+    if request.headers.get('x-requested-with', '') == "XMLHttpRequest":
+        return str(err), err.code
+
+    return render_template('error.html', error=str(err)), err.code
 
 
 app.register_blueprint(index.blueprint)
@@ -29,7 +32,6 @@ app.register_error_handler(404, error_handler)
 app.register_error_handler(500, error_handler)
 
 if __name__ == '__main__':
-    csrf = CSRFProtect()
     csrf.init_app(app)
     app.config.update(
         DEBUG=True,

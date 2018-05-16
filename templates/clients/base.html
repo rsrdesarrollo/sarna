@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block left_actions %}
+    <div class="btn-group-vertical text-center squared">
+        <a href="{{ url_for('.new') }}"
+           class="btn btn-lg {% if request.url_rule.endpoint=='clients.new' %}btn-success{% else %}btn-dark{% endif %}">
+            <span class="fa fa-plus"></span>
+        </a>
+    </div>
+{% endblock %}
