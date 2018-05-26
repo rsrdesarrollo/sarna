@@ -61,7 +61,7 @@ def edit(finding_id: int):
     return render_template('findings/details.html', **context)
 
 
-@blueprint.route('/<finding_id>/delete')
+@blueprint.route('/<finding_id>/delete', methods=('POST',))
 @db_session()
 def delete(finding_id: int):
     FindingTemplate[finding_id].delete()
@@ -103,7 +103,7 @@ def add_translation(finding_id: int):
     return render_template('findings/edit_translation.html', **context)
 
 
-@blueprint.route('/<finding_id>/delete/<language>')
+@blueprint.route('/<finding_id>/delete/<language>', methods=('POST',))
 @db_session()
 def delete_translation(finding_id: int, language: str):
     FindingTemplateTranslation[finding_id, Language[language]].delete()
@@ -167,7 +167,7 @@ def add_solution(finding_id: int):
     return render_template('findings/edit_solution.html', **context)
 
 
-@blueprint.route('/<finding_id>/solution/<solution_name>/delete')
+@blueprint.route('/<finding_id>/solution/<solution_name>/delete', methods=('POST',))
 @db_session()
 def delete_solution(finding_id: int, solution_name: str):
     Solution[finding_id, solution_name].delete()

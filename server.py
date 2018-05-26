@@ -1,24 +1,29 @@
 import os
 from flask import Flask, render_template, request
-from sarna.model import init_database
+from sarna.model import init_database, ObjectNotFound
 from sarna.routes import clients, index, findings, users, assessments
 from secrets import token_urlsafe
-from sarna import csrf
+from sarna import csrf, limiter, app, PROJECT_PATH
+from werkzeug import exceptions
 
 init_database()
-
-BASE_DIR = os.path.dirname(__file__)
-TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
-STATIC_DIR = os.path.join(BASE_DIR, 'static')
-
-app = Flask(__name__)
 
 
 def error_handler(err):
     if request.headers.get('x-requested-with', '') == "XMLHttpRequest":
         return str(err), err.code
 
-    return render_template('error.html', error=str(err)), err.code
+    if isinstance(err, ValueError):
+        err = exceptions.BadRequest()
+    elif isinstance(err, ObjectNotFound):
+        err = exceptions.NotFound()
+
+    context = dict(
+        code=err.code,
+        error=err.name,
+        description=err.description,
+    )
+    return render_template('error.html', **context), context['code']
 
 
 app.register_blueprint(index.blueprint)
@@ -28,15 +33,30 @@ app.register_blueprint(findings.blueprint, url_prefix='/findings')
 app.register_blueprint(users.blueprint, url_prefix='/users')
 
 app.register_error_handler(400, error_handler)
+app.register_error_handler(401, error_handler)
+app.register_error_handler(403, error_handler)
 app.register_error_handler(404, error_handler)
+app.register_error_handler(405, error_handler)
+app.register_error_handler(408, error_handler)
+app.register_error_handler(409, error_handler)
+app.register_error_handler(413, error_handler)
+app.register_error_handler(429, error_handler)
 app.register_error_handler(500, error_handler)
+app.register_error_handler(501, error_handler)
+app.register_error_handler(502, error_handler)
+app.register_error_handler(503, error_handler)
+app.register_error_handler(504, error_handler)
 
 if __name__ == '__main__':
+
     csrf.init_app(app)
+    limiter.init_app(app)
+
     app.config.update(
         DEBUG=True,
         WTF_CSRF_SECRET_KEY=token_urlsafe(64),
-        SECRET_KEY=token_urlsafe(64)
+        SECRET_KEY=token_urlsafe(64),
+        MAX_CONTENT_LENGTH=10 * 1024 * 1024  # 10 Mb limit
     )
 
     extra_files = ["templates"]

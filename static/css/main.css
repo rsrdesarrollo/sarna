@@ -11,6 +11,10 @@
     color: white;
 }
 
+.modal-xxl {
+    max-width: 95%;
+}
+
 /*Custom custom_checkbox*/
 /* The container */
 .custom_checkbox {

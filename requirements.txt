@@ -2,7 +2,10 @@ docxtpl
 pony
 cvsslib
 Flask-WTF
+Flask-Limiter
 jinja2
 flask
 uuid
 python-magic
+mistletoe
+aenum

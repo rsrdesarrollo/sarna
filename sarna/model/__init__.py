@@ -3,6 +3,7 @@ from pony.orm.core import *
 from uuid import UUID, uuid4
 from .aux import *
 from sarna import config
+import os
 
 db = Database()
 
@@ -15,12 +16,14 @@ class Client(db.Entity):
     long_name = Required(str, 128)
     users = Set('User')
 
+    def template_path(self):
+        return os.path.join(config.TEMPLATES_PATH, str(self.id))
+
 
 class Assessment(db.Entity):
     id = PrimaryKey(int, auto=True)
     uuid = Required(UUID, default=uuid4, unique=True)
     name = Required(str, 32)
-    reports = Set('Report')
     lang = Required(Language)
     type = Required(AssessmentType)
     platform = Required(str, 64)
@@ -61,18 +64,15 @@ class Assessment(db.Entity):
     def aggregate_business_risk(self):
         return self._aggregate_score('business_risk')
 
-
-class Report(db.Entity):
-    id = PrimaryKey(UUID, default=uuid4)
-    assessment = Required(Assessment)
-    name = Required(str, 64)
-    template = Required('Template')
+    def evidence_path(self):
+        return os.path.join(config.EVIDENCES_PATH, str(self.uuid))
 
 
 class FindingTemplate(db.Entity):
     id = PrimaryKey(int, auto=True)
     name = Required(str, 64)
     type = Required(FindingType)
+    owasp_category = Optional(OWASPCategory)
     tech_risk = Required(Score)  # [0 to 4]
     dissemination = Required(Score)  # [0 to 4]
     solution_complexity = Required(Score)  # [0 to 4]
@@ -104,6 +104,7 @@ class Finding(db.Entity):
 
     title = Required(str)
     status = Required(FindingStatus, default=FindingStatus.Pending)
+    owasp_category = Optional(OWASPCategory)
 
     description = Optional(LongStr)
     solution = Optional(LongStr)
@@ -136,6 +137,7 @@ class Finding(db.Entity):
             tech_risk=template.tech_risk,
             dissemination=template.dissemination,
             solution_complexity=template.solution_complexity,
+            owasp_category=template.owasp_category,
             template=template,
 
             title=translation.title,
@@ -161,11 +163,11 @@ class AffectedResource(db.Entity):
 
 
 class Template(db.Entity):
-    name = PrimaryKey(str, 32)
-    reports = Set(Report)
+    name = Required(str, 32)
+    client = Required(Client)
     description = Optional(str, 128)
-    clients = Set(Client)
-    # type = Required(str, 5)  # Choice
+    file = Required(str, 128)
+    PrimaryKey(client, name)
 
 
 class Solution(db.Entity):
@@ -205,7 +207,7 @@ def init_database():
 
     db.bind(provider='sqlite', filename=database_path, create_db=True)
 
-    for cls in (Language, AssessmentStatus, AssessmentType, FindingStatus, FindingType, Score):
+    for cls in (Language, AssessmentStatus, AssessmentType, FindingStatus, FindingType, Score, OWASPCategory):
         db.provider.converter_classes.append((cls, ChoiceEnumConverter))
 
     db.generate_mapping(create_tables=True)

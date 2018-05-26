@@ -1,0 +1,69 @@
+{% extends "assessments/panel/panel_base.html" %}
+
+{% from "macros.html" import render_form, render_score_label %}
+
+{% block body %}
+    <form action="{{ url_for('.index') }}" method="post">
+        {{ super() }}
+    </form>
+{% endblock %}
+{% block action_buttons %}
+    {% if assessment.client.templates %}
+        <div class="btn-group float-right" role="group">
+            <button type="submit" class="btn btn-warning" value="generate" name="action">
+                <span class="fa fa-file-archive"></span> Generate
+            </button>
+        </div>
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col">
+            {% if assessment.client.templates %}
+                <input type="hidden" value="{{ csrf_token() }}" name="csrf_token">
+                <table id="table_data" class="table table-striped">
+                    <thead class="thead-dark">
+                    <th>
+                        <label class="custom_checkbox">
+                            <input type="checkbox" id="all_checked" name="finding:all">
+                            <span class="checkmark"></span>
+                        </label>
+                    </th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th class="text-right">Actions</th>
+                    </thead>
+                    <tbody>
+                    {% for template in assessment.client.templates %}
+                        <tr>
+                            <td>
+                                <label class="custom_checkbox">
+                                    <input name="template:{{ template.name }}" type="checkbox">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </td>
+                            <td>{{ template.name }}</td>
+                            <td>{{ template.description }}</td>
+                            <td>
+                                <div class="btn-group float-right">
+                                    <a class="btn btn-info"
+                                       href="{{ url_for('.download_report', assessment_id=assessment.id, template_name=template.name) }}">
+                                        <span class="fa fa-download"></span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <h4 class="text-center">No findings in this assessment</h4>
+                <h5 class="text-center">
+                    <a href="{{ url_for('.add_findings', assessment_id=assessment.id) }}">
+                        You can add some findings here!
+                    </a>
+                </h5>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

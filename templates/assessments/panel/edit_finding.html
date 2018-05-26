@@ -49,22 +49,6 @@
                 </div>
             </div>
 
-            {% if assessment.images %}
-                <h5 class="mt-4">Images</h5>
-                <div class="row mt-3">
-                    {% for image in assessment.images %}
-                        <div class="col-md-4 border-secondary border">
-                            <strong>{{ image.name }}</strong>
-                            <a target="_blank"
-                               href="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=image.name) }}">
-                                <img style="width: 100%"
-                                     src="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=image.name) }}"/>
-                            </a>
-
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
             <script>
                 $(function () {
 

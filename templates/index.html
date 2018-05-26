@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 {% block body %}
-    <div class="jumbotron mt-3">
-        <h1>Welcome to SARNA</h1>
+    <div class="jumbotron mt-3 align-content-center text-center">
+        <h1>
+            Welcome to SARNA
+        </h1>
+
         <p>Security Assessment Report geNerated Automatically</p>
+
+        <img src="{{ url_for('static', filename='logo-red.png') }}" width="200" class="d-inline-block align-top" alt="">
     </div>
 {% endblock %}

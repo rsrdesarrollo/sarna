@@ -17,11 +17,11 @@
                 thumbnailHeight: null,
                 parallelUploads: 20,
                 previewTemplate: template.parent().html(),
-                autoQueue: true, // Make sure the files aren't queued until manually added
+                autoQueue: true,
                 previewsContainer: "#previews", // Define the container to display the previews
                 clickable: ".fileinput", // Define the element that should be used as click trigger to select files.
                 headers: {
-                    'X-CSRFToken': "{{ csrf_token() }}"
+                    'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')
                 }
             });
 
@@ -29,23 +29,6 @@
             myDropzone.on("complete", function (file) {
                 $(file.previewElement).find('.progress').fadeOut();
             });
-            // myDropzone.on("addedfile", function (file) {
-            //     // Hookup the start button
-            //     myDropzone.enqueueFile(file);
-            // });
-
-
-            // myDropzone.on("sending", function (file) {
-            //     // Show the total progress bar when upload starts
-            //     document.querySelector("#total-progress").style.opacity = "1";
-            //     // And disable the start button
-            //     file.previewElement.querySelector(".start").setAttribute("disabled", "disabled");
-            // });
-
-            // Hide the total progress bar when nothing's uploading anymore
-            // myDropzone.on("queuecomplete", function (progress) {
-            //     document.querySelector("#total-progress").style.opacity = "0";
-            // });
         });
     </script>
 {% endblock %}
@@ -57,7 +40,7 @@
 
     <div class="row mx-2" id="previews">
         {% for image in assessment.images %}
-            <div class="col-md-4 border-secondary border">
+            <div class="col-xl-3 col-lg-4 col-md-6 py-3 border-secondary border">
                 <strong>{{ image.name }}</strong>
                 <a target="_blank"
                    href="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=image.name) }}">
@@ -67,7 +50,7 @@
             </div>
         {% endfor %}
 
-        <div class="col-md-4 border-secondary border" id="template">
+        <div class="col-xl-3 col-lg-4 col-md-6 py-3 border-secondary border" id="template">
             <strong data-dz-name></strong>
             <span class="card-text" data-dz-size></span>
             <strong class="error text-danger" data-dz-errormessage></strong>

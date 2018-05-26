@@ -19,27 +19,40 @@ function ask_confirmation() {
 }
 
 $(function () {
-    var confirmed = false;
-    $('.need-confirm').click(function (e) {
+    $('a.need-confirm').click(function (e) {
         var elem = $(this);
         var href = elem.attr('href');
 
-        if (confirmed) {
-            confirmed = false;
-            if(href){
-                window.location.href = href;
-            }
-            return;
-        }
         e.preventDefault();
         ask_confirmation().then(
             function () {
-                confirmed = true;
-                elem.trigger('click')
+                let csrf_token = $('meta[name="csrf-token"]').attr('content');
+                $('<form action="' + href + '" method="POST">')
+                    .append($('<input type="hidden" name="csrf_token" value="' + csrf_token + '">'))
+                    .appendTo($(document.body))
+                    .submit();
             }
         );
 
     });
+
+    let confirmed = false;
+    $('button.need-confirm').click(function (e) {
+        let elem = $(this);
+
+        if (!confirmed) {
+            e.preventDefault()
+            ask_confirmation().then(
+                function () {
+                    confirmed = true;
+                    elem.trigger('click')
+                }
+            );
+        } else {
+            confirmed = false;
+        }
+    });
+
 
     $(".clickable-row").click(function () {
         window.location = $(this).data("href");

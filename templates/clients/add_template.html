@@ -1,0 +1,13 @@
+{% extends "clients/base.html" %}
+
+{% from "macros.html" import render_form %}
+{% block body %}
+
+    <div class="row mt-4 mx-3">
+
+        <div class="col-5">
+            <h2>Template for {{ client.short_name }}</h2>
+            {{ render_form(form, multipart=True) }}
+        </div>
+    </div>
+{% endblock %}

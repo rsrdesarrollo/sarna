@@ -1,13 +1,14 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, send_file, send_from_directory
-from flask import abort
-from sarna import config
-from sarna.aux import upload_helpers
-from sarna.model import *
+from flask import abort, Response
+from sarna.aux import upload_helpers, redirect_referer
+from sarna.model import Assessment, AffectedResource, Finding, Solution, FindingTemplate, FindingStatus, Active
+from sarna.model import Image, Template
 from sarna.model import db_session, select, commit, TransactionIntegrityError
 from sarna.forms import AssessmentForm
-from sarna.forms import FindingEditForm, BulkActionForm, ActiveCreateNewForm
+from sarna.forms import FindingEditForm, BulkActionForm, ActiveCreateNewForm, EvidenceCreateNewForm
+from sarna.report_generator.engine import generate_reports_bundle
 from werkzeug.utils import secure_filename
-
+from sarna import limiter
 import os
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
@@ -29,7 +30,6 @@ def index():
 def edit(assessment_id):
     assessment = Assessment[assessment_id]
     form_data = request.form.to_dict() or assessment.to_dict()
-
     form = AssessmentForm(**form_data)
 
     context = dict(
@@ -48,11 +48,11 @@ def edit(assessment_id):
     return render_template('assessments/edit.html', **context)
 
 
-@blueprint.route('/<assessment_id>/delete')
+@blueprint.route('/<assessment_id>/delete', methods=('POST',))
 @db_session()
 def delete(assessment_id):
     Assessment[assessment_id].delete()
-    return redirect(url_for('.index'))
+    return redirect_referer(url_for('.index'))
 
 
 @blueprint.route('/<assessment_id>/summary')
@@ -121,12 +121,12 @@ def edit_finding(assessment_id, finding_id):
     return render_template('assessments/panel/edit_finding.html', **context)
 
 
-@blueprint.route('/<assessment_id>/findings/<finding_id>/delete')
+@blueprint.route('/<assessment_id>/findings/<finding_id>/delete', methods=('POST',))
 @db_session()
 def delete_findings(assessment_id, finding_id):
     Finding[finding_id].delete()
     flash("Findign deleted", "success")
-    return redirect(url_for('.findings', assessment_id=assessment_id))
+    return redirect_referer(url_for('.findings', assessment_id=assessment_id))
 
 
 @blueprint.route('/<assessment_id>/add')
@@ -145,13 +145,14 @@ def add_findings(assessment_id):
 @blueprint.route('/<assessment_id>/add/<finding_id>')
 @db_session()
 def add_finding(assessment_id, finding_id):
+    # TODO: Change to POST
     assessment = Assessment[assessment_id]
     template = FindingTemplate[finding_id]
 
     finding = Finding.build_from_template(template, assessment)
     flash('Finding {} added successfully'.format(finding.name), 'success')
 
-    return redirect(url_for('.add_findings', assessment_id=assessment.id))
+    return redirect_referer(url_for('.add_findings', assessment_id=assessment.id))
 
 
 @blueprint.route('/<assessment_id>/edit_add/<finding_id>')
@@ -166,7 +167,7 @@ def edit_add_finding(assessment_id, finding_id):
         commit()
     except:
         flash('Error ading finding {}'.format(finding.name), 'danger')
-        return redirect(url_for('add_findings', assessment_id=assessment.id))
+        return redirect_referer(url_for('add_findings', assessment_id=assessment.id))
 
     flash('Finding {} added successfully'.format(finding.name), 'success')
 
@@ -211,7 +212,7 @@ def bulk_action_finding(assessment_id):
 
         flash("{} items set to {} status successfully.".format(len(findings), status.name), "success")
 
-    return redirect(url_for('.findings', assessment_id=assessment_id))
+    return redirect_referer(url_for('.findings', assessment_id=assessment_id))
 
 
 @blueprint.route('/<assessment_id>/actives', methods=("POST", "GET"))
@@ -246,37 +247,31 @@ def actives(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/evidences', methods=("POST", "GET"))
+@limiter.exempt
 @db_session()
 def evidences(assessment_id):
     assessment = Assessment[assessment_id]
+    form = EvidenceCreateNewForm()
     context = dict(
         route=ROUTE_NAME,
         endpoint=request.url_rule.endpoint.split('.')[-1],
         assessment=assessment
     )
-    if request.method == 'POST':
-        upload_path = os.path.join(config.UPLOAD_PATH, "{}-{}".format(
-            secure_filename(assessment.name),
-            assessment.uuid
-        ))
-        if not os.path.exists(upload_path):
-            os.makedirs(upload_path)
+    if form.is_submitted():
+        if form.validate_on_submit():
+            upload_path = assessment.evidence_path()
 
-        if 'file' not in request.files:
-            return "No Selected file", 400
+            if not os.path.exists(upload_path):
+                os.makedirs(upload_path)
 
-        file = request.files['file']
-        if file.filename == '':
-            return 'No selected file', 400
-        if file and upload_helpers.is_valid_evidence(file):
+            file = form.file.data
             try:
                 filename = secure_filename(file.filename)
                 Image(assessment=assessment, name=filename)
                 commit()
                 file.save(os.path.join(upload_path, filename))
-            except TransactionIntegrityError as ex:
+            except TransactionIntegrityError:
                 return "Duplicate image name {}".format(filename), 400
-
             return "OK", 200
         else:
             return "Invalid file", 400
@@ -284,19 +279,20 @@ def evidences(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/evidences/<evidence_name>')
+@limiter.exempt
 @db_session()
 def get_evidence(assessment_id, evidence_name):
     assessment = Assessment[assessment_id]
     image = Image[assessment, evidence_name]
 
-    upload_path = os.path.join(config.UPLOAD_PATH, "{}-{}".format(
-        secure_filename(assessment.name),
-        assessment.uuid
-    ))
-    return send_from_directory(upload_path, image.name, mimetype='image/jpeg')
+    return send_from_directory(
+        assessment.evidence_path(),
+        image.name,
+        mimetype='image/jpeg'
+    )
 
 
-@blueprint.route('/<assessment_id>/reports', methods=("POST", "GET"))
+@blueprint.route('/<assessment_id>/reports')
 @db_session()
 def reports(assessment_id):
     assessment = Assessment[assessment_id]
@@ -305,4 +301,28 @@ def reports(assessment_id):
         endpoint=request.url_rule.endpoint.split('.')[-1],
         assessment=assessment
     )
-    return render_template('assessments/panel/blank.html', **context)
+    return render_template('assessments/panel/reports.html', **context)
+
+
+@blueprint.route('/<assessment_id>/reports/download', methods=('POST',))
+@db_session()
+def download_reports(assessment_id):
+    data = request.form.to_dict()
+    action = data.pop('action', None)
+    data.pop('csrf_token', None)
+    data.pop('finding:all', None)
+
+
+@blueprint.route('/<assessment_id>/reports/download/<template_name>', methods=('GET',))
+@db_session()
+def download_report(assessment_id, template_name):
+    assessment = Assessment[assessment_id]
+    template = Template[assessment.client, template_name]
+    report_path, report_file = generate_reports_bundle(assessment, [template])
+    return send_from_directory(
+        report_path,
+        report_file,
+        mimetype='application/octet-stream',
+        as_attachment=True,
+        attachment_filename=report_file,
+    )

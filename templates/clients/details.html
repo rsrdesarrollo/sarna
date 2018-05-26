@@ -4,7 +4,7 @@
 {% block body %}
 
     <div class="row mt-3 pl-3">
-        <div class="col-lg-6">
+        <div class="col-lg">
             <div class="row">
                 <div class="col-10">
                     <h2>Assessments</h2>
@@ -16,7 +16,6 @@
                     </a>
                 </div>
             </div>
-
 
             <div class="row mt-3">
                 <div class="col">
@@ -59,9 +58,59 @@
                     {% endif %}
                 </div>
             </div>
+
+            <div class="row mt-5">
+                <div class="col-10">
+                    <h2>Templates</h2>
+                </div>
+                <div class="col-2">
+                    <a href="{{ url_for('.add_template', client_id=client.id) }}"
+                       class="btn btn-primary btn-success float-right">
+                        <span class="fa fa-plus"></span> Add
+                    </a>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col">
+                    {% if client.templates %}
+                        <table id="table_data" class="table table-striped">
+                            <thead class="thead-dark">
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th style="width: 20%" class="text-right">Actions</th>
+                            </thead>
+                            <tbody>
+                            {% for template in client.templates %}
+                                <tr>
+                                    <td>
+                                        {{ template.name }}
+                                    </td>
+                                    <td>{{ template.description }}</td>
+                                    <td>
+                                        <div class="btn-group float-right">
+                                            <a class="need-confirm btn btn-danger"
+                                               href="{{ url_for('.delete_template', client_id=client.id, template_name=template.name) }}">
+                                                <span class="fa fa-trash"></span>
+                                            </a>
+                                            <a class="btn btn-secondary"
+                                               href="{{ url_for('.add_template', client_id=client.id, template_id=template.id) }}">
+                                                <span class="fa fa-pencil-alt"></span>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <h4 class="text-center">No templates!</h4>
+                    {% endif %}
+                </div>
+            </div>
         </div>
 
-        <div class="col-lg-6 pl-lg-5 pr-lg-5">
+        <div class="col-lg pl-lg-5 pr-lg-5">
             <h2>Edit client</h2>
             {{ render_form(form) }}
         </div>

@@ -32,8 +32,6 @@
     </div>
 {% endblock %}
 {% block body %}
-
-
     <div class="row pl-2 mt-2">
         <div class="col">
             <h2>{{ assessment.name }}
@@ -45,4 +43,91 @@
     </div>
     {% block content %}
     {% endblock %}
+
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="image_selector_modal">
+        <div class="modal-dialog modal-xxl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Image Selector</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        {% if assessment.images %}
+                            <div class="row">
+                                {% for image in assessment.images %}
+                                    <div class="col-xl-3 col-lg-4 col-md-6 py-3">
+                                        <a target="_blank"
+                                           href="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=image.name) }}">
+                                            <strong>{{ image.name }}</strong>
+                                        </a>
+
+                                        <img style="width: 100%"
+                                             src="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=image.name) }}"/>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block markdown_init %}
+    <script>
+        $(function () {
+
+            var image_selector_modal = $('#image_selector_modal');
+            var image_select = $('#image_selector_modal img');
+
+            $("textarea").markdown({
+                autofocus: false,
+                savable: false,
+                iconlibrary: 'fa',
+                hiddenButtons: ['cmdImage', 'cmdQuote', 'cmdHeading'],
+                disabledButtons: ['cmdImage', 'cmdQuote', 'cmdHeading'],
+                additionalButtons: [
+                    [{
+                        name: "groupCustom",
+                        data: [{
+                            name: "cmdCustomImage",
+                            toggle: true, // this param only take effect if you load bootstrap.js
+                            title: "Images",
+                            icon: {
+                                glyph: 'glyphicon glyphicon-picture',
+                                fa: 'fa fa-image',
+                            },
+                            callback: function (e) {
+                                image_selector_modal.modal('show');
+                                image_select.unbind('click');
+                                image_select.click(function (ev) {
+                                    ev.preventDefault();
+                                    let img = $(this);
+                                    let src = img.attr('src');
+
+                                    let selected = e.getSelection();
+
+                                    let img_caption = 'Image Caption';
+                                    let cursor = selected.start + 2;
+
+                                    image_selector_modal.modal('hide');
+
+                                    e.$textarea.focus()
+                                    e.replaceSelection('![' + img_caption + '](' + src + ')');
+                                    e.setSelection(cursor, cursor + img_caption.length);
+
+                                })
+                            }
+                        }]
+                    }]
+                ]
+            });
+        });
+    </script>
 {% endblock %}

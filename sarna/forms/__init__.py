@@ -3,10 +3,13 @@ from wtforms.fields.html5 import IntegerField, DateField
 from wtforms.fields import BooleanField, SelectField, StringField, TextAreaField
 from wtforms import validators
 from pony.orm.core import Entity, Attribute
+from flask_wtf.file import FileField, FileRequired
 
 from sarna.model import *
+from sarna.aux.upload_helpers import *
 import datetime
 
+simple_str_validator = validators.Regexp('^[\w\d \t_\[\]\(\)<>"\'.*:|$!-]+$')
 
 class EntityForm(type):
     def __new__(cls, entity: Entity, skip_attrs={}, custom_validators=dict(), skip_pk=True):
@@ -30,6 +33,10 @@ class EntityForm(type):
 
                 if required:
                     vals.append(validators.DataRequired())
+
+                if field.is_pk and field.py_type == str:
+                    # Just use things that wont mess the url: Issue: pallets/flask#900
+                    vals.append(simple_str_validator)
 
                 t = None
                 if field.py_type == str:
@@ -139,5 +146,27 @@ class ActiveCreateNewForm(
 ):
     pass
 
+
 class ActiveCreateBulkForm(FlaskForm):
     TextAreaField(validators=[validators.DataRequired()], description="List of actives. One per line.")
+
+
+"""
+TEMPLATES
+"""
+
+
+class TemplateCreateNewForm(
+    EntityForm(Template)
+):
+    file = FileField(validators=[FileRequired(), is_valid_template], description="Allowed templates: .docx")
+
+TemplateCreateNewForm.name.kwargs['validators'].append(simple_str_validator)
+
+"""
+EVIDENCE
+"""
+
+
+class EvidenceCreateNewForm(FlaskForm):
+    file = FileField(validators=[FileRequired(), is_valid_evidence])
