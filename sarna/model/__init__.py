@@ -1,9 +1,12 @@
-from datetime import datetime, date
-from pony.orm.core import *
-from uuid import UUID, uuid4
-from .aux import *
-from sarna import config
 import os
+from datetime import datetime, date
+from uuid import UUID, uuid4
+
+from cvsslib import cvss3, calculate_vector
+from pony.orm.core import *
+
+from sarna import config
+from .aux import *
 
 db = Database()
 
@@ -109,11 +112,11 @@ class Finding(db.Entity):
     description = Optional(LongStr)
     solution = Optional(LongStr)
 
-    tech_risk = Required(Score)  # [0 to 4]
-    business_risk = Optional(Score)  # [0 to 4]
-    exploitability = Optional(Score)  # [0 to 4]
-    dissemination = Required(Score)  # [0 to 4]
-    solution_complexity = Required(Score)  # [0 to 4]
+    tech_risk = Required(Score)
+    business_risk = Optional(Score)
+    exploitability = Optional(Score)
+    dissemination = Required(Score)
+    solution_complexity = Required(Score)
 
     definition = Required(LongStr)
     references = Required(LongStr)
@@ -121,6 +124,27 @@ class Finding(db.Entity):
     affected_resources = Set('AffectedResource')
 
     cvss_v3_vector = Optional(str, 128)
+
+    @property
+    def cvss_v3_score(self):
+        try:
+            return calculate_vector(self.cvss_v3_vector, cvss3)
+        except:
+            return 0
+
+    @property
+    def cvss_v3_severity(self):
+        score = self.cvss_v3_score
+        if score == 0:
+            return Score.NA
+        elif 0 < score < 4:
+            return Score.Low
+        elif 4 <= score < 7:
+            return Score.Medium
+        elif 7 <= score < 9:
+            return Score.High
+        else:
+            return Score.Critical
 
     @classmethod
     def build_from_template(cls, template: FindingTemplate, assessment: Assessment):
@@ -153,6 +177,11 @@ class Active(db.Entity):
     affected_resources = Set('AffectedResource')
     assessment = Required(Assessment)
 
+    @property
+    def urls(self):
+        for resource in self.affected_resources:
+            yield resource.url
+
 
 class AffectedResource(db.Entity):
     id = PrimaryKey(int, auto=True)
@@ -160,6 +189,10 @@ class AffectedResource(db.Entity):
     route = Optional(str)
     findings = Set(Finding)
     composite_key(active, route)
+
+    @property
+    def url(self):
+        return os.path.join(self.active.name, self.route)
 
 
 class Template(db.Entity):

@@ -1,7 +1,9 @@
-import magic
 import re
-from sarna import config
+
+import magic
 from wtforms.validators import ValidationError
+
+from sarna import config
 
 
 def _get_mime_ext(file):

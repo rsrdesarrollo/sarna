@@ -1,6 +1,8 @@
-from sarna.model import Choice
-from pony.orm.core import Entity
 import json
+
+from pony.orm.core import Entity
+
+from sarna.model import Choice
 
 
 def _json_serializer(value):

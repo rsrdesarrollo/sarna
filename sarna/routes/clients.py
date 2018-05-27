@@ -1,12 +1,13 @@
-from flask import Blueprint, render_template, redirect, url_for, request
-from sarna.model import Client, Assessment, Template, User
-from sarna.model import db_session, select, commit, TransactionIntegrityError
-from sarna.forms import ClientForm
-from sarna.forms import AssessmentForm, TemplateCreateNewForm
-from sarna.aux import redirect_referer
+import os
 from uuid import uuid4
 
-import os
+from flask import Blueprint, render_template, redirect, url_for, request
+
+from sarna.aux import redirect_referer
+from sarna.forms import AssessmentForm, TemplateCreateNewForm
+from sarna.forms import ClientForm
+from sarna.model import Client, Assessment, Template
+from sarna.model import db_session, select, commit, TransactionIntegrityError
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('clients', __name__)

@@ -1,10 +1,12 @@
 from typing import *
-from sarna.report_generator import *
-from docxtpl import DocxTemplate
-import mistletoe
 
+import mistletoe
+from docxtpl import DocxTemplate
 from mistletoe.base_renderer import BaseRenderer
+
 from report_generator.style import RenderStyle
+from sarna.report_generator import *
+
 
 class DOCXRenderer(BaseRenderer):
     """

@@ -122,13 +122,13 @@ def get_document_render_styles(doc_path) -> RenderStylesCollection:
                 tag_name = match.group(1).lower()
                 if tag_name in PSTYLE_TAGS:
                     # Get style from paragraph
-                    if paragraph._element.pPr:
+                    if paragraph._element.pPr is not None:
                         attrs[tag_name] = paragraph._element.pPr.xml
                     else:
                         attrs[tag_name] = '<w:pPr></w:pPr>'
                 elif tag_name in RSTYLE_TAGS:
                     # Get style from Run
-                    if paragraph.runs[0]._element.rPr:
+                    if paragraph.runs[0]._element.rPr is not None:
                         attrs[tag_name] = paragraph.runs[0]._element.rPr.xml
                     else:
                         attrs[tag_name] = '<w:rPr></w:rPr>'

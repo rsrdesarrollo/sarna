@@ -2,6 +2,7 @@ import re
 
 __all__ = ['docx_escape', 'escape_url', 'list_level_style', 'make_run', 'make_paragraph']
 
+
 def docx_escape(s, quote=False):
     """
     Replace special characters "&", "<" and ">" to HTML-safe sequences.
@@ -45,4 +46,3 @@ def make_paragraph(pPr, content, close_prev=False):
         return "</w:p><w:p>{}{}".format(pPr, content)
     else:
         return "<w:p>{}{}</w:p>".format(pPr, content)
-

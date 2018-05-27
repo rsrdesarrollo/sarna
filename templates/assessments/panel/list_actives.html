@@ -4,9 +4,8 @@
 
 {% block scripts %}
 
-    <script src="/static/js/fuse.min.js"></script>
-    <link href="/static/css/fuzzycomplete.min.css" rel="stylesheet">
-    <script src="/static/js/fuzzycomplete.min.js"></script>
+    <script src="/static/js/horsey.min.js"></script>
+    <link href="/static/css/horsey.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -47,14 +46,11 @@
             <h3>Add Active</h3>
             {{ render_form(form) }}
             <script>
-                var fuseOptions = {keys: ["name"]};
-                var options = {display: "name", key: "name", fuseOptions: fuseOptions};
-                var actives = {{ actives_dict|tojson }};
+                var actives = [{% for active in actives %}{{ active.name | tojson }}, {% endfor %}];
                 $(document).ready(function () {
-                    $("#name").fuzzyComplete(
-                        actives,
-                        options
-                    );
+                    horsey(document.querySelector('#name'), {
+                        source: [{list: actives}]
+                    });
                 });
             </script>
         </div>

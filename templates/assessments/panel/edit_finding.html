@@ -4,7 +4,9 @@
 
 {% block scripts %}
     <link rel="stylesheet" type="text/css" media="all" href="http://cvssjs.github.io/cvss.css">
+    <link href="/static/css/horsey.min.css" rel="stylesheet">
     <script src="http://cvssjs.github.io/cvss.js"></script>
+    <script src="/static/js/horsey.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -80,6 +82,14 @@
                         $('#solution').val(selected_text)
                         ev.preventDefault();
                     });
+
+                    var actives = [{% for active in assessment.actives %}{{ active.name | tojson }}, {% endfor %}];
+                    horsey(document.querySelector('#affected_resources'), {
+                        source: [{list: actives}],
+                        blankSearch:true,
+                        anchor: '.'
+                    });
+
                 });
             </script>
         </div>

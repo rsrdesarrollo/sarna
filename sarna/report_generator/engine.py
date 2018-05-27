@@ -1,23 +1,26 @@
+import os
+import shutil
+import tempfile
+import time
+import zipfile
 from typing import *
+
+import jinja2
 from docxtpl import DocxTemplate
-from sarna import PROJECT_PATH
-from sarna.routes import parse_url
-from sarna.model import Assessment, Template
-from sarna.model import db_session
-from sarna.report_generator.style import get_document_render_styles
-from sarna.report_generator.markdown import markdown_to_docx, DOCXRenderer
-from sarna.report_generator.scores import score_to_docx
 from werkzeug.utils import secure_filename
 
-import tempfile
-import os
-import time
-import shutil
-import jinja2
+from sarna import PROJECT_PATH
+from sarna.model import Assessment, Template
+from sarna.model import db_session
+from sarna.report_generator.markdown import markdown_to_docx, DOCXRenderer
+from sarna.report_generator.scores import score_to_docx
+from sarna.report_generator.locale_choice import locale_choice
+from sarna.report_generator.style import get_document_render_styles
+from sarna.routes import parse_url
 
 
 def clean_temp_dir():
-    for path, dirs, _ in os.walk('/tmp'):
+    for path, dirs, files in os.walk('/tmp'):
         for dir in dirs:
             if not dir.startswith('sarna-'):
                 continue
@@ -27,13 +30,22 @@ def clean_temp_dir():
             if now - os.path.getctime(dir_path) > 120:
                 shutil.rmtree(dir_path)
 
+        for file in files:
+            if not file.startswith('sarna-'):
+                continue
+
+            now = time.time()
+            file_path = os.path.join(path, file)
+            if now - os.path.getctime(file_path) > 120:
+                os.unlink(file_path)
+
 
 def mk_working_dir():
     return tempfile.mkdtemp(prefix='sarna-', dir='/tmp')
 
 
 @db_session
-def generate_reports_bundle(assessment: Assessment, templates: List[Template]) -> AnyStr:
+def generate_reports_bundle(assessment: Assessment, templates: Collection[Template]) -> Tuple[AnyStr, AnyStr]:
     """
     :param assessment: Assessment object
     :param templates: List of templates
@@ -43,6 +55,7 @@ def generate_reports_bundle(assessment: Assessment, templates: List[Template]) -
     clean_temp_dir()
 
     out_dir = mk_working_dir()
+    out_file = ""
 
     def image_path_converter(path):
         not_found_image_path = os.path.join(PROJECT_PATH, 'resources', 'images', 'img_not_found.png')
@@ -71,12 +84,16 @@ def generate_reports_bundle(assessment: Assessment, templates: List[Template]) -
             return markdown_to_docx(text, render)
 
         def score(text, style='default'):
-            return score_to_docx(text, render_styles.get_style(style))
+            return score_to_docx(text, render_styles.get_style(style), assessment.lang)
+
+        def locale(choice):
+            return locale_choice(choice, assessment.lang)
 
         # apply jinja template
         jinja2_env = jinja2.Environment()
         jinja2_env.filters['markdown'] = markdown
         jinja2_env.filters['score'] = score
+        jinja2_env.filters['locale'] = locale
 
         template_render.render(
             dict(
@@ -90,8 +107,15 @@ def generate_reports_bundle(assessment: Assessment, templates: List[Template]) -
         template_render.save(os.path.join(out_dir, out_file))
 
     if len(templates) > 1:
-        # make a zip file with all the reports
-        pass
+        _, out_file = tempfile.mkstemp(prefix='sarna-reports', suffix='.zip', dir='/tmp')
+        zipf = zipfile.ZipFile(out_file, 'w', zipfile.ZIP_DEFLATED)
+        for root, dirs, files in os.walk(out_dir):
+            for file in files:
+                zipf.write(os.path.join(root, file), file)
+        zipf.close()
+
+        out_dir = '/tmp'
+        out_file = out_file.split('/')[-1]
 
     # return file path of output
     return out_dir, out_file

@@ -2,8 +2,10 @@
 
     {% set with_label = kwargs.pop('with_label', True) %}
     {% set placeholder = kwargs.pop('placeholder', field.label.text) %}
-    {% set class_ = kwargs.pop('class_', 'form-control') %}
+    {% set class_ = kwargs.pop('class_', '') %}
 
+
+    {% set class_ = class_ + ' form-control' %}
     {% if field.flags.required %}
         {% set class_ = class_ + ' required' %}
     {% endif %}
@@ -66,7 +68,7 @@
           {% if multipart %}enctype="multipart/form-data"{% endif %}
     >
         {% for field in form %}
-            {{ render_field(field) }}
+            {{ render_field(field, **(field.render_kw or dict())) }}
         {% endfor %}
         <button type="submit" class="btn btn-success btn-block">Submit</button>
     </form>

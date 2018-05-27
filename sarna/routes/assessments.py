@@ -1,15 +1,17 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, send_file, send_from_directory
-from flask import abort, Response
-from sarna.aux import upload_helpers, redirect_referer
+import os
+
+from flask import Blueprint, render_template, redirect, url_for, request, flash, send_from_directory
+from flask import abort
+from werkzeug.utils import secure_filename
+
+from sarna import limiter
+from sarna.aux import redirect_referer
+from sarna.forms import AssessmentForm
+from sarna.forms import FindingEditForm, BulkActionForm, ActiveCreateNewForm, EvidenceCreateNewForm
 from sarna.model import Assessment, AffectedResource, Finding, Solution, FindingTemplate, FindingStatus, Active
 from sarna.model import Image, Template
 from sarna.model import db_session, select, commit, TransactionIntegrityError
-from sarna.forms import AssessmentForm
-from sarna.forms import FindingEditForm, BulkActionForm, ActiveCreateNewForm, EvidenceCreateNewForm
 from sarna.report_generator.engine import generate_reports_bundle
-from werkzeug.utils import secure_filename
-from sarna import limiter
-import os
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('assessments', __name__)
@@ -221,13 +223,11 @@ def actives(assessment_id):
     assessment = Assessment[assessment_id]
     form = ActiveCreateNewForm(request.form)
     actives = assessment.actives.order_by(Active.name)
-    actives_dict = [dict(name=a.name) for a in actives]
     context = dict(
         route=ROUTE_NAME,
         endpoint=request.url_rule.endpoint.split('.')[-1],
         assessment=assessment,
         actives=actives,
-        actives_dict=actives_dict,
         form=form
     )
 
@@ -307,10 +307,33 @@ def reports(assessment_id):
 @blueprint.route('/<assessment_id>/reports/download', methods=('POST',))
 @db_session()
 def download_reports(assessment_id):
+    assessment = Assessment[assessment_id]
     data = request.form.to_dict()
-    action = data.pop('action', None)
+    data.pop('action', None)
     data.pop('csrf_token', None)
-    data.pop('finding:all', None)
+    data.pop('template:all', None)
+
+    templates = set()
+    for k, v in data.items():
+        if k.startswith('template'):
+            try:
+                template_name = k.split(':')[1]
+                templates.add(Template[assessment.client, template_name])
+            except:
+                continue
+
+    if not templates:
+        flash('No report selected', 'danger')
+        return redirect(url_for('.reports', assessment_id=assessment_id))
+
+    report_path, report_file = generate_reports_bundle(assessment, templates)
+    return send_from_directory(
+        report_path,
+        report_file,
+        mimetype='application/octet-stream',
+        as_attachment=True,
+        attachment_filename=report_file,
+    )
 
 
 @blueprint.route('/<assessment_id>/reports/download/<template_name>', methods=('GET',))

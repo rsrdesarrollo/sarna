@@ -1,8 +1,9 @@
+from os import path
+
 from flask import Flask
-from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from os import path
+from flask_wtf.csrf import CSRFProtect
 
 csrf = CSRFProtect()
 limiter = Limiter(

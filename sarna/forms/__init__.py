@@ -1,15 +1,17 @@
-from flask_wtf import FlaskForm
-from wtforms.fields.html5 import IntegerField, DateField
-from wtforms.fields import BooleanField, SelectField, StringField, TextAreaField
-from wtforms import validators
-from pony.orm.core import Entity, Attribute
-from flask_wtf.file import FileField, FileRequired
-
-from sarna.model import *
-from sarna.aux.upload_helpers import *
 import datetime
 
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired
+from pony.orm.core import Entity, Attribute
+from wtforms import validators
+from wtforms.fields import BooleanField, SelectField, StringField, TextAreaField
+from wtforms.fields.html5 import IntegerField, DateField
+
+from sarna.aux.upload_helpers import *
+from sarna.model import *
+
 simple_str_validator = validators.Regexp('^[\w\d \t_\[\]\(\)<>"\'.*:|$!-]+$')
+
 
 class EntityForm(type):
     def __new__(cls, entity: Entity, skip_attrs={}, custom_validators=dict(), skip_pk=True):
@@ -131,7 +133,7 @@ FINDINGS
 """
 
 
-class FindingEditForm(EntityForm(Finding, skip_attrs={'name', 'type'})):
+class FindingEditForm(EntityForm(Finding, skip_attrs={'name', 'type', 'owasp_category'})):
     pass
 
 
@@ -160,6 +162,7 @@ class TemplateCreateNewForm(
     EntityForm(Template)
 ):
     file = FileField(validators=[FileRequired(), is_valid_template], description="Allowed templates: .docx")
+
 
 TemplateCreateNewForm.name.kwargs['validators'].append(simple_str_validator)
 

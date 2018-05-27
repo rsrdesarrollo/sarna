@@ -1,10 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
-from sarna.model import FindingTemplate
-from sarna.model import db_session, select
+
 from sarna.forms import *
 from sarna.model.aux import Language
-
-import os
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('findings', __name__)
@@ -196,5 +193,3 @@ def edit_solution(finding_id: int, solution_name: str):
         return redirect(url_for('.edit', finding_id=finding_id))
 
     return render_template('findings/edit_solution.html', **context)
-
-

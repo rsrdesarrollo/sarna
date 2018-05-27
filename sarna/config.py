@@ -1,5 +1,6 @@
 import os
 from os import path
+
 from sarna import PROJECT_PATH
 
 _default_database_path = path.join(PROJECT_PATH, 'database')
