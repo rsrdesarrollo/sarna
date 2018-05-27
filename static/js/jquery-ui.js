@@ -209,7 +209,7 @@ $.widget.extend = function( target ) {
 						// Don't extend strings, arrays, etc. with objects
 						$.widget.extend( {}, value );
 
-				// Copy everything else by reference
+				// Copy everything else by bookmark
 				} else {
 					target[ key ] = value;
 				}
@@ -393,7 +393,7 @@ $.Widget.prototype = {
 
 		if ( arguments.length === 0 ) {
 
-			// Don't return a reference to the internal hash
+			// Don't return a bookmark to the internal hash
 			return $.widget.extend( {}, this.options );
 		}
 
@@ -463,7 +463,7 @@ $.Widget.prototype = {
 			}
 
 			// We are doing this to create a new jQuery object because the _removeClass() call
-			// on the next line is going to destroy the reference to the current elements being
+			// on the next line is going to destroy the bookmark to the current elements being
 			// tracked. We need to save a copy of this collection so that we can add the new classes
 			// below.
 			elements = $( currentElements.get() );
@@ -3312,7 +3312,7 @@ $.widget( "ui.droppable", {
 
 	_addToManager: function( scope ) {
 
-		// Add the reference and positions to the manager
+		// Add the bookmark and positions to the manager
 		$.ui.ddmanager.droppables[ scope ] = $.ui.ddmanager.droppables[ scope ] || [];
 		$.ui.ddmanager.droppables[ scope ].push( this );
 	},
@@ -8781,7 +8781,7 @@ var widgetsControlgroup = $.widget( "ui.controlgroup", {
 					}
 					element[ widget ]( instanceOptions );
 
-					// Store an instance of the controlgroup to be able to reference
+					// Store an instance of the controlgroup to be able to bookmark
 					// from the outermost element for changing options and refresh
 					var widgetElement = element[ widget ]( "widget" );
 					$.data( widgetElement[ 0 ], "ui-controlgroup-data",
@@ -13775,7 +13775,7 @@ var widgetsSlider = $.widget( "ui.slider", $.ui.mouse, {
 	_change: function( event, index ) {
 		if ( !this._keySliding && !this._mouseSliding ) {
 
-			//store the last changed value index for reference when handles overlap
+			//store the last changed value index for bookmark when handles overlap
 			this._lastChangedValue = index;
 			this._trigger( "change", event, this._uiHash( index ) );
 		}
@@ -17138,7 +17138,7 @@ if ( $.uiBackCompat !== false ) {
 			}
 
 			// Hotfix for jQuery 1.4 since some change in wrap() seems to actually
-			// lose the reference to the wrapped element
+			// lose the bookmark to the wrapped element
 			wrapper = element.parent();
 
 			// Transfer positioning properties to the wrapper

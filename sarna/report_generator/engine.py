@@ -3,6 +3,7 @@ import shutil
 import tempfile
 import time
 import zipfile
+from datetime import datetime
 from typing import *
 
 import jinja2
@@ -12,11 +13,16 @@ from werkzeug.utils import secure_filename
 from sarna import PROJECT_PATH
 from sarna.model import Assessment, Template
 from sarna.model import db_session
+from sarna.report_generator.locale_choice import locale_choice
 from sarna.report_generator.markdown import markdown_to_docx, DOCXRenderer
 from sarna.report_generator.scores import score_to_docx
-from sarna.report_generator.locale_choice import locale_choice
 from sarna.report_generator.style import get_document_render_styles
+from sarna.report_generator.xrefs import xref, bookmark
 from sarna.routes import parse_url
+
+
+def dateformat(value, format='%d/%m/%Y'):
+    return value.strftime(format)
 
 
 def clean_temp_dir():
@@ -94,12 +100,15 @@ def generate_reports_bundle(assessment: Assessment, templates: Collection[Templa
         jinja2_env.filters['markdown'] = markdown
         jinja2_env.filters['score'] = score
         jinja2_env.filters['locale'] = locale
+        jinja2_env.filters['xref'] = xref
+        jinja2_env.filters['bookmark'] = bookmark
+        jinja2_env.filters['dateformat'] = dateformat
 
         template_render.render(
             dict(
                 client=assessment.client,
                 assessment=assessment,
-                date='2018/05/19'
+                date=datetime.date(datetime.now())
             ),
             jinja_env=jinja2_env
         )

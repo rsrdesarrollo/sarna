@@ -2390,7 +2390,7 @@ var Dropzone = function (_Emitter) {
 
       var xhr = new XMLHttpRequest();
 
-      // Put the xhr object in the file objects to be able to reference it later.
+      // Put the xhr object in the file objects to be able to bookmark it later.
       for (var _iterator22 = files, _isArray22 = true, _i24 = 0, _iterator22 = _isArray22 ? _iterator22 : _iterator22[Symbol.iterator]();;) {
         var _ref21;
 
@@ -3461,8 +3461,8 @@ ExifRestore.initClass();
  * http://javascript.nwbox.com/ContentLoaded/MIT-LICENSE
  */
 
-// @win window reference
-// @fn function reference
+// @win window bookmark
+// @fn function bookmark
 var contentLoaded = function contentLoaded(win, fn) {
   var done = false;
   var top = true;

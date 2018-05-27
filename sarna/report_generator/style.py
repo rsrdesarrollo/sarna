@@ -11,7 +11,7 @@ _TAG_STYLE = re.compile('##\s*(\w+)\s*##', re.IGNORECASE)
 
 PSTYLE_TAGS = {'ul', 'ol', 'paragraph', 'code', 'image_caption'}
 RSTYLE_TAGS = {
-    'href_caption', 'href_url', 'na', 'low', 'medium', 'high', 'critical',
+    'href_caption', 'href_url', 'na', 'info', 'low', 'medium', 'high', 'critical',
     'strong', 'italic', 'strike'
 }
 
@@ -29,6 +29,7 @@ class RenderStyle:
     image_caption: AnyStr
 
     na: AnyStr
+    info: AnyStr
     low: AnyStr
     medium: AnyStr
     high: AnyStr
@@ -46,6 +47,7 @@ class RenderStyle:
         href_url=None,
         image_caption=None,
         na=None,
+        info=None,
         low=None,
         medium=None,
         high=None,

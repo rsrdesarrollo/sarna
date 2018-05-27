@@ -128,7 +128,7 @@ class Finding(db.Entity):
     @property
     def cvss_v3_score(self):
         try:
-            return calculate_vector(self.cvss_v3_vector, cvss3)
+            return calculate_vector(self.cvss_v3_vector, cvss3)[0]
         except:
             return 0
 

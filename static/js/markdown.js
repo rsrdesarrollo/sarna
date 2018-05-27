@@ -863,7 +863,7 @@ Markdown.dialects.Gruber.inline = {
       m = text.match( /^!\[(.*?)\][ \t]*\[(.*?)\]/ );
 
       if ( m ) {
-        // We can't check if the reference is known here as it likely wont be
+        // We can't check if the bookmark is known here as it likely wont be
         // found till after. Check it in md tree->hmtl tree conversion
         return [ m[0].length, [ "img_ref", { alt: m[1], ref: m[2].toLowerCase(), original: m[0] } ] ];
       }
@@ -887,7 +887,7 @@ Markdown.dialects.Gruber.inline = {
           attrs;
 
       // At this point the first [...] has been parsed. See what follows to find
-      // out which kind of link we are (reference or direct url)
+      // out which kind of link we are (bookmark or direct url)
       text = text.substr( consumed );
 
       // [link text](/path/to/img.jpg "Optional title")
@@ -941,12 +941,12 @@ Markdown.dialects.Gruber.inline = {
 
         consumed += m[ 0 ].length;
 
-        // [links][] uses links as its reference
+        // [links][] uses links as its bookmark
         attrs = { ref: ( m[ 1 ] || String(children) ).toLowerCase(),  original: orig.substr( 0, consumed ) };
 
         link = [ "link_ref", attrs ].concat( children );
 
-        // We can't check if the reference is known here as it likely wont be
+        // We can't check if the bookmark is known here as it likely wont be
         // found till after. Check it in md tree->hmtl tree conversion.
         // Store the original so that conversion can revert if the ref isn't found.
         return [ consumed, link ];
@@ -1622,7 +1622,7 @@ function convert_tree_to_html( tree, references, options ) {
       // grab this ref and clean up the attribute node
       var ref = references[ attrs.ref ];
 
-      // if the reference exists, make the link
+      // if the bookmark exists, make the link
       if ( ref ) {
         delete attrs.ref;
 
@@ -1635,7 +1635,7 @@ function convert_tree_to_html( tree, references, options ) {
         // get rid of the unneeded original text
         delete attrs.original;
       }
-      // the reference doesn't exist, so revert to plain text
+      // the bookmark doesn't exist, so revert to plain text
       else {
         return attrs.original;
       }
@@ -1646,7 +1646,7 @@ function convert_tree_to_html( tree, references, options ) {
       // grab this ref and clean up the attribute node
       var ref = references[ attrs.ref ];
 
-      // if the reference exists, make the link
+      // if the bookmark exists, make the link
       if ( ref ) {
         delete attrs.ref;
 
@@ -1659,7 +1659,7 @@ function convert_tree_to_html( tree, references, options ) {
         // get rid of the unneeded original text
         delete attrs.original;
       }
-      // the reference doesn't exist, so revert to plain text
+      // the bookmark doesn't exist, so revert to plain text
       else {
         return attrs.original;
       }

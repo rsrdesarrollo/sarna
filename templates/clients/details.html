@@ -93,9 +93,9 @@
                                                href="{{ url_for('.delete_template', client_id=client.id, template_name=template.name) }}">
                                                 <span class="fa fa-trash"></span>
                                             </a>
-                                            <a class="btn btn-secondary"
-                                               href="{{ url_for('.add_template', client_id=client.id, template_id=template.id) }}">
-                                                <span class="fa fa-pencil-alt"></span>
+                                            <a class="btn btn-info"
+                                               href="{{ url_for('.download_template', client_id=client.id, template_name=template.name) }}">
+                                                <span class="fa fa-download"></span>
                                             </a>
                                         </div>
                                     </td>

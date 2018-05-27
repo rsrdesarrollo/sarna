@@ -1,7 +1,7 @@
 import os
 from uuid import uuid4
 
-from flask import Blueprint, render_template, redirect, url_for, request
+from flask import Blueprint, render_template, redirect, url_for, request, send_from_directory
 
 from sarna.aux import redirect_referer
 from sarna.forms import AssessmentForm, TemplateCreateNewForm
@@ -117,22 +117,31 @@ def add_template(client_id: int, template_id=None):
             Template(client=client, **data)
             commit()
             file.save(os.path.join(upload_path, filename))
+            return redirect(url_for('.edit', client_id=client_id))
         except TransactionIntegrityError:
             form.name.errors.append('Name already used')
 
-        return redirect(url_for('.edit', client_id=client_id))
     return render_template('clients/add_template.html', **context)
 
 
 @blueprint.route('/<client_id>/template/<template_name>/delete', methods=('POST',))
 @db_session()
 def delete_template(client_id: int, template_name):
-    Template[client_id, template_name].delete()
+    client = Client[client_id]
+    template = Template[client, template_name]
+    os.remove(os.path.join(client.template_path(), template.file))
+    template.delete()
     return redirect_referer(url_for('.edit', client_id=client_id))
 
 
-@blueprint.route('/<client_id>/template/<template_id>/download')
+@blueprint.route('/<client_id>/template/<template_name>/download')
 @db_session()
-def download_template(client_id: int, template_id):
-    ## TODO: implement
-    pass
+def download_template(client_id: int, template_name):
+    client = Client[client_id]
+    template = Template[client, template_name]
+    return send_from_directory(
+        client.template_path(),
+        template.file,
+        as_attachment=True,
+        attachment_filename="{}.{}".format(template.name, template.file.split('.')[-1])
+    )
