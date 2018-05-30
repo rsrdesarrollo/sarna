@@ -150,7 +150,7 @@ var Dropzone = function (_Emitter) {
          * Has to be specified on elements other than form (or when the form
          * doesn't have an `action` attribute). You can also
          * provide a function that will be called with `files` and
-         * must return the url (since `v3.12.0`)
+         * must return the uri (since `v3.12.0`)
          */
         url: null,
 
@@ -1055,7 +1055,7 @@ var Dropzone = function (_Emitter) {
       return _ret = _this.options.fallback.call(_this), _possibleConstructorReturn(_this, _ret);
     }
 
-    // @options.url = @element.getAttribute "action" unless @options.url?
+    // @options.uri = @element.getAttribute "action" unless @options.uri?
     if (_this.options.url == null) {
       _this.options.url = _this.element.getAttribute("action");
     }

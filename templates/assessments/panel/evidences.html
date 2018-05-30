@@ -12,7 +12,7 @@
             template.wrap('<div></div>');
 
             var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
-                url: "{{ url_for('.evidences', assessment_id=assessment.id) }}", // Set the url
+                url: "{{ url_for('.evidences', assessment_id=assessment.id) }}", // Set the uri
                 thumbnailWidth: null,
                 thumbnailHeight: null,
                 parallelUploads: 20,

@@ -9,3 +9,4 @@ uuid
 python-magic
 mistletoe
 aenum
+rfc3986

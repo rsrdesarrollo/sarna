@@ -1,9 +1,11 @@
 import os
 from datetime import datetime, date
+from typing import *
 from uuid import UUID, uuid4
 
 from cvsslib import cvss3, calculate_vector
 from pony.orm.core import *
+from rfc3986.uri import URIReference
 
 from sarna import config
 from .aux import *
@@ -94,8 +96,33 @@ class FindingTemplateTranslation(db.Entity):
     title = Required(str)
     definition = Required(LongStr)
     references = Required(LongStr)
+    description = Optional(LongStr)
     finding = Required(FindingTemplate)
     PrimaryKey(finding, lang)
+
+
+class Active(db.Entity):
+    name = Required(str)
+    affected_resources = Set('AffectedResource')
+    assessment = Required(Assessment)
+    PrimaryKey(assessment, name)
+
+    @property
+    def uris(self):
+        for resource in self.affected_resources:
+            yield resource.uri
+
+
+class AffectedResource(db.Entity):
+    id = PrimaryKey(int, auto=True)
+    active = Required(Active)
+    route = Optional(str)
+    findings = Set('Finding')
+    composite_key(active, route)
+
+    @property
+    def uri(self):
+        return "{}{}".format(self.active.name, self.route or '')
 
 
 class Finding(db.Entity):
@@ -124,6 +151,54 @@ class Finding(db.Entity):
     affected_resources = Set('AffectedResource')
 
     cvss_v3_vector = Optional(str, 128)
+
+    def update_affected_resources(self, resources: Collection[AnyStr]):
+        resource_uris = []
+        for resource in resources:
+            resource = resource.strip()
+            if not resource:
+                continue  # Skip empty lines
+            resource_uri = URIReference.from_string(resource)
+            if resource_uri.is_valid(require_scheme=True, require_path=True):
+                if resource_uri.authority is not None or resource_uri.scheme == 'urn':
+                    resource_uris.append(resource_uri)
+                    continue
+
+            raise ValueError('Invalid formatted URI: "{}"'.format(resource.strip()))
+
+        self.affected_resources.clear()
+        for resource in resource_uris:
+            if resource.authority is not None:
+                # URL
+                active_name = "{}://{}".format(resource.scheme, resource.authority)
+                resource_rute = resource.path
+                if resource.query:
+                    resource_rute += "?"+resource.query
+                if resource.fragment:
+                    resource_rute += "#" + resource.fragment
+            elif resource.scheme == 'urn':
+                # URN
+                active_name = "{}:{}".format(resource.scheme, resource.path)
+                resource_rute = None
+            else:
+                # TODO: this should never happen. Make some warning.
+                continue
+
+            try:
+                active = Active[self.assessment, active_name]
+                affected_resource = select(
+                    r for r in AffectedResource if r.active == active and r.route == resource_rute
+                ).first()
+
+                if not affected_resource:
+                    affected_resource = AffectedResource(active=active, route=resource_rute)
+
+            except ObjectNotFound:
+                active = Active(assessment=self.assessment, name=active_name)
+                affected_resource = AffectedResource(active=active, route=resource_rute)
+
+            commit()
+            self.affected_resources.add(affected_resource)
 
     @property
     def cvss_v3_score(self):
@@ -167,32 +242,10 @@ class Finding(db.Entity):
             title=translation.title,
             definition=translation.definition,
             references=translation.references,
+            description=translation.description,
 
             assessment=assessment
         )
-
-
-class Active(db.Entity):
-    name = PrimaryKey(str)
-    affected_resources = Set('AffectedResource')
-    assessment = Required(Assessment)
-
-    @property
-    def urls(self):
-        for resource in self.affected_resources:
-            yield resource.url
-
-
-class AffectedResource(db.Entity):
-    id = PrimaryKey(int, auto=True)
-    active = Required(Active)
-    route = Optional(str)
-    findings = Set(Finding)
-    composite_key(active, route)
-
-    @property
-    def url(self):
-        return os.path.join(self.active.name, self.route)
 
 
 class Template(db.Entity):

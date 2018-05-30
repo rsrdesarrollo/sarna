@@ -100,7 +100,9 @@ def edit_finding(assessment_id, finding_id):
     assessment = Assessment[assessment_id]
     finding = Finding[finding_id]
 
-    form_data = request.form.to_dict() or finding.to_dict(with_lazy=True)
+    finding_dict = finding.to_dict(with_lazy=True)
+    finding_dict['affected_resources'] = "\r\n".join(r.uri for r in finding.affected_resources)
+    form_data = request.form.to_dict() or finding_dict
     form = FindingEditForm(**form_data)
     context = dict(
         route=ROUTE_NAME,
@@ -117,9 +119,13 @@ def edit_finding(assessment_id, finding_id):
     if form.validate_on_submit():
         data = dict(form.data)
         data.pop('csrf_token', None)
-        finding.set(**data)
-        return redirect(url_for('.findings', assessment_id=assessment_id))
-
+        affected_resources = data.pop('affected_resources', '').split('\n')
+        try:
+            finding.update_affected_resources(affected_resources)
+            finding.set(**data)
+            return redirect(url_for('.findings', assessment_id=assessment_id))
+        except ValueError as ex:
+            form.affected_resources.errors.append(str(ex))
     return render_template('assessments/panel/edit_finding.html', **context)
 
 

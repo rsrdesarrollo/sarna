@@ -1,6 +1,9 @@
 .md-preview img{
     width: 70%;
 }
+.md-editor~.invalid-feedback{
+    display: block;
+}
 
 .hidden{
     display: none;

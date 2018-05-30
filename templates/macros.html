@@ -45,17 +45,15 @@
 
         {% endif %}
 
+        {% if field.errors %}
+            <div class="invalid-feedback">{{ field.errors|join(', ') }}</div>
+        {% endif %}
+
         {% if field.description %}
             <small class="form-text text-muted">
                 {{ field.description|safe }}
             </small>
         {% endif %}
-
-        {% if field.errors %}
-            <div class="invalid-feedback">{{ field.errors|join(', ') }}</div>
-        {% endif %}
-
-
     </div>
 {%- endmacro %}
 

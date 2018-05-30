@@ -37,7 +37,7 @@ class EntityForm(type):
                     vals.append(validators.DataRequired())
 
                 if field.is_pk and field.py_type == str:
-                    # Just use things that wont mess the url: Issue: pallets/flask#900
+                    # Just use things that wont mess the uri: Issue: pallets/flask#900
                     vals.append(simple_str_validator)
 
                 t = None
@@ -134,7 +134,8 @@ FINDINGS
 
 
 class FindingEditForm(EntityForm(Finding, skip_attrs={'name', 'type', 'owasp_category'})):
-    pass
+    affected_resources = TextAreaField(description='List of affected resources. One per line.',
+                                       render_kw=dict(class_='noMD', rows=5))
 
 
 """

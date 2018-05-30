@@ -86,12 +86,98 @@
             var image_selector_modal = $('#image_selector_modal');
             var image_select = $('#image_selector_modal img');
 
+            $("textarea#affected_resources").markdown({
+                autofocus: false,
+                savable: false,
+                fullscreen: false,
+                iconlibrary: 'fa',
+                hiddenButtons: ['cmdImage', 'cmdQuote', 'cmdHeading', 'cmdPreview', 'cmdQuote',
+                    'cmdListO', 'cmdList', 'cmdUrl', 'cmdHeading', 'cmdItalic', 'cmdBold', 'cmdCode'],
+                additionalButtons: [
+                    [{
+                        name: "HttpUrl",
+                        data: [{
+                            name: "cmdCustomUrl",
+                            title: "Url",
+                            icon: {
+                                fa: 'fa fa-link',
+                            },
+                            callback: function (e) {
+
+                                let uri = 'http://example.com:8080/path?query=param';
+                                let selected = e.getSelection();
+                                let cursor = selected.start;
+
+                                image_selector_modal.modal('hide');
+
+                                e.replaceSelection(url);
+                                e.setSelection(cursor, cursor + url.length);
+                            }
+                        },{
+                            name: "cmdHost",
+                            title: "Host",
+                            icon: {
+                                fa: 'fa fa-server',
+                            },
+                            callback: function (e) {
+
+                                let urn = 'urn:host:';
+                                let path = 'example.com:8080';
+                                let selected = e.getSelection();
+                                let cursor = selected.start + urn.length;
+
+                                image_selector_modal.modal('hide');
+
+                                e.replaceSelection(urn+path);
+                                e.setSelection(cursor, cursor + path.length);
+                            }
+                        }]
+                    }, {
+                        name: "MobileApps",
+                        data: [{
+                            name: "cmdAndroidApp",
+                            title: "Android App",
+                            icon: {
+                                fa: 'fab fa-android',
+                            },
+                            callback: function (e) {
+
+                                let prev = 'urn:android:';
+                                let path = 'com.package.id';
+                                let selected = e.getSelection();
+                                let cursor = selected.start + prev.length;
+
+                                image_selector_modal.modal('hide');
+                                e.replaceSelection(prev + path);
+                                e.setSelection(cursor, cursor + path.length);
+                            }
+                        }, {
+                            name: "cmdiOSApp",
+                            title: "iOS App",
+                            icon: {
+                                fa: 'fab fa-apple',
+                            },
+                            callback: function (e) {
+
+                                let prev = 'urn:ios:';
+                                let path = 'com.package.id';
+                                let selected = e.getSelection();
+                                let cursor = selected.start + prev.length;
+
+                                image_selector_modal.modal('hide');
+                                e.replaceSelection(prev + path);
+                                e.setSelection(cursor, cursor + path.length);
+                            }
+                        }]
+                    }]
+                ]
+            });
+
             $("textarea").not(".noMD").markdown({
                 autofocus: false,
                 savable: false,
                 iconlibrary: 'fa',
                 hiddenButtons: ['cmdImage', 'cmdQuote', 'cmdHeading'],
-                disabledButtons: ['cmdImage', 'cmdQuote', 'cmdHeading'],
                 additionalButtons: [
                     [{
                         name: "groupCustom",

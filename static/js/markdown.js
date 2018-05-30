@@ -721,7 +721,7 @@ Markdown.dialects.Gruber = {
 
     referenceDefn: function referenceDefn( block, next) {
       var re = /^\s*\[(.*?)\]:\s*(\S+)(?:\s+(?:(['"])(.*?)\3|\((.*?)\)))?\n?/;
-      // interesting matches are [ , ref_id, url, , title, title ]
+      // interesting matches are [ , ref_id, uri, , title, title ]
 
       if ( !block.match(re) )
         return undefined;
@@ -887,14 +887,14 @@ Markdown.dialects.Gruber.inline = {
           attrs;
 
       // At this point the first [...] has been parsed. See what follows to find
-      // out which kind of link we are (bookmark or direct url)
+      // out which kind of link we are (bookmark or direct uri)
       text = text.substr( consumed );
 
       // [link text](/path/to/img.jpg "Optional title")
       //                 1            2       3         <--- captures
       // This will capture up to the last paren in the block. We then pull
-      // back based on if there a matching ones in the url
-      //    ([here](/url/(test))
+      // back based on if there a matching ones in the uri
+      //    ([here](/uri/(test))
       // The parens have to be balanced
       var m = text.match( /^\s*\([ \t]*([^"']*)(?:[ \t]+(["'])(.*?)\2)?[ \t]*\)/ );
       if ( m ) {
@@ -904,7 +904,7 @@ Markdown.dialects.Gruber.inline = {
         if ( url && url[0] == "<" && url[url.length-1] == ">" )
           url = url.substring( 1, url.length - 1 );
 
-        // If there is a title we don't have to worry about parens in the url
+        // If there is a title we don't have to worry about parens in the uri
         if ( !m[3] ) {
           var open_parens = 1; // One open that isn't in the capture
           for ( var len = 0; len < url.length; len++ ) {

@@ -15,7 +15,7 @@
 
                 <table id="table_data" class="table">
                     <thead class="thead-dark">
-                    <th>Name</th>
+                    <th>Active</th>
                     <th>Resources</th>
                     <th>#</th>
                     </thead>
@@ -25,7 +25,7 @@
                             <td rowspan="{{ active.affected_resources.count() }}">{{ active.name }}</td>
 
                             {% for resource in active.affected_resources %}
-                                <td>{{ resource.route }}</td>
+                                <td>{{ resource.route or '' }}</td>
                                 <td><a>{{ resource.findings.count() }}</a></td>
                                 </tr>
                             {% else %}
