@@ -8,7 +8,7 @@ from pony.orm.core import *
 from rfc3986.uri import URIReference
 
 from sarna import config
-from .aux import *
+from .auxiliary import *
 
 db = Database()
 

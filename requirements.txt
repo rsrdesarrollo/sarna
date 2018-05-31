@@ -10,3 +10,4 @@ python-magic
 mistletoe
 aenum
 rfc3986
+Pillow

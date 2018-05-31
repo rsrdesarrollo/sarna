@@ -7,7 +7,7 @@ from wtforms import validators
 from wtforms.fields import BooleanField, SelectField, StringField, TextAreaField
 from wtforms.fields.html5 import IntegerField, DateField
 
-from sarna.aux.upload_helpers import *
+from sarna.auxiliary.upload_helpers import *
 from sarna.model import *
 
 simple_str_validator = validators.Regexp('^[\w\d \t_\[\]\(\)<>"\'.*:|$!-]+$')

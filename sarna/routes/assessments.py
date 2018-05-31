@@ -5,7 +5,7 @@ from flask import abort
 from werkzeug.utils import secure_filename
 
 from sarna import limiter
-from sarna.aux import redirect_referer
+from sarna.auxiliary import redirect_referer
 from sarna.forms import AssessmentForm
 from sarna.forms import FindingEditForm, BulkActionForm, ActiveCreateNewForm, EvidenceCreateNewForm
 from sarna.model import Assessment, AffectedResource, Finding, Solution, FindingTemplate, FindingStatus, Active

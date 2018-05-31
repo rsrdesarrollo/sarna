@@ -1,11 +1,24 @@
 from typing import *
 
 import mistletoe
+from PIL import Image
+from docx.section import Section
 from docxtpl import DocxTemplate
 from mistletoe.base_renderer import BaseRenderer
 
 from report_generator.style import RenderStyle
 from sarna.report_generator import *
+
+
+def _get_img_prefered_size(img: AnyStr, section: Section):
+    img: Image = Image.open(img)
+    width, heigh = img.size
+    max_width = (section.page_width.emu - section.left_margin.emu - section.right_margin.emu) * 0.8
+    max_heigh = (section.page_height.emu / 2 - section.top_margin.emu - section.bottom_margin.emu) * 0.8
+    if width > heigh:
+        return max_width, None
+    else:
+        return None, max_heigh
 
 
 class DOCXRenderer(BaseRenderer):
@@ -66,10 +79,11 @@ class DOCXRenderer(BaseRenderer):
 
         path = self._img_path(token.src)
 
+        width, height = _get_img_prefered_size(path, section)
         pic = self._tpl.docx._part.new_pic_inline(
             path,
-            width=section.page_width.emu - section.left_margin.emu - section.right_margin,
-            height=None
+            width=width,
+            height=height
         ).xml
         self._mod_pstyle_stack.append(self.style.image_caption)
         return '<w:r><w:drawing>{}</w:drawing></w:r><w:br/>'.format(pic) + inner
@@ -83,7 +97,7 @@ class DOCXRenderer(BaseRenderer):
         return make_run(self.style.href_caption, inner + " - ") + make_run(self.style.href_url, target)
 
     def render_raw_text(self, token):
-        text = docx_escape(token.content).rstrip('\n').rstrip('\a')
+        text = token.content.rstrip('\n').rstrip('\a')
         if self._suppress_rtag_stack[-1]:
             return text
         else:

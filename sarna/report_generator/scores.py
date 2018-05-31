@@ -1,5 +1,5 @@
 from report_generator.style import RenderStyle
-from sarna.model.aux import Score, Language
+from sarna.model.auxiliary import Score, Language
 from sarna.report_generator import *
 from sarna.report_generator.locale_choice import locale_choice
 

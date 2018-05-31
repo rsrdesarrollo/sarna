@@ -1,5 +1,5 @@
 from sarna.model import Language
-from sarna.model.aux import Choice
+from sarna.model.auxiliary import Choice
 
 
 def locale_choice(choice: Choice, lang: Language):

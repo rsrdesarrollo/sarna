@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from flask import Blueprint, render_template, redirect, url_for, request, send_from_directory
 
-from sarna.aux import redirect_referer
+from sarna.auxiliary import redirect_referer
 from sarna.forms import AssessmentForm, TemplateCreateNewForm
 from sarna.forms import ClientForm
 from sarna.model import Client, Assessment, Template

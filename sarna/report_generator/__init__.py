@@ -28,8 +28,8 @@ def escape_url(raw):
 
 
 def make_run(rPr, text):
-    return '<w:r>{}{}'.format(rPr, "<w:br/>".join(
-        ('<w:t xml:space="preserve">{}</w:t></w:r>'.format(text) for text in docx_escape(text).split('\n'))
+    return '<w:r>{}{}</w:r>'.format(rPr, "<w:br/>".join(
+        ('<w:t xml:space="preserve">{}</w:t>'.format(text) for text in docx_escape(text).split('\n'))
     ))
 
 
