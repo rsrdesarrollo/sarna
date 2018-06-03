@@ -2,7 +2,7 @@ import json
 
 from pony.orm.core import Entity
 
-from sarna.model import Choice
+from sarna import Choice
 
 
 def _json_serializer(value):

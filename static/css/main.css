@@ -13,7 +13,7 @@
 }
 
 .hidden{
-    display: none;
+    display: none !important;
 }
 
 .badge-critical {

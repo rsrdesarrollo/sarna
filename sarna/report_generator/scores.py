@@ -1,7 +1,7 @@
 from sarna.report_generator.style import RenderStyle
-from sarna.model.auxiliary import Score, Language
-from sarna.report_generator import *
+from sarna.model.enumerations import Score, Language
 from sarna.report_generator.locale_choice import locale_choice
+from sarna.report_generator import make_run
 
 
 def score_to_docx(score: Score, style: RenderStyle, lang: Language):

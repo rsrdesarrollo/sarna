@@ -15,3 +15,4 @@ flask-assets
 PyYAML
 jsmin
 cssmin
+flask-login

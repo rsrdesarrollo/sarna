@@ -4,13 +4,11 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask import abort
 from werkzeug.utils import secure_filename
 
-from sarna import limiter
 from sarna.auxiliary import redirect_referer
-from sarna.forms import AssessmentForm
-from sarna.forms import FindingEditForm, BulkActionForm, ActiveCreateNewForm, EvidenceCreateNewForm
-from sarna.model import Assessment, AffectedResource, Finding, Solution, FindingTemplate, FindingStatus, Active
-from sarna.model import Image, Template
-from sarna.model import db_session, select, commit, TransactionIntegrityError
+from sarna.core import limiter
+from sarna.forms import *
+from sarna.model import *
+from sarna.model.enumerations import *
 from sarna.report_generator.engine import generate_reports_bundle
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
@@ -72,7 +70,7 @@ def summary(assessment_id):
 @blueprint.route('/<assessment_id>/findings/resource/<affected_resource_id>')
 @blueprint.route('/<assessment_id>/findings')
 @db_session()
-def findings(assessment_id, finding_id=None, affected_resource_id=None):
+def findings(assessment_id, affected_resource_id=None):
     assessment = Assessment[assessment_id]
     context = dict(
         route=ROUTE_NAME,
@@ -89,7 +87,6 @@ def findings(assessment_id, finding_id=None, affected_resource_id=None):
     else:
         findings = assessment.findings.order_by(Finding.id)
 
-    context['form'] = BulkActionForm()
     context['findings'] = findings
     return render_template('assessments/panel/list_findings.html', **context)
 
@@ -121,11 +118,12 @@ def edit_finding(assessment_id, finding_id):
         data.pop('csrf_token', None)
         affected_resources = data.pop('affected_resources', '').split('\n')
         try:
-            finding.update_affected_resources(affected_resources)
+            finding.update_affected_resources(affected_resources)  # TODO: Raise different exception
             finding.set(**data)
             return redirect(url_for('.findings', assessment_id=assessment_id))
         except ValueError as ex:
             form.affected_resources.errors.append(str(ex))
+
     return render_template('assessments/panel/edit_finding.html', **context)
 
 
@@ -241,7 +239,7 @@ def actives(assessment_id):
         data = dict(form.data)
         data.pop('csrf_token', None)
         try:
-            active = Active[data['name']]
+            active = Active[assessment, data['name']]
         except:
             active = Active(name=data['name'], assessment=assessment)
 

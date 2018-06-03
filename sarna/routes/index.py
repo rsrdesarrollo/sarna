@@ -12,3 +12,12 @@ def index():
         route=ROUTE_NAME
     )
     return render_template('index.html', **context)
+
+
+@blueprint.route('/login', methods=('GET', 'POST'))
+def login():
+    pass
+
+@blueprint.route('/logout')
+def logout():
+    pass

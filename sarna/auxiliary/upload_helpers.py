@@ -3,7 +3,9 @@ import re
 import magic
 from wtforms.validators import ValidationError
 
-from sarna import config
+from sarna.core import config
+
+__all__ = ['is_valid_evidence', 'is_valid_template']
 
 
 def _get_mime_ext(file):

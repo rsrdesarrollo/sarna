@@ -1,6 +1,6 @@
 from werkzeug.routing import RequestRedirect, MethodNotAllowed, NotFound
 
-from sarna import app
+from sarna.core import app
 
 _url_adapter = app.url_map.bind('localhost')
 

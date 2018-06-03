@@ -7,7 +7,6 @@ from docxtpl import DocxTemplate
 from mistletoe.base_renderer import BaseRenderer
 
 from sarna.report_generator.style import RenderStyle
-from sarna.report_generator import *
 
 
 def _get_img_prefered_size(img: AnyStr, section: Section):

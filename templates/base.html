@@ -15,8 +15,8 @@
     {% endassets %}
 
 
-    {% block markdown_init %}
-        <script>
+    {% block scripts %}
+        <script type="text/javascript">
             $(document).ready(function () {
                 $("textarea").not(".noMD").markdown({
                     autofocus: false,

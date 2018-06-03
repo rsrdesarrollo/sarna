@@ -2,7 +2,7 @@ from os import path
 
 from flask_assets import Environment
 
-from sarna import PROJECT_PATH
+from sarna.core import PROJECT_PATH
 
 
 def init_app(app):

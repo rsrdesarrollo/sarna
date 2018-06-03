@@ -3,14 +3,23 @@ import datetime
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
 from pony.orm.core import Entity, Attribute
+from pony.orm.core import Required, LongStr
 from wtforms import validators
 from wtforms.fields import BooleanField, SelectField, StringField, TextAreaField
 from wtforms.fields.html5 import IntegerField, DateField
 
 from sarna.auxiliary.upload_helpers import *
 from sarna.model import *
+from sarna.model.enumerations import Choice
 
 simple_str_validator = validators.Regexp('^[\w\d \t_\[\]\(\)<>"\'.*:|$!-]+$')
+
+__all__ = [
+    'ClientForm', 'AssessmentForm', 'FindingTemplateEditForm', 'FindingTemplateCreateNewForm',
+    'FindingTemplateEditSolutionForm', 'FindingEditForm', 'FindingTemplateAddSolutionForm',
+    'FindingTemplateAddTranslationForm', 'FindingTemplateEditTranslationForm', 'ActiveCreateNewForm',
+    'TemplateCreateNewForm', 'EvidenceCreateNewForm'
+]
 
 
 class EntityForm(type):
@@ -148,10 +157,6 @@ class ActiveCreateNewForm(
     EntityForm(AffectedResource)
 ):
     pass
-
-
-class ActiveCreateBulkForm(FlaskForm):
-    TextAreaField(validators=[validators.DataRequired()], description="List of actives. One per line.")
 
 
 """

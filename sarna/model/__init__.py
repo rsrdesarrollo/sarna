@@ -7,11 +7,16 @@ from cvsslib import cvss3, calculate_vector
 from pony.orm.core import *
 from rfc3986.uri import URIReference
 
-from sarna import config
-from .auxiliary import *
+from sarna.core import config
+from .enumerations import *
 
 db = Database()
 
+__all__ = [
+    'db', 'Client', 'Assessment', 'FindingTemplate', 'FindingTemplateTranslation',
+    'Active', 'AffectedResource', 'Finding', 'Template', 'Solution', 'Image', 'Approval',
+    'User', 'select', 'commit', 'db_session', 'TransactionIntegrityError'
+]
 
 class Client(db.Entity):
     id = PrimaryKey(UUID, default=uuid4)
@@ -79,7 +84,7 @@ class FindingTemplate(db.Entity):
     type = Required(FindingType)
     owasp_category = Optional(OWASPCategory)
     tech_risk = Required(Score)  # [0 to 4]
-    dissemination = Required(Score)  # [0 to 4]
+    dissemination = Required(Score)  # [0 to 4]Active
     solution_complexity = Required(Score)  # [0 to 4]
     solutions = Set('Solution')
     translations = Set('FindingTemplateTranslation')

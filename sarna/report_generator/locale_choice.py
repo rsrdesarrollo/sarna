@@ -1,5 +1,4 @@
-from sarna.model import Language
-from sarna.model.auxiliary import Choice
+from sarna.model.enumerations import Language, Choice
 
 
 def locale_choice(choice: Choice, lang: Language):

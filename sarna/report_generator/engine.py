@@ -10,9 +10,8 @@ import jinja2
 from docxtpl import DocxTemplate
 from werkzeug.utils import secure_filename
 
-from sarna import PROJECT_PATH
-from sarna.model import Assessment, Template
-from sarna.model import db_session
+from sarna.core import PROJECT_PATH
+from sarna.model import Assessment, Template, db_session
 from sarna.report_generator.locale_choice import locale_choice
 from sarna.report_generator.markdown import markdown_to_docx, DOCXRenderer
 from sarna.report_generator.scores import score_to_docx

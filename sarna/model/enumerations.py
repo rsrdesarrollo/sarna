@@ -9,7 +9,7 @@ class LocaleText(Json):
 class Choice(OrderedEnum):
     @classmethod
     def choices(cls):
-        return [("", "---")] + [cls.choice(elem) for elem in cls]
+        return [(None, "---")] + [cls.choice(elem) for elem in cls]
 
     @classmethod
     def choice(cls, elem):
@@ -27,8 +27,8 @@ class Choice(OrderedEnum):
 
     @classmethod
     def coerce(cls, item):
-        if not item:
-            return ''
+        if not item or item == 'None':
+            return None
 
         return cls[item.replace(" ", "_")] if not isinstance(item, cls) else item
 

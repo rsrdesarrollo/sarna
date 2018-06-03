@@ -4,6 +4,7 @@
 
 {% block body %}
     <form action="{{ url_for('.bulk_action_finding', assessment_id=assessment.id) }}" method="post">
+        <input type="hidden" value="{{ csrf_token() }}" name="csrf_token">
         {{ super() }}
     </form>
 {% endblock %}
@@ -44,7 +45,6 @@
         <div class="col">
             {% if findings %}
 
-                {{ form.csrf_token }}
                 <table id="table_data" class="table table-striped">
                     <thead class="thead-dark">
                     <th>

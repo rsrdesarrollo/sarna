@@ -4,7 +4,8 @@ from secrets import token_urlsafe
 from flask import render_template, request
 from werkzeug import exceptions
 
-from sarna import csrf, limiter, app, assets
+from sarna.core import csrf, limiter, app
+from sarna.core import assets
 from sarna.model import init_database, ObjectNotFound
 from sarna.routes import clients, index, findings, users, assessments
 

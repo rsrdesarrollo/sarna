@@ -1,5 +1,3 @@
-from sarna.report_generator import *
-
 _xrefs_runs = """
 <w:r>
     <w:rPr></w:rPr>
