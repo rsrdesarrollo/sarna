@@ -10,7 +10,6 @@ _xrefs_runs = """
     <w:instrText> REF {ref} {ops} </w:instrText>
 </w:r>
 <w:r>
-    <w:rPr></w:rPr>
     <w:fldChar w:fldCharType="separate"/>
 </w:r>
 <w:r>
@@ -18,20 +17,19 @@ _xrefs_runs = """
     <w:t>[ref]</w:t>
 </w:r>
 <w:r>
-    <w:rPr></w:rPr>
     <w:fldChar w:fldCharType="end"/>
 </w:r>
 """
 
 _bookmark = """
 <w:bookmarkStart w:id="{ref}" w:name="{ref}"/>
-<w:bookmarkEnd w:id="{ref}"/>
 {run}
+<w:bookmarkEnd w:id="{ref}"/>
 """
 
 
 def _ref_name(elem):
-    return "__{}__{:010d}".format(elem.__class__.__name__, elem.id)
+    return "_Ref{:09d}".format(elem.id)
 
 
 def xref(elem, type='number'):

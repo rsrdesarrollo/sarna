@@ -6,7 +6,7 @@ from docx.section import Section
 from docxtpl import DocxTemplate
 from mistletoe.base_renderer import BaseRenderer
 
-from report_generator.style import RenderStyle
+from sarna.report_generator.style import RenderStyle
 from sarna.report_generator import *
 
 
@@ -86,7 +86,11 @@ class DOCXRenderer(BaseRenderer):
             height=height
         ).xml
         self._mod_pstyle_stack.append(self.style.image_caption)
-        return '<w:r><w:drawing>{}</w:drawing></w:r><w:br/>'.format(pic) + inner
+        return '<w:r><w:drawing>{pic}</w:drawing></w:r><w:br/>{seq}{run}'.format(
+            pic=pic,
+            seq=make_sequence(),
+            run=inner
+        )
 
     def render_link(self, token):
         target = escape_url(token.target)

@@ -2,13 +2,6 @@
 
 {% from "macros.html" import render_form, render_score_label %}
 
-{% block scripts %}
-    <link rel="stylesheet" type="text/css" media="all" href="http://cvssjs.github.io/cvss.css">
-    <link href="/static/css/horsey.min.css" rel="stylesheet">
-    <script src="http://cvssjs.github.io/cvss.js"></script>
-    <script src="/static/js/horsey.min.js"></script>
-{% endblock %}
-
 {% block content %}
     <div class="row mt-3 pl-3">
 
@@ -52,7 +45,7 @@
             </div>
 
             <script>
-                $(function () {
+                $(document).ready(function () {
 
                     var cvss = new CVSS("cvssboard", {
                         onchange: function () {

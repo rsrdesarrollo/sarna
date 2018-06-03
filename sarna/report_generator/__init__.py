@@ -1,6 +1,6 @@
 import re
 
-__all__ = ['docx_escape', 'escape_url', 'list_level_style', 'make_run', 'make_paragraph']
+__all__ = ['docx_escape', 'escape_url', 'list_level_style', 'make_run', 'make_paragraph', 'make_sequence']
 
 
 def docx_escape(s, quote=False):
@@ -31,6 +31,25 @@ def make_run(rPr, text):
     return '<w:r>{}{}</w:r>'.format(rPr, "<w:br/>".join(
         ('<w:t xml:space="preserve">{}</w:t>'.format(text) for text in docx_escape(text).split('\n'))
     ))
+
+
+_sequence_format = """
+<w:r>
+    <w:t xml:space="preserve">{sec_name} </w:t> 
+</w:r>
+<w:fldSimple w:instr=" SEQ {sec_name} \* ARABIC ">
+    <w:r>
+        <w:rPr><w:noProof/></w:rPr> 
+        <w:t>1</w:t>
+    </w:r>
+</w:fldSimple>
+<w:r>
+    <w:t xml:space="preserve">{separator}</w:t>
+</w:r>"""
+
+
+def make_sequence():
+    return _sequence_format.format(sec_name="Imagen", separator=": ")
 
 
 def list_level_style(pPr, level):

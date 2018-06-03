@@ -1,5 +1,12 @@
+.show.dropdown-menu{
+    min-width: 9rem;
+}
+
 .md-preview img{
-    width: 70%;
+    max-height:500px;
+    max-width:500px;
+    height:auto;
+    width:auto;
 }
 .md-editor~.invalid-feedback{
     display: block;

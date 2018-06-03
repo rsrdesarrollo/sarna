@@ -1,0 +1,25 @@
+js_all:
+  filters: jsmin
+  output: dist/main.js
+  contents:
+    - node_modules/popper.js/dist/umd/popper.js
+    - node_modules/jquery/dist/jquery.js
+    - node_modules/jquery-ui-dist/jquery-ui.js
+    - node_modules/horsey/dist/horsey.js
+    - node_modules/markdown/lib/markdown.js
+    - node_modules/dropzone/dist/dropzone.js
+    - node_modules/bootstrap-markdown/js/bootstrap-markdown.js
+    - node_modules/bootstrap/dist/js/bootstrap.js
+    - node_modules/chart.js/dist/Chart.js
+    - js/main.js
+    - js/cvss.js
+css_all:
+  filters: cssmin
+  output: dist/main.css
+  contents:
+    - css/main.css
+    - css/cvss.css
+    - node_modules/bootstrap/dist/css/bootstrap.css
+    - node_modules/bootstrap-markdown/css/bootstrap-markdown.min.css
+    - node_modules/horsey/dist/horsey.css
+    - node_modules/jquery-ui-dist/jquery-ui.css

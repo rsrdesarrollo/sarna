@@ -11,3 +11,7 @@ mistletoe
 aenum
 rfc3986
 Pillow
+flask-assets
+PyYAML
+jsmin
+cssmin

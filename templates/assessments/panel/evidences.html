@@ -2,11 +2,8 @@
 
 {% from "macros.html" import render_form, render_score_label %}
 {% block scripts %}
-
-    <link href="/static/css/dropzone.css" rel="stylesheet">
-    <script type="application/javascript" src="/static/js/dropzone.js"></script>
     <script type="text/javascript">
-        $(function () {
+        $(document).ready(function () {
             var template = $('#template');
             template.removeAttr('id');
             template.wrap('<div></div>');
