@@ -18,6 +18,7 @@ def index():
 def login():
     pass
 
+
 @blueprint.route('/logout')
 def logout():
     pass

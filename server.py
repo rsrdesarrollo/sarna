@@ -70,5 +70,6 @@ if __name__ == '__main__':
             extra_files.append(os.path.join(dirname, file))
 
     app.run(
+        '0.0.0.0',
         extra_files=extra_files
     )

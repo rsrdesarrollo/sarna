@@ -23,7 +23,12 @@ __all__ = [
 
 
 class EntityForm(type):
-    def __new__(cls, entity: Entity, skip_attrs={}, custom_validators=dict(), skip_pk=True):
+    def __new__(cls, entity: Entity, skip_attrs=None, custom_validators=None, skip_pk=True):
+        if skip_attrs is None:
+            skip_attrs = {}
+        if custom_validators is None:
+            custom_validators = dict()
+
         class Form(FlaskForm):
             pass
 

@@ -18,6 +18,7 @@ __all__ = [
     'User', 'select', 'commit', 'db_session', 'TransactionIntegrityError'
 ]
 
+
 class Client(db.Entity):
     id = PrimaryKey(UUID, default=uuid4)
     assessments = Set('Assessment')
@@ -178,7 +179,7 @@ class Finding(db.Entity):
                 active_name = "{}://{}".format(resource.scheme, resource.authority)
                 resource_rute = resource.path
                 if resource.query:
-                    resource_rute += "?"+resource.query
+                    resource_rute += "?" + resource.query
                 if resource.fragment:
                     resource_rute += "#" + resource.fragment
             elif resource.scheme == 'urn':

@@ -136,6 +136,9 @@ def get_document_render_styles(doc_path) -> RenderStylesCollection:
                         attrs[tag_name] = '<w:rPr></w:rPr>'
 
     if style_name is not None:
-        raise TemplateSyntaxError('Unexpected end of template style definition {}. Never closed'.format(style_name))
+        raise TemplateSyntaxError(
+            'Unexpected end of template style definition {}. Never closed'.format(style_name),
+            None
+        )
 
     return styles

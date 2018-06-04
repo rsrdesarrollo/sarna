@@ -171,7 +171,7 @@ def edit_add_finding(assessment_id, finding_id):
 
     try:
         commit()
-    except:
+    except Exception:
         flash('Error ading finding {}'.format(finding.name), 'danger')
         return redirect_referer(url_for('add_findings', assessment_id=assessment.id))
 
@@ -265,8 +265,10 @@ def evidences(assessment_id):
         if form.validate_on_submit():
             upload_path = assessment.evidence_path()
 
-            if not os.path.exists(upload_path):
+            try:
                 os.makedirs(upload_path)
+            except FileExistsError:
+                pass
 
             file = form.file.data
             try:

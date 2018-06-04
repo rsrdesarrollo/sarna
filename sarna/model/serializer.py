@@ -2,7 +2,7 @@ import json
 
 from pony.orm.core import Entity
 
-from sarna import Choice
+from sarna.model.enumerations import Choice
 
 
 def _json_serializer(value):
@@ -43,11 +43,15 @@ def _to_dict_spanning_tree(obj: Entity, skip_attrs, visited):
     return result
 
 
-def to_dict(obj: Entity, skip_attrs={}):
+def to_dict(obj: Entity, skip_attrs=None):
+    if skip_attrs is None:
+        skip_attrs = {}
     return _to_dict_spanning_tree(obj, skip_attrs, {obj})
 
 
-def to_json(obj: Entity, skip_attrs={}, pretty=False):
+def to_json(obj: Entity, skip_attrs=None, pretty=False):
+    if skip_attrs is None:
+        skip_attrs = {}
     data = to_dict(obj, skip_attrs)
 
     if pretty:
