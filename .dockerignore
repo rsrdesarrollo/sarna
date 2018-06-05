@@ -60,7 +60,6 @@ db.sqlite3
 
 # Flask stuff:
 instance/
-.webassets-cache
 
 # Scrapy stuff:
 .scrapy
@@ -109,9 +108,15 @@ venv.bak/
 test_files
 poc_*.py
 
-node_modules/
+static/node_modules/
+static/dist
+static/yarn.lock
+static/.webassets-cache
+
 yarn.lock
 
-uploaded_data/*
-database/*
+uploaded_data/
+database/
+volumes
+*.zip
 

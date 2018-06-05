@@ -167,7 +167,7 @@
     z-index: 1000;
     position: fixed;
     width: 100%;
-    height: 56px;
+    min-height: 56px;
     overflow-y: auto;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;

@@ -6,21 +6,20 @@ RUN apk --update --no-cache add \
 	mkdir -p /sarna/database/ && \
 	mkdir -p /sarna/uploaded_data
 
-# Add and install requirements
-WORKDIR /sarna
-
-ADD requirements.txt .
+ADD requirements.txt /tmp/
 RUN apk --no-cache add build-base libxslt-dev python3-dev jpeg-dev zlib-dev && \
-    pip install -r requirements.txt && \
+    pip install -r /tmp/requirements.txt && \
     apk del build-base libxslt-dev python3-dev jpeg-dev zlib-dev
 
-ADD static/package.json /sarna/static/static/
+RUN ls -lahtr /sarna/static
+ADD static/package.json /sarna/static/
 RUN cd /sarna/static && yarn install
 RUN apk --no-cache add libmagic libxslt jpeg zlib
 
+RUN ls -lahtr /sarna/static
 WORKDIR /sarna
 COPY ./ /sarna/
-RUN ls -lahtr /sarna/
+RUN ls -lahtr /sarna/static
 
 EXPOSE 5000
 ENTRYPOINT ["python3", "/sarna/server.py"]

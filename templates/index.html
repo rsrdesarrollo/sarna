@@ -1,12 +1,40 @@
 {% extends "base.html" %}
 {% block body %}
-    <div class="jumbotron mt-3 align-content-center text-center">
-        <h1>
-            Welcome to SARNA
-        </h1>
+    <div class="row">
+        <div class="align-content-center text-center col-lg-7 bg-light p-5">
 
-        <p>Security Assessment Report geNerated Automatically</p>
+            <img src="{{ url_for('static', filename='logo-full.png') }}" width="500"
+                 class="d-inline-block align-top mt-5" alt="Logo Sarna">
+            <h2>
+                <strong>S</strong>ecurity
+                <strong>A</strong>ssessment
+                <strong>R</strong>eport
+                ge<strong>N</strong>erated
+                <strong>A</strong>utomatically
+            </h2>
+        </div>
+        <div class="col-lg-5 align-content-center text-center bg-light p-5">
+            <h2 class="mt-4">Login</h2>
+            <hr>
+            <form>
+                <div class="input-group mt-5 px-5">
+                    <div class="input-group-append">
+                        <i class="fa fa-user input-group-text" style="min-width: 41px;"></i>
+                    </div>
+                    <input type="text" class="form-control" id="username" placeholder="Username">
+                </div>
+                <div class="input-group mt-3 px-5">
+                    <div class="input-group-append">
+                        <i class="fa fa-asterisk input-group-text" style="min-width: 41px;"></i>
+                    </div>
+                    <input type="password" class="form-control" id="password" placeholder="Password">
+                </div>
 
-        <img src="{{ url_for('static', filename='logo-red.png') }}" width="200" class="d-inline-block align-top" alt="">
+                <div class="input-group mt-4 px-5">
+                    <button type="submit" class="btn btn-primary btn-block">Login</button>
+                </div>
+            </form>
+        </div>
     </div>
+
 {% endblock %}

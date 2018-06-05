@@ -57,10 +57,10 @@
                     </tbody>
                 </table>
             {% else %}
-                <h4 class="text-center">No findings in this assessment</h4>
+                <h4 class="text-center">No report templates for this client</h4>
                 <h5 class="text-center">
-                    <a href="{{ url_for('.add_findings', assessment_id=assessment.id) }}">
-                        You can add some findings here!
+                    <a href="{{ url_for('clients.add_template', client_id=assessment.client.id) }}">
+                        You can add some templates here!
                     </a>
                 </h5>
             {% endif %}

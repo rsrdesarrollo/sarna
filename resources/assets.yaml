@@ -10,6 +10,7 @@ js_all:
     - node_modules/dropzone/dist/dropzone.js
     - node_modules/bootstrap-markdown/js/bootstrap-markdown.js
     - node_modules/bootstrap/dist/js/bootstrap.js
+    - node_modules/bootstrap-notify/bootstrap-notify.js
     - node_modules/chart.js/dist/Chart.js
     - js/main.js
     - js/cvss.js
@@ -23,3 +24,4 @@ css_all:
     - node_modules/bootstrap-markdown/css/bootstrap-markdown.min.css
     - node_modules/horsey/dist/horsey.css
     - node_modules/jquery-ui-dist/jquery-ui.css
+    - node_modules/font-awesome/css/font-awesome.css

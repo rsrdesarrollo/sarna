@@ -28,20 +28,20 @@
                             <td>{{ finding.solutions.count() }}</td>
                             <td>
                                 <div class="btn-group float-right">
-                                    <a class="need-confirm btn btn-danger"
+                                    <a class="need-confirm btn btn-danger" title="Delete Finding"
                                        href="{{ url_for('.delete', finding_id=finding.id) }}">
                                         <span class="fa fa-trash"></span>
                                     </a>
-                                    <a class="btn btn-secondary"
+                                    <a class="btn btn-secondary" title="Edit Finding"
                                        href="{{ url_for('.edit', finding_id=finding.id) }}">
-                                        <span class="fa fa-pencil-alt"></span>
+                                        <span class="fa fa-pencil"></span>
                                     </a>
-                                    <a class="btn btn-success"
+                                    <a class="btn btn-success" title="Add Translation to Finding"
                                        href="{{ url_for('.add_translation', finding_id=finding.id) }}">
                                         <span class="fa fa-globe"></span>
                                     </a>
 
-                                    <a class="btn btn-info"
+                                    <a class="btn btn-info" title="Add Solution to Finding"
                                        href="{{ url_for('.add_solution', finding_id=finding.id) }}">
                                         <span class="fa fa-flag"></span>
                                     </a>

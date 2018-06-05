@@ -4,7 +4,7 @@
     <div class="btn-group-vertical text-center squared">
         <a href="{{ url_for('.summary', assessment_id=assessment.id) }}"
            class="btn btn-lg {% if endpoint=='summary' %}btn-info{% else %}btn-dark{% endif %}">
-            <span class="fa fa-tachometer-alt"></span>
+            <span class="fa fa-tachometer"></span>
         </a>
 
         <a href="{{ url_for('.findings', assessment_id=assessment.id) }}"
@@ -22,7 +22,7 @@
         </a>
         <a href="{{ url_for('.evidences', assessment_id=assessment.id) }}"
            class="btn btn-lg {% if endpoint=='evidences' %}btn-purple{% else %}btn-dark{% endif %}">
-            <span class="fa fa-images"></span>
+            <span class="fa fa-image"></span>
         </a>
 
         <a href="{{ url_for('.reports', assessment_id=assessment.id) }}"
