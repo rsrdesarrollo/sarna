@@ -1,13 +1,14 @@
 <p align="center">
-    <img height="300" src="static/logo-full.png?raw=true">
-    <h2>
-        <strong>S</strong>ecurity
-        <strong>A</strong>ssessment
-        <strong>R</strong>eport
-        ge<strong>N</strong>erated
-        <strong>A</strong>utomatically
-    </h2>
+    <img style="max-width: 70%;" src="static/logo-full.png?raw=true">
 </p>
+
+<h2 style="text-align: center;">
+    <strong>S</strong>ecurity
+    <strong>A</strong>ssessment
+    <strong>R</strong>eport
+    ge<strong>N</strong>erated
+    <strong>A</strong>utomatically
+</h2>
 
 ## What is SARNA?
 
