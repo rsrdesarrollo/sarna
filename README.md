@@ -1,8 +1,13 @@
-# SARNA
-Security Assessment Report geNerated Automatically
-
-![Sarna Logo](https://github.com/rsrdesarrollo/sarna/raw/master/static/logo-red.png)
-
+<p align="center">
+    <img height="300" src="static/logo-full.png?raw=true">
+    <h2>
+        <strong>S</strong>ecurity
+        <strong>A</strong>ssessment
+        <strong>R</strong>eport
+        ge<strong>N</strong>erated
+        <strong>A</strong>utomatically
+    </h2>
+</p>
 
 ## What is SARNA?
 

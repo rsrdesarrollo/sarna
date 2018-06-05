@@ -21,8 +21,8 @@
     color: white;
 }
 
-.modal-xxl {
-    max-width: 95%;
+.modal-dialog.modal-xxl {
+    max-width: 95% !important;
 }
 
 /*Custom custom_checkbox*/
