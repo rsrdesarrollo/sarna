@@ -77,12 +77,12 @@
                             <td>
                                 <div class="btn-group float-right">
                                     <a class="btn btn-danger need-confirm"
-                                       href="{{ url_for('.delete_findings', assessment_id=assessment.id, finding_id=finding.id) }}">
+                                       href="{{ url_for('.delete_findings', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}">
                                         <span class="fa fa-trash"></span>
                                     </a>
 
                                     <a class="btn btn-secondary"
-                                       href="{{ url_for('.edit_finding', assessment_id=assessment.id, finding_id=finding.id) }}">
+                                       href="{{ url_for('.edit_finding', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}">
                                         <span class="fa fa-pencil"></span>
                                     </a>
                                 </div>
@@ -94,7 +94,7 @@
             {% else %}
                 <h4 class="text-center">No findings in this assessment</h4>
                 <h5 class="text-center">
-                    <a href="{{ url_for('.add_findings', assessment_id=assessment.id) }}">
+                    <a href="{{ url_for('.add_findings', assessment_id=assessment.id, next=request.path) }}">
                         You can add some findings here!
                     </a>
                 </h5>

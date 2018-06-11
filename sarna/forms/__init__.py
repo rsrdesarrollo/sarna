@@ -23,7 +23,7 @@ __all__ = [
 
 
 class EntityForm(type):
-    def __new__(cls, entity: Entity, skip_attrs=None, custom_validators=None, skip_pk=True):
+    def __new__(mcs, entity: Entity, skip_attrs=None, custom_validators=None, skip_pk=True):
         if skip_attrs is None:
             skip_attrs = {}
         if custom_validators is None:
@@ -184,3 +184,18 @@ EVIDENCE
 
 class EvidenceCreateNewForm(FlaskForm):
     file = FileField(validators=[FileRequired(), is_valid_evidence])
+
+
+"""
+Login form
+"""
+
+
+class LoginForm(FlaskForm):
+    username = StringField(validators=[validators.DataRequired()])
+    password = StringField(validators=[validators.DataRequired()])
+    otp = StringField(label='Google Authenticator')
+
+
+class OtpConfirmForm(FlaskForm):
+    otp = StringField(label='Google Authenticator')

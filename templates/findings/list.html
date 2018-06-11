@@ -29,20 +29,20 @@
                             <td>
                                 <div class="btn-group float-right">
                                     <a class="need-confirm btn btn-danger" title="Delete Finding"
-                                       href="{{ url_for('.delete', finding_id=finding.id) }}">
+                                       href="{{ url_for('.delete', finding_id=finding.id, next=request.path) }}">
                                         <span class="fa fa-trash"></span>
                                     </a>
                                     <a class="btn btn-secondary" title="Edit Finding"
-                                       href="{{ url_for('.edit', finding_id=finding.id) }}">
+                                       href="{{ url_for('.edit', finding_id=finding.id, next=request.path) }}">
                                         <span class="fa fa-pencil"></span>
                                     </a>
                                     <a class="btn btn-success" title="Add Translation to Finding"
-                                       href="{{ url_for('.add_translation', finding_id=finding.id) }}">
+                                       href="{{ url_for('.add_translation', finding_id=finding.id, next=request.path) }}">
                                         <span class="fa fa-globe"></span>
                                     </a>
 
                                     <a class="btn btn-info" title="Add Solution to Finding"
-                                       href="{{ url_for('.add_solution', finding_id=finding.id) }}">
+                                       href="{{ url_for('.add_solution', finding_id=finding.id, next=request.path) }}">
                                         <span class="fa fa-flag"></span>
                                     </a>
                                 </div>
@@ -53,7 +53,7 @@
                 </table>
             {% else %}
                 <h4 class="text-center">No findings on global database</h4>
-                <h5 class="text-center"><a href="{{ url_for('findings.new') }}">Do your work and add some findings!</a>
+                <h5 class="text-center"><a href="{{ url_for('findings.new', next=request.path) }}">Do your work and add some findings!</a>
                 </h5>
             {% endif %}
         </div>

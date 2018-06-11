@@ -22,12 +22,12 @@
                             {% for resource in active.affected_resources %}
                                 <td>{{ resource.route or '' }}</td>
                                 <td><a>{{ resource.findings.count() }}</a></td>
-                                </tr>
+                        </tr>
                             {% else %}
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                </tr>
+                        </tr>
                             {% endfor %}
                     {% endfor %}
                     </tbody>

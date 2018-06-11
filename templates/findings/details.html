@@ -11,7 +11,7 @@
                 </div>
 
                 <div class="col-2">
-                    <a href="{{ url_for('.add_translation', finding_id=finding.id) }}"
+                    <a href="{{ url_for('.add_translation', finding_id=finding.id, next=request.path) }}"
                        class="btn btn-primary btn-success float-right">
                         <span class="fa fa-plus"></span> Add
                     </a>
@@ -35,11 +35,11 @@
                                     <td>
                                         <div class="btn-group float-right">
                                             <a class="need-confirm btn btn-danger"
-                                               href="{{ url_for('.delete_translation', finding_id=finding.id, language=translation.lang) }}">
+                                               href="{{ url_for('.delete_translation', finding_id=finding.id, language=translation.lang, next=request.path) }}">
                                                 <span class="fa fa-trash"></span>
                                             </a>
                                             <a class="btn btn-secondary"
-                                               href="{{ url_for('.edit_translation', finding_id=finding.id, language=translation.lang) }}">
+                                               href="{{ url_for('.edit_translation', finding_id=finding.id, language=translation.lang, next=request.path) }}">
                                                 <span class="fa fa-pencil"></span>
                                             </a>
                                         </div>
@@ -59,7 +59,7 @@
                     <h2>Solutions</h2>
                 </div>
                 <div class="col-2">
-                    <a href="{{ url_for('.add_solution', finding_id=finding.id) }}"
+                    <a href="{{ url_for('.add_solution', finding_id=finding.id, next=request.path) }}"
                        class="btn btn-primary btn-success float-right">
                         <span class="fa fa-plus"></span> Add
                     </a>
@@ -83,11 +83,11 @@
                                     <td>
                                         <div class="btn-group float-right">
                                             <a class="need-confirm btn btn-danger"
-                                               href="{{ url_for('.delete_solution', finding_id=finding.id, solution_name=solution.name) }}">
+                                               href="{{ url_for('.delete_solution', finding_id=finding.id, solution_name=solution.name, next=request.path) }}">
                                                 <span class="fa fa-trash"></span>
                                             </a>
                                             <a class="btn btn-secondary"
-                                               href="{{ url_for('.edit_solution', finding_id=finding.id, solution_name=solution.name) }}">
+                                               href="{{ url_for('.edit_solution', finding_id=finding.id, solution_name=solution.name, next=request.path) }}">
                                                 <span class="fa fa-pencil"></span>
                                             </a>
                                         </div>

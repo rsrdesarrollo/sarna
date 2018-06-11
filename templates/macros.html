@@ -10,51 +10,49 @@
         {% set class_ = class_ + ' required' %}
     {% endif %}
 
-    <div class="form-group">
-        {% if field.errors %}
-            {% set class_ = class_ + ' is-invalid' %}
-        {% endif %}
-        {% if with_label and field.type != 'CSRFTokenField' %}
-            <label for="{{ field.id }}"
-                   class="control-label{% if field.flags.required %} required{% endif %}">
-                {{ field.label.text }}{% if field.flags.required %}*{% endif %}
-            </label>
-        {% endif %}
+    {% if field.errors %}
+        {% set class_ = class_ + ' is-invalid' %}
+    {% endif %}
+    {% if with_label and field.type != 'CSRFTokenField' %}
+        <label for="{{ field.id }}"
+               class="control-label{% if field.flags.required %} required{% endif %}">
+            {{ field.label.text }}{% if field.flags.required %}*{% endif %}
+        </label>
+    {% endif %}
 
-        {% if field.type == 'BooleanField' %}
-            <div class="checkbox">
-                <label>
-                    {{ field(class_=class_, **kwargs) }}
-                </label>
-            </div>
-        {% else %}
-
-            {% if field.type in ( 'StringField', 'TextField', 'TextAreaField', 'PasswordField', 'IntegerField') %}
-                {% set class_ = class_ + ' input-xlarge' %}
-            {% elif field.type == 'FileField' %}
-                {% set class_ = class_ + ' input-file' %}
-            {% elif field.type == 'DateField' %}
-                {% set class_ = class_ + ' input-xlarge datepicker' %}
-            {% endif %}
-
-            {% if field.type == 'SelectField' %}
+    {% if field.type == 'BooleanField' %}
+        <div class="checkbox">
+            <label>
                 {{ field(class_=class_, **kwargs) }}
-            {% else %}
-                {{ field(class_=class_, placeholder=placeholder, **kwargs) }}
-            {% endif %}
+            </label>
+        </div>
+    {% else %}
 
+        {% if field.type in ( 'StringField', 'TextField', 'TextAreaField', 'PasswordField', 'IntegerField') %}
+            {% set class_ = class_ + ' input-xlarge' %}
+        {% elif field.type == 'FileField' %}
+            {% set class_ = class_ + ' input-file' %}
+        {% elif field.type == 'DateField' %}
+            {% set class_ = class_ + ' input-xlarge datepicker' %}
         {% endif %}
 
-        {% if field.errors %}
-            <div class="invalid-feedback">{{ field.errors|join(', ') }}</div>
+        {% if field.type == 'SelectField' %}
+            {{ field(class_=class_, **kwargs) }}
+        {% else %}
+            {{ field(class_=class_, placeholder=placeholder, **kwargs) }}
         {% endif %}
 
-        {% if field.description %}
-            <small class="form-text text-muted">
-                {{ field.description|safe }}
-            </small>
-        {% endif %}
-    </div>
+    {% endif %}
+
+    {% if field.errors %}
+        <div class="invalid-feedback">{{ field.errors|join(', ') }}</div>
+    {% endif %}
+
+    {% if field.description %}
+        <small class="form-text text-muted">
+            {{ field.description|safe }}
+        </small>
+    {% endif %}
 {%- endmacro %}
 
 {% macro render_form(form) -%}
@@ -66,7 +64,10 @@
           {% if multipart %}enctype="multipart/form-data"{% endif %}
     >
         {% for field in form %}
-            {{ render_field(field, **(field.render_kw or dict())) }}
+
+            <div class="form-group">
+                {{ render_field(field, **(field.render_kw or dict())) }}
+            </div>
         {% endfor %}
         <button type="submit" class="btn btn-success btn-block">Submit</button>
     </form>

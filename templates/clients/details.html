@@ -10,7 +10,7 @@
                     <h2>Assessments</h2>
                 </div>
                 <div class="col-2">
-                    <a href="{{ url_for('.add_assessment', client_id=client.id) }}"
+                    <a href="{{ url_for('.add_assessment', client_id=client.id, next=request.path) }}"
                        class="btn btn-primary btn-success float-right">
                         <span class="fa fa-plus"></span> Add
                     </a>
@@ -31,7 +31,7 @@
                             {% for assessment in client.assessments %}
                                 <tr>
                                     <td>
-                                        <a href="{{ url_for('assessments.summary', assessment_id=assessment.id) }}">
+                                        <a href="{{ url_for('assessments.summary', assessment_id=assessment.id, next=request.path) }}">
                                             {{ assessment.name }}
                                         </a>
                                     </td>
@@ -40,11 +40,11 @@
                                     <td>
                                         <div class="btn-group float-right">
                                             <a class="need-confirm btn btn-danger"
-                                               href="{{ url_for('assessments.delete', assessment_id=assessment.id) }}">
+                                               href="{{ url_for('assessments.delete', assessment_id=assessment.id, next=request.path) }}">
                                                 <span class="fa fa-trash"></span>
                                             </a>
                                             <a class="btn btn-secondary"
-                                               href="{{ url_for('assessments.edit', assessment_id=assessment.id) }}">
+                                               href="{{ url_for('assessments.edit', assessment_id=assessment.id, next=request.path) }}">
                                                 <span class="fa fa-pencil"></span>
                                             </a>
                                         </div>
@@ -64,7 +64,7 @@
                     <h2>Templates</h2>
                 </div>
                 <div class="col-2">
-                    <a href="{{ url_for('.add_template', client_id=client.id) }}"
+                    <a href="{{ url_for('.add_template', client_id=client.id, next=request.path) }}"
                        class="btn btn-primary btn-success float-right">
                         <span class="fa fa-plus"></span> Add
                     </a>
@@ -90,11 +90,11 @@
                                     <td>
                                         <div class="btn-group float-right">
                                             <a class="need-confirm btn btn-danger"
-                                               href="{{ url_for('.delete_template', client_id=client.id, template_name=template.name) }}">
+                                               href="{{ url_for('.delete_template', client_id=client.id, template_name=template.name, next=request.path) }}">
                                                 <span class="fa fa-trash"></span>
                                             </a>
                                             <a class="btn btn-info"
-                                               href="{{ url_for('.download_template', client_id=client.id, template_name=template.name) }}">
+                                               href="{{ url_for('.download_template', client_id=client.id, template_name=template.name, next=request.path) }}">
                                                 <span class="fa fa-download"></span>
                                             </a>
                                         </div>

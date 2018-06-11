@@ -13,22 +13,22 @@
                         <tr>
                             <td>
                                 <a title="Edit Client"
-                                       href="{{ url_for('.edit', client_id=client.id) }}">
+                                       href="{{ url_for('.edit', client_id=client.id, next=request.path) }}">
                                 {{ client.long_name }}
                                 </a>
                             </td>
                             <td>
                                 <div class="btn-group float-right">
                                     <a class="need-confirm btn btn-danger" title="Delete Client"
-                                       href="{{ url_for('.delete', client_id=client.id) }}">
+                                       href="{{ url_for('.delete', client_id=client.id, next=request.path) }}">
                                         <span class="fa fa-trash"></span>
                                     </a>
                                     <a class="btn btn-secondary" title="Edit Client"
-                                       href="{{ url_for('.edit', client_id=client.id) }}">
+                                       href="{{ url_for('.edit', client_id=client.id, next=request.path) }}">
                                         <span class="fa fa-pencil"></span>
                                     </a>
                                     <a class="btn btn-success" title="Add Assessment"
-                                       href="{{ url_for('.add_assessment', client_id=client.id) }}">
+                                       href="{{ url_for('.add_assessment', client_id=client.id, next=request.path) }}">
                                         <span class="fa fa-plus"></span>
                                     </a>
 

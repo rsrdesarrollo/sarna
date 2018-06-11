@@ -1,11 +1,12 @@
 import os
 
-from flask import Blueprint, render_template, redirect, url_for, request, flash, send_from_directory
+from flask import Blueprint, render_template, request, flash, send_from_directory
 from flask import abort
 from werkzeug.utils import secure_filename
 
-from sarna.auxiliary import redirect_referer
+from sarna.auxiliary import redirect_back
 from sarna.core import limiter
+from sarna.core import login_required
 from sarna.forms import *
 from sarna.model import *
 from sarna.model.enumerations import *
@@ -16,7 +17,8 @@ blueprint = Blueprint('assessments', __name__)
 
 
 @blueprint.route('/')
-@db_session()
+@db_session
+@login_required
 def index():
     context = dict(
         route=ROUTE_NAME,
@@ -26,7 +28,8 @@ def index():
 
 
 @blueprint.route('/<assessment_id>', methods=('GET', 'POST'))
-@db_session()
+@db_session
+@login_required
 def edit(assessment_id):
     assessment = Assessment[assessment_id]
     form_data = request.form.to_dict() or assessment.to_dict()
@@ -43,20 +46,22 @@ def edit(assessment_id):
         data.pop('csrf_token', None)
         assessment.set(**data)
 
-        return redirect(url_for('.index'))
+        return redirect_back('.index')
 
     return render_template('assessments/edit.html', **context)
 
 
 @blueprint.route('/<assessment_id>/delete', methods=('POST',))
-@db_session()
+@db_session
+@login_required
 def delete(assessment_id):
     Assessment[assessment_id].delete()
-    return redirect_referer(url_for('.index'))
+    return redirect_back('.index')
 
 
 @blueprint.route('/<assessment_id>/summary')
-@db_session()
+@db_session
+@login_required
 def summary(assessment_id):
     assessment = Assessment[assessment_id]
     context = dict(
@@ -69,7 +74,8 @@ def summary(assessment_id):
 
 @blueprint.route('/<assessment_id>/findings/resource/<affected_resource_id>')
 @blueprint.route('/<assessment_id>/findings')
-@db_session()
+@db_session
+@login_required
 def findings(assessment_id, affected_resource_id=None):
     assessment = Assessment[assessment_id]
     context = dict(
@@ -83,16 +89,17 @@ def findings(assessment_id, affected_resource_id=None):
         if affected.active.assessment != assessment:
             return abort(401)
 
-        findings = affected.findings
+        list_findings = affected.findings
     else:
-        findings = assessment.findings.order_by(Finding.id)
+        list_findings = assessment.findings.order_by(Finding.id)
 
-    context['findings'] = findings
+    context['findings'] = list_findings
     return render_template('assessments/panel/list_findings.html', **context)
 
 
 @blueprint.route('/<assessment_id>/findings/<finding_id>', methods=('GET', 'POST'))
-@db_session()
+@db_session
+@login_required
 def edit_finding(assessment_id, finding_id):
     assessment = Assessment[assessment_id]
     finding = Finding[finding_id]
@@ -120,7 +127,7 @@ def edit_finding(assessment_id, finding_id):
         try:
             finding.update_affected_resources(affected_resources)  # TODO: Raise different exception
             finding.set(**data)
-            return redirect(url_for('.findings', assessment_id=assessment_id))
+            return redirect_back('.findings', assessment_id=assessment_id)
         except ValueError as ex:
             form.affected_resources.errors.append(str(ex))
 
@@ -128,15 +135,17 @@ def edit_finding(assessment_id, finding_id):
 
 
 @blueprint.route('/<assessment_id>/findings/<finding_id>/delete', methods=('POST',))
-@db_session()
+@db_session
+@login_required
 def delete_findings(assessment_id, finding_id):
     Finding[finding_id].delete()
     flash("Findign deleted", "success")
-    return redirect_referer(url_for('.findings', assessment_id=assessment_id))
+    return redirect_back('.findings', assessment_id=assessment_id)
 
 
 @blueprint.route('/<assessment_id>/add')
-@db_session()
+@db_session
+@login_required
 def add_findings(assessment_id):
     assessment = Assessment[assessment_id]
     context = dict(
@@ -149,7 +158,8 @@ def add_findings(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/add/<finding_id>')
-@db_session()
+@db_session
+@login_required
 def add_finding(assessment_id, finding_id):
     # TODO: Change to POST
     assessment = Assessment[assessment_id]
@@ -158,11 +168,12 @@ def add_finding(assessment_id, finding_id):
     finding = Finding.build_from_template(template, assessment)
     flash('Finding {} added successfully'.format(finding.name), 'success')
 
-    return redirect_referer(url_for('.add_findings', assessment_id=assessment.id))
+    return redirect_back('.add_findings', assessment_id=assessment.id)
 
 
 @blueprint.route('/<assessment_id>/edit_add/<finding_id>')
-@db_session()
+@db_session
+@login_required
 def edit_add_finding(assessment_id, finding_id):
     assessment = Assessment[assessment_id]
     template = FindingTemplate[finding_id]
@@ -173,33 +184,34 @@ def edit_add_finding(assessment_id, finding_id):
         commit()
     except Exception:
         flash('Error ading finding {}'.format(finding.name), 'danger')
-        return redirect_referer(url_for('add_findings', assessment_id=assessment.id))
+        return redirect_back('add_findings', assessment_id=assessment.id)
 
     flash('Finding {} added successfully'.format(finding.name), 'success')
 
-    return redirect(url_for('.edit_finding', assessment_id=assessment.id, finding_id=finding.id))
+    return redirect_back('.edit_finding', assessment_id=assessment.id, finding_id=finding.id)
 
 
 @blueprint.route('/<assessment_id>/bulk_action', methods=("POST",))
-@db_session()
+@db_session
+@login_required
 def bulk_action_finding(assessment_id):
     data = request.form.to_dict()
     action = data.pop('action', None)
     data.pop('csrf_token', None)
     data.pop('finding:all', None)
 
-    findings = set()
+    set_findings = set()
     for k, v in data.items():
         if k.startswith('finding'):
             try:
-                findings.add(int(k.split(':')[1]))
+                set_findings.add(int(k.split(':')[1]))
             except:
                 continue
 
-    target = select(elem for elem in Finding if elem.id in findings)
+    target = select(elem for elem in Finding if elem.id in set_findings)
     if action == "delete":
         target.delete(bulk=True)
-        flash("{} items deleted successfully.".format(len(findings)), "success")
+        flash("{} items deleted successfully.".format(len(set_findings)), "success")
     elif action.startswith('status_'):
         status = None
         if action == "status_pending":
@@ -216,22 +228,23 @@ def bulk_action_finding(assessment_id):
         for elem in target:
             elem.status = status
 
-        flash("{} items set to {} status successfully.".format(len(findings), status.name), "success")
+        flash("{} items set to {} status successfully.".format(len(set_findings), status.name), "success")
 
-    return redirect_referer(url_for('.findings', assessment_id=assessment_id))
+    return redirect_back('.findings', assessment_id=assessment_id)
 
 
 @blueprint.route('/<assessment_id>/actives', methods=("POST", "GET"))
-@db_session()
+@db_session
+@login_required
 def actives(assessment_id):
     assessment = Assessment[assessment_id]
     form = ActiveCreateNewForm(request.form)
-    actives = assessment.actives.order_by(Active.name)
+    list_actives = assessment.actives.order_by(Active.name)
     context = dict(
         route=ROUTE_NAME,
         endpoint=request.url_rule.endpoint.split('.')[-1],
         assessment=assessment,
-        actives=actives,
+        actives=list_actives,
         form=form
     )
 
@@ -245,14 +258,15 @@ def actives(assessment_id):
 
         AffectedResource(active=active, route=data['route'])
 
-        return redirect(url_for('.actives', assessment_id=assessment_id))
+        return redirect_back('.actives', assessment_id=assessment_id)
 
     return render_template('assessments/panel/list_actives.html', **context)
 
 
 @blueprint.route('/<assessment_id>/evidences', methods=("POST", "GET"))
 @limiter.exempt
-@db_session()
+@db_session
+@login_required
 def evidences(assessment_id):
     assessment = Assessment[assessment_id]
     form = EvidenceCreateNewForm()
@@ -271,8 +285,8 @@ def evidences(assessment_id):
                 pass
 
             file = form.file.data
+            filename = secure_filename(file.filename)
             try:
-                filename = secure_filename(file.filename)
                 Image(assessment=assessment, name=filename)
                 commit()
                 file.save(os.path.join(upload_path, filename))
@@ -286,7 +300,8 @@ def evidences(assessment_id):
 
 @blueprint.route('/<assessment_id>/evidences/<evidence_name>')
 @limiter.exempt
-@db_session()
+@db_session
+@login_required
 def get_evidence(assessment_id, evidence_name):
     assessment = Assessment[assessment_id]
     image = Image[assessment, evidence_name]
@@ -299,7 +314,8 @@ def get_evidence(assessment_id, evidence_name):
 
 
 @blueprint.route('/<assessment_id>/reports')
-@db_session()
+@db_session
+@login_required
 def reports(assessment_id):
     assessment = Assessment[assessment_id]
     context = dict(
@@ -311,7 +327,8 @@ def reports(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/reports/download', methods=('POST',))
-@db_session()
+@db_session
+@login_required
 def download_reports(assessment_id):
     assessment = Assessment[assessment_id]
     data = request.form.to_dict()
@@ -330,7 +347,7 @@ def download_reports(assessment_id):
 
     if not templates:
         flash('No report selected', 'danger')
-        return redirect(url_for('.reports', assessment_id=assessment_id))
+        return redirect_back('.reports', assessment_id=assessment_id)
 
     report_path, report_file = generate_reports_bundle(assessment, templates)
     return send_from_directory(
@@ -343,7 +360,8 @@ def download_reports(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/reports/download/<template_name>', methods=('GET',))
-@db_session()
+@db_session
+@login_required
 def download_report(assessment_id, template_name):
     assessment = Assessment[assessment_id]
     template = Template[assessment.client, template_name]

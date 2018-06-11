@@ -1,9 +1,10 @@
 import os
 from uuid import uuid4
 
-from flask import Blueprint, render_template, redirect, url_for, request, send_from_directory
+from flask import Blueprint, render_template, request, send_from_directory
 
-from sarna.auxiliary import redirect_referer
+from sarna.auxiliary import redirect_back
+from sarna.core import login_required, current_user
 from sarna.forms import AssessmentForm, TemplateCreateNewForm
 from sarna.forms import ClientForm
 from sarna.model import Client, Assessment, Template
@@ -14,7 +15,8 @@ blueprint = Blueprint('clients', __name__)
 
 
 @blueprint.route('/')
-@db_session()
+@db_session
+@login_required
 def index():
     context = dict(
         route=ROUTE_NAME,
@@ -24,7 +26,8 @@ def index():
 
 
 @blueprint.route('/new', methods=('POST', 'GET'))
-@db_session()
+@db_session
+@login_required
 def new():
     form = ClientForm(request.form)
     context = dict(
@@ -34,22 +37,25 @@ def new():
     if form.validate_on_submit():
         Client(
             short_name=form.short_name.data,
-            long_name=form.long_name.data
+            long_name=form.long_name.data,
+            creator=current_user.username
         )
-        return redirect(url_for('.index'))
+        return redirect_back('.index')
 
     return render_template('clients/new.html', **context)
 
 
 @blueprint.route('/delete/<client_id>', methods=('POST',))
-@db_session()
+@db_session
+@login_required
 def delete(client_id: int):
     Client[client_id].delete()
-    return redirect(url_for('.index'))
+    return redirect_back('.index')
 
 
 @blueprint.route('/<client_id>', methods=('POST', 'GET'))
-@db_session()
+@db_session
+@login_required
 def edit(client_id: int):
     client = Client[client_id]
 
@@ -64,12 +70,13 @@ def edit(client_id: int):
         data = dict(form.data)
         data.pop('csrf_token', None)
         client.set(**data)
-        return redirect(url_for('.index'))
+        return redirect_back('.index')
     return render_template('clients/details.html', **context)
 
 
 @blueprint.route('/<client_id>/add_assessment', methods=('POST', 'GET'))
-@db_session()
+@db_session
+@login_required
 def add_assessment(client_id: int):
     client = Client[client_id]
     form = AssessmentForm(request.form)
@@ -83,15 +90,15 @@ def add_assessment(client_id: int):
         data = dict(form.data)
         data.pop('csrf_token', None)
 
-        Assessment(client=client, **data)
-        return redirect(url_for('.edit', client_id=client_id))
+        Assessment(client=client, creator=current_user.username, **data)
+        return redirect_back('.edit', client_id=client_id)
     return render_template('clients/add_assessment.html', **context)
 
 
-@blueprint.route('/<client_id>/template/<template_id>', methods=('POST', 'GET'))
 @blueprint.route('/<client_id>/add_template', methods=('POST', 'GET'))
-@db_session()
-def add_template(client_id: int, template_id=None):
+@db_session
+@login_required
+def add_template(client_id: int):
     client = Client[client_id]
     form = TemplateCreateNewForm()
     context = dict(
@@ -117,7 +124,7 @@ def add_template(client_id: int, template_id=None):
             Template(client=client, **data)
             commit()
             file.save(os.path.join(upload_path, filename))
-            return redirect(url_for('.edit', client_id=client_id))
+            return redirect_back('.edit', client_id=client_id)
         except TransactionIntegrityError:
             form.name.errors.append('Name already used')
 
@@ -125,17 +132,19 @@ def add_template(client_id: int, template_id=None):
 
 
 @blueprint.route('/<client_id>/template/<template_name>/delete', methods=('POST',))
-@db_session()
+@db_session
+@login_required
 def delete_template(client_id: int, template_name):
     client = Client[client_id]
     template = Template[client, template_name]
     os.remove(os.path.join(client.template_path(), template.file))
     template.delete()
-    return redirect_referer(url_for('.edit', client_id=client_id))
+    return redirect_back('.edit', client_id=client_id)
 
 
 @blueprint.route('/<client_id>/template/<template_name>/download')
-@db_session()
+@db_session
+@login_required
 def download_template(client_id: int, template_name):
     client = Client[client_id]
     template = Template[client, template_name]

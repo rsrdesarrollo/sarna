@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros.html" import render_field %}
 {% block body %}
     <div class="row">
         <div class="align-content-center text-center col-lg-7 bg-light p-5">
@@ -13,28 +14,39 @@
                 <strong>A</strong>utomatically
             </h2>
         </div>
-        <div class="col-lg-5 align-content-center text-center bg-light p-5">
-            <h2 class="mt-4">Login</h2>
-            <hr>
-            <form>
-                <div class="input-group mt-5 px-5">
-                    <div class="input-group-append">
-                        <i class="fa fa-user input-group-text" style="min-width: 41px;"></i>
+        {% if not current_user.is_authenticated %}
+            <div class="col-lg-5 align-content-center text-center bg-light p-5">
+                <h2 class="mt-4">Login</h2>
+                <hr>
+                <form method="POST">
+                    {{ form.csrf_token }}
+                    <div class="input-group mt-5 px-5">
+                        <div class="input-group-append">
+                            <i class="fa fa-user input-group-text" style="min-width: 41px;"></i>
+                        </div>
+                        {{ render_field(form.username, with_label=False) }}
                     </div>
-                    <input type="text" class="form-control" id="username" placeholder="Username">
-                </div>
-                <div class="input-group mt-3 px-5">
-                    <div class="input-group-append">
-                        <i class="fa fa-asterisk input-group-text" style="min-width: 41px;"></i>
+                    <div class="input-group mt-3 px-5">
+                        <div class="input-group-append">
+                            <i class="fa fa-asterisk input-group-text" style="min-width: 41px;"></i>
+                        </div>
+                        {{ render_field(form.password, with_label=False, type='password') }}
                     </div>
-                    <input type="password" class="form-control" id="password" placeholder="Password">
-                </div>
+                    {% if need_otp %}
+                    <div class="input-group mt-3 px-5">
+                        <div class="input-group-append">
+                            <i class="fa fa-clock input-group-text" style="min-width: 41px;"></i>
+                        </div>
 
-                <div class="input-group mt-4 px-5">
-                    <button type="submit" class="btn btn-primary btn-block">Login</button>
-                </div>
-            </form>
-        </div>
+                        {{ render_field(form.otp, with_label=False, maxlength="6", pattern="[0-9]{6}") }}
+                    </div>
+                    {% endif %}
+                    <div class="input-group mt-4 px-5">
+                        <button type="submit" class="btn btn-primary btn-block">Login</button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
     </div>
 
 {% endblock %}

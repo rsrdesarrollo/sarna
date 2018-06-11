@@ -3,19 +3,22 @@ from datetime import datetime, date
 from typing import *
 from uuid import UUID, uuid4
 
+import pyotp
 from cvsslib import cvss3, calculate_vector
 from pony.orm.core import *
 from rfc3986.uri import URIReference
+from werkzeug.security import generate_password_hash, check_password_hash
 
-from sarna.core import config
-from .enumerations import *
+from sarna.core.config import config
+from sarna.model.enumerations import *
 
 db = Database()
 
 __all__ = [
     'db', 'Client', 'Assessment', 'FindingTemplate', 'FindingTemplateTranslation',
     'Active', 'AffectedResource', 'Finding', 'Template', 'Solution', 'Image', 'Approval',
-    'User', 'select', 'commit', 'db_session', 'TransactionIntegrityError'
+    'User', 'select', 'commit', 'db_session', 'TransactionIntegrityError', 'ObjectNotFound',
+    'init_database'
 ]
 
 
@@ -25,7 +28,10 @@ class Client(db.Entity):
     templates = Set('Template')
     short_name = Required(str, 64)
     long_name = Required(str, 128)
-    users = Set('User')
+
+    creator = Required('User')
+    managers = Set('User')
+    auditors = Set('User')
 
     def template_path(self):
         return os.path.join(config.TEMPLATES_PATH, str(self.id))
@@ -43,13 +49,15 @@ class Assessment(db.Entity):
     actives = Set('Active')
     findings = Set('Finding')
     images = Set('Image')
-    approvals = Set('Approval')
     creation_date = Required(datetime, default=lambda: datetime.now())
-    users = Set('User')
     start_date = Optional(date)
     end_date = Optional(date)
     estimated_hours = Optional(int)
     effective_hours = Optional(int)
+
+    approvals = Set('Approval')
+    creator = Required('User')
+    auditors = Set('User')
 
     def _aggregate_score(self, field):
         return [
@@ -90,6 +98,7 @@ class FindingTemplate(db.Entity):
     solutions = Set('Solution')
     translations = Set('FindingTemplateTranslation')
 
+    creator = Required('User')
     findings = Set('Finding')
 
     @property
@@ -287,9 +296,73 @@ class Approval(db.Entity):
 class User(db.Entity):
     username = PrimaryKey(str)
     is_admin = Required(bool, default=False)
-    assessments = Set(Assessment)
-    clients = Set(Client)
+    passwd = Optional(str)
+    creation_date = Required(datetime, default=lambda: datetime.now())
+    last_access = Optional(datetime)
+    is_locked = Required(bool, default=False)
+    otp_enabled = Required(bool, default=False)
+    otp_seed = Optional(str)
+
     approvals = Set(Approval)
+
+    manages = Set('Client', reverse='managers')
+
+    created_clients = Set('Client', reverse='creator')
+    created_findings = Set('FindingTemplate', reverse='creator')
+    created_assessments = Set('Assessment', reverse='creator')
+
+    audits_assessments = Set('Assessment', reverse='auditors')
+    audits_clients = Set('Client', reverse='auditors')
+
+    def login(self):
+        from flask_login import login_user
+        self.last_access = datetime.now()
+        login_user(self)
+
+    def get_id(self):
+        return self.username
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    @property
+    def is_active(self):
+        return not self.is_locked
+
+    def set_passwd(self, passwd):
+        self.passwd = generate_password_hash(passwd)
+
+    def check_password(self, password):
+        return check_password_hash(self.passwd, password)
+
+    def generate_otp(self):
+        if self.otp_enabled:
+            raise ValueError('otp already set')
+
+        self.otp_seed = pyotp.random_base32()
+        return pyotp.totp.TOTP(self.otp_seed).provisioning_uri(self.username, issuer_name="SARNA")
+
+    def enable_otp(self, otp):
+        if self.otp_enabled:
+            raise ValueError('otp already set')
+
+        self.otp_enabled = self.check_otp(otp)
+        return self.otp_enabled
+
+    def confirm_otp(self, otp):
+        if not self.otp_enabled:
+            raise ValueError('otp not set')
+
+        return self.check_otp(otp)
+
+    def check_otp(self, otp):
+        totp = pyotp.TOTP(self.otp_seed)
+        return totp.verify(otp)
 
 
 def init_database():

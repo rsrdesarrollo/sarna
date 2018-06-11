@@ -31,12 +31,12 @@ def _ref_name(elem):
     return "_Ref{:09d}".format(elem.id)
 
 
-def xref(elem, type='number'):
+def xref(elem, xref_type='number'):
     ref_name = _ref_name(elem)
     ref_ops = ""
-    if type == 'number':
+    if xref_type == 'number':
         ref_ops = "\\r \\h"
-    elif type == 'title':
+    elif xref_type == 'title':
         ref_ops = "\\h"
 
     return _xrefs_runs.format(ref=ref_name, ops=ref_ops)

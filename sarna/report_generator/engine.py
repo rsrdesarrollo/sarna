@@ -10,7 +10,7 @@ import jinja2
 from docxtpl import DocxTemplate
 from werkzeug.utils import secure_filename
 
-from sarna.core import PROJECT_PATH
+from sarna.core.config import config
 from sarna.model import Assessment, Template, db_session
 from sarna.report_generator.locale_choice import locale_choice
 from sarna.report_generator.markdown import markdown_to_docx, DOCXRenderer
@@ -20,17 +20,17 @@ from sarna.report_generator.xrefs import xref, bookmark
 from sarna.routes import parse_url
 
 
-def dateformat(value, format='%d/%m/%Y'):
-    return value.strftime(format)
+def dateformat(value, fmt='%d/%m/%Y'):
+    return value.strftime(fmt)
 
 
 def clean_temp_dir():
     for path, dirs, files in os.walk('/tmp'):
-        for dir in dirs:
-            if not dir.startswith('sarna-'):
+        for directory in dirs:
+            if not directory.startswith('sarna-'):
                 continue
 
-            dir_path = os.path.join(path, dir)
+            dir_path = os.path.join(path, directory)
             now = time.time()
             if now - os.path.getctime(dir_path) > 120:
                 shutil.rmtree(dir_path)
@@ -63,7 +63,7 @@ def generate_reports_bundle(assessment: Assessment, templates: Collection[Templa
     out_file = ""
 
     def image_path_converter(path):
-        not_found_image_path = os.path.join(PROJECT_PATH, 'resources', 'images', 'img_not_found.png')
+        not_found_image_path = os.path.join(config.PROJECT_PATH, 'resources', 'images', 'img_not_found.png')
         try:
             _, args = parse_url(path)
             file_path = os.path.abspath(

@@ -33,10 +33,6 @@ class DOCXRenderer(BaseRenderer):
         return self
 
     def __init__(self, docx: DocxTemplate, img_path_trans: Callable):
-        """
-        Args:
-            extras (list): allows subclasses to add even more custom tokens.
-        """
         self.warnings = set()
         self.style = None
         self._tpl = docx

@@ -17,7 +17,7 @@
                     {% for assessment in assessments %}
                         <tr>
                             <td>
-                                <a href="{{ url_for('.summary', assessment_id=assessment.id) }}">
+                                <a href="{{ url_for('.summary', assessment_id=assessment.id, next=request.path) }}">
                                     {{ assessment.name }}
                                 </a>
                             </td>
@@ -29,19 +29,19 @@
                             <td>
                                 <div class="btn-group float-right">
                                     <a class="need-confirm btn btn-danger" title="Delete Assessment"
-                                       href="{{ url_for('.delete', assessment_id=assessment.id) }}">
+                                       href="{{ url_for('.delete', assessment_id=assessment.id, next=request.path) }}">
                                         <span class="fa fa-trash"></span>
                                     </a>
                                     <a class="btn btn-secondary" title="Edit Assessment"
-                                       href="{{ url_for('.edit', assessment_id=assessment.id) }}">
+                                       href="{{ url_for('.edit', assessment_id=assessment.id, next=request.path) }}">
                                         <span class="fa fa-pencil"></span>
                                     </a>
                                     <a class="btn btn-info" title="Assessment Panel"
-                                       href="{{ url_for('.summary', assessment_id=assessment.id) }}">
+                                       href="{{ url_for('.summary', assessment_id=assessment.id, next=request.path) }}">
                                         <span class="fa fa-tachometer"></span>
                                     </a>
                                     <a class="btn btn-success" title="Add findings to assessment"
-                                       href="{{ url_for('.add_findings', assessment_id=assessment.id) }}">
+                                       href="{{ url_for('.add_findings', assessment_id=assessment.id, next=request.path) }}">
                                         <span class="fa fa-plus"></span>
                                     </a>
                                 </div>

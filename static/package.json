@@ -17,6 +17,7 @@
     "horsey": "^4.2.2",
     "jquery": "^3.3.1",
     "jquery-ui-dist": "^1.12.1",
+    "jquery.qrcode": "^1.0.3",
     "markdown": "^0.5.0",
     "popper.js": "^1.14.3"
   }

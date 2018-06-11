@@ -1,10 +1,9 @@
 import os
-from secrets import token_urlsafe
 
+from sarna.core import csrf, limiter, app, login_manager
 from flask import render_template, request
 from werkzeug import exceptions
 
-from sarna.core import csrf, limiter, app
 from sarna.core import assets
 from sarna.model import init_database, ObjectNotFound
 from sarna.routes import clients, index, findings, users, assessments
@@ -55,14 +54,7 @@ if __name__ == '__main__':
     csrf.init_app(app)
     limiter.init_app(app)
     assets.init_app(app)
-
-    app.config.update(
-        DEBUG=True,
-        WTF_CSRF_SECRET_KEY=token_urlsafe(64),
-        SECRET_KEY=token_urlsafe(64),
-        MAX_CONTENT_LENGTH=10 * 1024 * 1024,  # 10 Mb limit
-        ASSETS_DEBUG=True
-    )
+    login_manager.init_app(app)
 
     extra_files = ["templates"]
     for dirname, dirs, files in os.walk("templates"):

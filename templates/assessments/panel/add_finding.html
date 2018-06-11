@@ -29,12 +29,12 @@
                             <td>
                                 <div class="btn-group float-right">
                                     <a class="btn btn-success"
-                                       href="{{ url_for('.add_finding', assessment_id=assessment.id, finding_id=finding.id) }}">
+                                       href="{{ url_for('.add_finding', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}">
                                         <span class="fa fa-plus"></span>
                                     </a>
 
                                     <a class="btn btn-info"
-                                       href="{{ url_for('.edit_add_finding', assessment_id=assessment.id, finding_id=finding.id) }}">
+                                       href="{{ url_for('.edit_add_finding', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}">
                                         <span class="fa fa-pencil"></span>
                                         <span class="fa fa-plus"></span>
                                     </a>
@@ -46,7 +46,7 @@
                 </table>
             {% else %}
                 <h4 class="text-center">No findings on global database</h4>
-                <h5 class="text-center"><a href="{{ url_for('findings.new') }}">Do your work and add some
+                <h5 class="text-center"><a href="{{ url_for('findings.new', next=request.path) }}">Do your work and add some
                     findings!</a></h5>
 
             {% endif %}

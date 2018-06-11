@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css"
           integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
     {% assets "css_all" %}
-    <link href="{{ ASSET_URL }}" rel="stylesheet">
+        <link href="{{ ASSET_URL }}" rel="stylesheet">
     {% endassets %}
     {% assets "js_all" %}
-    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
     {% endassets %}
 
 
@@ -72,8 +72,11 @@
                         </li>
                     {% endblock %}
                 </ul>
-                {% if username %}
-                    <p class="navbar-text navbar-right">Signed in as {{ username }}</p>
+                {% if current_user.is_authenticated %}
+                    <p class="navbar-text navbar-right">
+                        Signed in as {{ current_user.username }}
+                        <a href="{{ url_for('index.logout') }}">Log out</a>
+                    </p>
                 {% endif %}
             </div>
         </nav>
