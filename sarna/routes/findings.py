@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, render_template, request, flash
 
-from sarna.core import login_required, current_user
+from sarna.core.auth import login_required, current_user
 from sarna.auxiliary import redirect_back
 from sarna.model.enumerations import *
 from sarna.model import *

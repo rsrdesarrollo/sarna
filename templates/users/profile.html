@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% from "macros.html" import render_field %}
+{% from "macros.html" import render_field, render_form %}
 {% block body %}
 
     <div class="row mt-3 pl-3">
@@ -16,38 +16,84 @@
             <div class="ml-3">
                 {% if not current_user.otp_enabled %}
                     <h3 class="mt-5">Enable OTP</h3>
-                    <div id="qrcode" class="mt-4 mb-4 row justify-content-center"></div>
+                    <div id="qrcode" class="mt-4 mb-4 px-5 row justify-content-center">
+                        <button type="button" class="btn btn-block btn-outline-primary" id="show_qr">Show QR</button>
+                    </div>
                     <script>
                         $(document).ready(function () {
-                            $('#qrcode').qrcode({
-                                width: 400,
-                                height: 400,
-                                text: "{{ current_user.generate_otp() }}"
+                            var show_qr = $('#show_qr');
+                            show_qr.click(function (ev) {
+                                show_qr.hide();
+                                var qrcode = $('#qrcode');
+                                qrcode.qrcode({
+                                    width: 400,
+                                    height: 400,
+                                    text: "{{ current_user.generate_otp() }}"
+                                });
+
+                                var canvas = qrcode.children('canvas');
+                                canvas.click(function () {
+                                    show_qr.show();
+                                    canvas.remove();
+                                })
                             });
                         })
                     </script>
                     <form action="{{ url_for('users.enable_otp') }}" method="POST" class="mt-3">
+
+                        {{ otp_form.csrf_token }}
                         <div class="form-row">
-                            {{ form.csrf_token }}
                             <div class="col">
-                                {{ render_field(form.otp, with_label=False, maxlength="6", pattern="[0-9]{6}") }}
+                                {{ render_field(otp_form.password, with_label=False, type='password') }}
+                            </div>
+                        </div>
+                        <div class="form-row mt-2">
+                            <div class="col">
+                                {{ render_field(otp_form.otp, with_label=False, maxlength="6", pattern="[0-9]{6}") }}
                             </div>
                             <div class="col-5">
-                                <button type="submit" class="btn btn-success btn-block ml-2">Enable OTP</button>
+                                <button type="submit" class="btn btn-success btn-block pl-2">Enable OTP</button>
                             </div>
                         </div>
                     </form>
                 {% else %}
 
                     <h3 class="mt-5">Disable OTP</h3>
-                    <h5>Insert your current OTP to disable it.</h5>
-                    <form action="{{ url_for('users.disable_otp') }}" method="POST" class="form-inline mt-3">
-                        {{ form.csrf_token }}
-                        {{ render_field(form.otp, with_label=False, maxlength="6", pattern="[0-9]{6}") }}
-                        <button type="submit" class="btn btn-danger ml-2">Disable OTP</button>
+                    <h5>Insert your current OTP and password to disable it.</h5>
+                    <form action="{{ url_for('users.disable_otp') }}" method="POST" class="mt-3">
+                        {{ otp_form.csrf_token }}
+                        <div class="form-row">
+                            <div class="col">
+                                {{ render_field(otp_form.password, with_label=False, type='password') }}
+                            </div>
+                        </div>
+                        <div class="form-row mt-2">
+                            <div class="col">
+                                {{ render_field(otp_form.otp, with_label=False, maxlength="6", pattern="[0-9]{6}") }}
+                            </div>
+                            <div class="col-5">
+                                <button type="submit" class="btn btn-danger btn-block pl-2">Disable OTP</button>
+                            </div>
+                        </div>
                     </form>
                 {% endif %}
             </div>
+        </div>
+    </div>
+    <div class="row mt-5 pl-3">
+
+
+        <div class="col-lg-4 ml-3">
+            <h3>Change password</h3>
+            <form action="{{ url_for('users.change_passwd') }}" method="POST">
+                {{ render_field(change_passwd_form.oldpassword, type='password', with_label=False, class_='mt-2') }}
+                {{ render_field(change_passwd_form.newpassword, type='password', with_label=False, class_='mt-2') }}
+                {{ render_field(change_passwd_form.newpasswordrep, type='password', with_label=False, class_='mt-2') }}
+                {% if current_user.otp_enabled %}
+                    {{ render_field(change_passwd_form.otp, with_label=False, class_='mt-2') }}
+                {% endif %}
+                <button type="submit" class="btn btn-success btn-block mt-3">Change password</button>
+            </form>
         </div>
     </div>
 

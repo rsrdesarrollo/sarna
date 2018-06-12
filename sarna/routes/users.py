@@ -3,8 +3,8 @@ import os
 from flask import Blueprint, render_template, request, flash
 
 from sarna.auxiliary import redirect_back
-from sarna.core import login_required, current_user
-from sarna.forms import OtpConfirmForm
+from sarna.core.auth import login_required, current_user
+from sarna.forms import OtpConfirmForm, ChangePasswordForm
 from sarna.model import db_session, User
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
@@ -15,10 +15,10 @@ blueprint = Blueprint('users', __name__)
 @db_session
 @login_required
 def index():
-    form = OtpConfirmForm()
     context = dict(
         route=ROUTE_NAME,
-        form=form
+        otp_form=OtpConfirmForm(),
+        change_passwd_form=ChangePasswordForm()
     )
     return render_template('users/profile.html', **context)
 
@@ -58,3 +58,19 @@ def disable_otp():
         flash('Invalid OTP, please try again.', 'danger')
 
     return redirect_back('users.index')
+
+
+@blueprint.route('/changepass_otp', methods=('POST',))
+@db_session
+@login_required
+def change_passwd():
+    form = ChangePasswordForm()
+    user: User = current_user
+
+    if not user.otp_enabled or user.check_otp(form.otp.data):
+        if user.check_password(form.oldpassword.data):
+            if form.newpassword.data == form.newpasswordrep.data:
+                pass
+            else:
+                flash('Password repea')
+    return redirect_back('user.index')

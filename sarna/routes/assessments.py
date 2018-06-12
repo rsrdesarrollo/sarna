@@ -5,8 +5,8 @@ from flask import abort
 from werkzeug.utils import secure_filename
 
 from sarna.auxiliary import redirect_back
-from sarna.core import limiter
-from sarna.core import login_required
+from sarna.core.security import limiter
+from sarna.core.auth import login_required
 from sarna.forms import *
 from sarna.model import *
 from sarna.model.enumerations import *

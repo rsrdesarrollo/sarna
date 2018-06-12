@@ -1,10 +1,12 @@
 import os
 
-from sarna.core import csrf, limiter, app, login_manager
 from flask import render_template, request
 from werkzeug import exceptions
 
+from sarna.core import app
 from sarna.core import assets
+from sarna.core.auth import login_manager
+from sarna.core.security import csrf, limiter
 from sarna.model import init_database, ObjectNotFound
 from sarna.routes import clients, index, findings, users, assessments
 

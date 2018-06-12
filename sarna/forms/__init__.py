@@ -198,4 +198,12 @@ class LoginForm(FlaskForm):
 
 
 class OtpConfirmForm(FlaskForm):
+    otp = StringField(validators=[validators.DataRequired()], label='Google Authenticator')
+    password = StringField(validators=[validators.DataRequired()])
+
+
+class ChangePasswordForm(FlaskForm):
+    oldpassword = StringField(validators=[validators.DataRequired()], label='Old Password')
+    newpassword = StringField(validators=[validators.DataRequired()], label='New Password')
+    newpasswordrep = StringField(validators=[validators.DataRequired()], label='Repeat new Password')
     otp = StringField(label='Google Authenticator')

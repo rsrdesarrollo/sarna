@@ -4,7 +4,7 @@ from uuid import uuid4
 from flask import Blueprint, render_template, request, send_from_directory
 
 from sarna.auxiliary import redirect_back
-from sarna.core import login_required, current_user
+from sarna.core.auth import login_required, current_user
 from sarna.forms import AssessmentForm, TemplateCreateNewForm
 from sarna.forms import ClientForm
 from sarna.model import Client, Assessment, Template
