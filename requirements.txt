@@ -2,7 +2,6 @@ docx
 wtforms
 werkzeug
 docxtpl
-pony
 cvsslib
 Flask-WTF
 Flask-Limiter
@@ -21,3 +20,5 @@ cssmin
 flask-login
 terminaltables
 pyotp
+flask-sqlalchemy
+Flask-Migrate
