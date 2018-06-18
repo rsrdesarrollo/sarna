@@ -2,7 +2,7 @@ from functools import wraps
 
 from flask_login import LoginManager, login_required, current_user, logout_user
 
-from sarna.model import User, db_session
+from sarna.model import User
 
 __all__ = ['login_manager', 'logout_user', 'login_required', 'current_user', 'admin_required']
 
@@ -26,6 +26,5 @@ def admin_required(func):
 
 
 @login_manager.user_loader
-@db_session
 def load_user(user_id):
     return User[user_id]

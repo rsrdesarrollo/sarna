@@ -22,3 +22,4 @@ terminaltables
 pyotp
 flask-sqlalchemy
 Flask-Migrate
+Flask-Script

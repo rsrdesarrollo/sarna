@@ -20,7 +20,11 @@ class DevelopmentConfig:
     _default_evidences_path = path.join(PROJECT_PATH, 'uploaded_data', 'evidences')
     _default_templates_path = path.join(PROJECT_PATH, 'uploaded_data', 'templates')
 
-    DATABASE_PATH = path.abspath(os.getenv('SARNA_DATABASE_PATH', _default_database_path))
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = "sqlite:///{}".format(path.join(
+        path.abspath(os.getenv('SARNA_DATABASE_PATH', _default_database_path)),
+        'databse.db'
+    ))
 
     EVIDENCES_PATH = path.abspath(os.getenv('SARNA_EVIDENCES_PATH', _default_evidences_path))
     EVIDENCES_ALLOW_EXTENSIONS = {'png', 'jpeg', 'jpg', 'bmp'}

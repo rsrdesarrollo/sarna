@@ -1,80 +1,125 @@
 import os
-from datetime import datetime, date
+from datetime import datetime
 from typing import *
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pyotp
 from cvsslib import cvss3, calculate_vector
-from pony.orm.core import *
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 from rfc3986.uri import URIReference
+from sqlalchemy.ext.associationproxy import association_proxy
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from sarna.core import app
 from sarna.core.config import config
 from sarna.model.enumerations import *
+from sarna.model.guid import GUID
 
-db = Database()
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 __all__ = [
     'db', 'Client', 'Assessment', 'FindingTemplate', 'FindingTemplateTranslation',
-    'Active', 'AffectedResource', 'Finding', 'Template', 'Solution', 'Image', 'Approval',
-    'User', 'select', 'commit', 'db_session', 'TransactionIntegrityError', 'ObjectNotFound',
-    'init_database'
+    'Active', 'AffectedResource', 'Finding', 'Template', 'Solution', 'Image',
+    'User'
 ]
 
+"""
+Client
+"""
 
-class Client(db.Entity):
-    id = PrimaryKey(UUID, default=uuid4)
-    assessments = Set('Assessment')
-    templates = Set('Template')
-    short_name = Required(str, 64)
-    long_name = Required(str, 128)
+client_management = db.Table('client_management',
+    db.Column('managed_client_id', db.Integer, db.ForeignKey('client.id'), primary_key=True),
+    db.Column('manager_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
 
-    creator = Required('User')
-    managers = Set('User')
-    auditors = Set('User')
+client_audit = db.Table('client_audit',
+    db.Column('audited_client_id', db.Integer, db.ForeignKey('client.id'), primary_key=True),
+    db.Column('auditor_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
+
+
+class Client(db.Model):
+    __tablename__ = 'client'
+    id = db.Column(db.Integer, primary_key=True)
+    assessments = db.relationship('Assessment', back_populates='client')
+    templates = db.relationship('Template', back_populates='client')
+    short_name = db.Column(db.String(64), nullable=False)
+    long_name = db.Column(db.String(128), nullable=False)
+
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    creator = db.relationship("User", back_populates="created_clients", uselist=False)
+
+    managers = db.relationship('User', secondary=client_management, back_populates='managed_clients')
+    auditors = db.relationship('User', secondary=client_audit, back_populates='audited_clients')
 
     def template_path(self):
         return os.path.join(config.TEMPLATES_PATH, str(self.id))
 
 
-class Assessment(db.Entity):
-    id = PrimaryKey(int, auto=True)
-    uuid = Required(UUID, default=uuid4, unique=True)
-    name = Required(str, 32)
-    lang = Required(Language)
-    type = Required(AssessmentType)
-    platform = Required(str, 64)
-    status = Required(AssessmentStatus)
-    client = Required(Client)
-    actives = Set('Active')
-    findings = Set('Finding')
-    images = Set('Image')
-    creation_date = Required(datetime, default=lambda: datetime.now())
-    start_date = Optional(date)
-    end_date = Optional(date)
-    estimated_hours = Optional(int)
-    effective_hours = Optional(int)
+"""
+Assessment
+"""
 
-    approvals = Set('Approval')
-    creator = Required('User')
-    auditors = Set('User')
+auditor_approval = db.Table('auditor_approval',
+    db.Column('approving_user_id', db.ForeignKey('user.id', primary_key=True)),
+    db.Column('approved_assessment_id', db.ForeignKey('assessment.id', primary_key=True)),
+    db.Column('approved_at', db.DateTime, default=lambda: datetime.now(), nullable=False)
+)
+
+assessment_audit = db.Table('assessment_audit',
+    db.Column('audited_assessment_id', db.Integer, db.ForeignKey('assessment.id', primary_key=True)),
+    db.Column('auditor_id', db.Integer, db.ForeignKey('user.id', primary_key=True))
+)
+
+
+class Assessment(db.Model):
+    __tablename__ = 'assessment'
+    id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(GUID, default=uuid4, unique=True, nullable=False)
+    name = db.Column(db.String(32), nullable=False)
+    platform = db.Column(db.String(64), nullable=False)
+    lang = db.Column(db.Enum(Language), nullable=False)
+    type = db.Column(db.Enum(AssessmentType), nullable=False)
+    status = db.Column(db.Enum(AssessmentStatus), nullable=False)
+
+    client_id = db.Column(db.Integer, db.ForeignKey('client.id'), nullable=False)
+    client = db.relationship("User", back_populates="assessments", uselist=False)
+
+    actives = db.relationship('Active', back_populates='assessment')
+    findings = db.relationship('Finding', back_populates='assessment')
+    images = db.relationship('Image', back_populates='assessment')
+
+    creation_date = db.Column(db.DateTime, default=lambda: datetime.now(), nullable=False)
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
+    estimated_hours = db.Column(db.Integer)
+    effective_hours = db.Column(db.Integer)
+
+    approvals = db.relationship('User', secondary=auditor_approval, back_populates='approved_assessments')
+
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    creator = db.relationship("User", back_populates="created_assessments", uselist=False)
+
+    auditors = db.relationship('User', secondary=assessment_audit, back_populates='audited_assessments')
 
     def _aggregate_score(self, field):
         return [
-            count(f for f in self.findings if getattr(f, field) == Score.Info),
-            count(f for f in self.findings if getattr(f, field) == Score.Low),
-            count(f for f in self.findings if getattr(f, field) == Score.Medium),
-            count(f for f in self.findings if getattr(f, field) == Score.High),
-            count(f for f in self.findings if getattr(f, field) == Score.Critical)
+            self.findings.filter(Finding.has(**{field: Score.Info})).count(),
+            self.findings.filter(Finding.has(**{field: Score.Low})).count(),
+            self.findings.filter(Finding.has(**{field: Score.Medium})).count(),
+            self.findings.filter(Finding.has(**{field: Score.High})).count(),
+            self.findings.filter(Finding.has(**{field: Score.Critical})).count()
         ]
 
     def aggregate_finding_status(self):
         return [
-            count(f for f in self.findings if f.status == FindingStatus.Pending),
-            count(f for f in self.findings if f.status == FindingStatus.Reviewed),
-            count(f for f in self.findings if f.status == FindingStatus.Confirmed),
-            count(f for f in self.findings if f.status == FindingStatus.False_Positive),
-            count(f for f in self.findings if f.status == FindingStatus.Other)
+            self.findings.filter(Finding.has(status=FindingStatus.Pending)).count(),
+            self.findings.filter(Finding.has(status=FindingStatus.Reviewed)).count(),
+            self.findings.filter(Finding.has(status=FindingStatus.Confirmed)).count(),
+            self.findings.filter(Finding.has(status=FindingStatus.False_Positive)).count(),
+            self.findings.filter(Finding.has(status=FindingStatus.Other)).count()
         ]
 
     def aggregate_technical_risk(self):
@@ -87,87 +132,112 @@ class Assessment(db.Entity):
         return os.path.join(config.EVIDENCES_PATH, str(self.uuid))
 
 
-class FindingTemplate(db.Entity):
-    id = PrimaryKey(int, auto=True)
-    name = Required(str, 64)
-    type = Required(FindingType)
-    owasp_category = Optional(OWASPCategory)
-    tech_risk = Required(Score)  # [0 to 4]
-    dissemination = Required(Score)  # [0 to 4]Active
-    solution_complexity = Required(Score)  # [0 to 4]
-    solutions = Set('Solution')
-    translations = Set('FindingTemplateTranslation')
+"""
+Finding template
+"""
 
-    creator = Required('User')
-    findings = Set('Finding')
+
+class FindingTemplate(db.Model):
+    __tablename__ = 'finding_template'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), nullable=False)
+    type = db.Column(db.Enum(FindingType), nullable=False)
+    owasp_category = db.Column(db.Enum(OWASPCategory))
+    tech_risk = db.Column(db.Enum(Score), nullable=False)
+    dissemination = db.Column(db.Enum(Score), nullable=False)
+    solution_complexity = db.Column(db.Enum(Score), nullable=False)
+
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    creator = db.relationship('User', back_populates='created_findings', uselist=False)
+
+    solutions = db.relationship('Solution')
+    translations = db.relationship('FindingTemplateTranslation')
 
     @property
     def langs(self):
-        return [t.lang for t in self.translations]
+        return self.translations.distinct(FindingTemplateTranslation.lang)
 
 
-class FindingTemplateTranslation(db.Entity):
-    lang = Required(Language)
-    title = Required(str)
-    definition = Required(LongStr)
-    references = Required(LongStr)
-    description = Optional(LongStr)
-    finding = Required(FindingTemplate)
-    PrimaryKey(finding, lang)
+class FindingTemplateTranslation(db.Model):
+    __tablename__ = 'finding_template_translation'
+
+    lang = db.Column(db.Enum(Language), primary_key=True)
+    finding_id = db.Column(db.ForeignKey('finding_template.id'), primary_key=True)
+
+    title = db.Column(db.String(), nullable=False)
+    definition = db.Column(db.String(), nullable=False)
+    references = db.Column(db.String(), nullable=False)
+    description = db.Column(db.String())
 
 
-class Active(db.Entity):
-    name = Required(str)
-    affected_resources = Set('AffectedResource')
-    assessment = Required(Assessment)
-    PrimaryKey(assessment, name)
+"""
+Actives
+"""
+
+
+class Active(db.Model):
+    __tablename__ = 'active'
+    assessment_id = db.Column(db.ForeignKey('assessment.id'), primary_key=True)
+    name = db.Column(db.String(), primary_key=True)
+
+    affected_resources = association_proxy('active_resources', 'affected_resources')
 
     @property
     def uris(self):
-        for resource in self.affected_resources:
+        for resource in self.affected_resources.all():
             yield resource.uri
 
 
-class AffectedResource(db.Entity):
-    id = PrimaryKey(int, auto=True)
-    active = Required(Active)
-    route = Optional(str)
-    findings = Set('Finding')
-    composite_key(active, route)
+class AffectedResource(db.Model):
+    __tablename__ = 'affected_resource'
+    active_id = db.Column(db.String, db.ForeignKey('active.name'), primary_key=True)
+    active = db.relationship(Active, backref='active_resources', uselist=False)
+
+    finding_id = db.Column(db.Integer, db.ForeignKey('finding.id'), primary_key=True)
+    finding = db.relationship(Active, backref='finding_resources', uselist=False)
+
+    route = db.Column(db.String(), nullable=True)
+    db.UniqueConstraint('active_id', 'route')
 
     @property
     def uri(self):
         return "{}{}".format(self.active.name, self.route or '')
 
 
-class Finding(db.Entity):
-    id = PrimaryKey(int, auto=True)
-    name = Required(str, 64)
-    type = Required(FindingType)
-    assessment = Required(Assessment, index=True)
-    template = Optional(FindingTemplate)
+class Finding(db.Model):
+    __tablename__ = 'finding'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), nullable=False)
+    type = db.Column(db.Enum(FindingType), nullable=False)  # FindingType)
 
-    title = Required(str)
-    status = Required(FindingStatus, default=FindingStatus.Pending)
-    owasp_category = Optional(OWASPCategory)
+    assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'))
+    assessment = db.relationship(Assessment, back_populates='findings', uselist=False)
 
-    description = Optional(LongStr)
-    solution = Optional(LongStr)
+    template_id = db.Column(db.Integer, db.ForeignKey('finding_template.id'))
+    template = db.relationship(FindingTemplate, uselist=False)
 
-    tech_risk = Required(Score)
-    business_risk = Optional(Score)
-    exploitability = Optional(Score)
-    dissemination = Required(Score)
-    solution_complexity = Required(Score)
+    title = db.Column(db.String(), nullable=False)
+    status = db.Column(db.Enum(FindingStatus), nullable=False, default=FindingStatus.Pending)
+    owasp_category = db.Column(db.Enum(OWASPCategory))
 
-    definition = Required(LongStr)
-    references = Required(LongStr)
+    description = db.Column(db.String())
+    solution = db.Column(db.String())
 
-    affected_resources = Set('AffectedResource')
+    tech_risk = db.Column(db.Enum(Score), nullable=False)
+    business_risk = db.Column(db.Enum(Score))
+    exploitability = db.Column(db.Enum(Score))
+    dissemination = db.Column(db.Enum(Score), nullable=False)
+    solution_complexity = db.Column(db.Enum(Score), nullable=False)
 
-    cvss_v3_vector = Optional(str, 128)
+    definition = db.Column(db.String(), nullable=False)
+    references = db.Column(db.String(), nullable=False)
+
+    affected_resources = association_proxy('finding_resources', 'affected_resources')
+
+    cvss_v3_vector = db.Column(db.String(128))
 
     def update_affected_resources(self, resources: Collection[AnyStr]):
+        ## TODO: migrate to SQLAlchemy
         resource_uris = []
         for resource in resources:
             resource = resource.strip()
@@ -201,18 +271,18 @@ class Finding(db.Entity):
 
             try:
                 active = Active[self.assessment, active_name]
-                affected_resource = select(
+                affected_resource = len(
                     r for r in AffectedResource if r.active == active and r.route == resource_rute
                 ).first()
 
                 if not affected_resource:
                     affected_resource = AffectedResource(active=active, route=resource_rute)
 
-            except ObjectNotFound:
+            except Exception as objectNotFound:
                 active = Active(assessment=self.assessment, name=active_name)
                 affected_resource = AffectedResource(active=active, route=resource_rute)
 
-            commit()
+            db.session.commit()
             self.affected_resources.add(affected_resource)
 
     @property
@@ -238,6 +308,7 @@ class Finding(db.Entity):
 
     @classmethod
     def build_from_template(cls, template: FindingTemplate, assessment: Assessment):
+        # TODO: Migrate to SQLAlchemy
         lang = assessment.lang
         translation: FindingTemplateTranslation = None
         for t in template.translations:
@@ -263,56 +334,55 @@ class Finding(db.Entity):
         )
 
 
-class Template(db.Entity):
-    name = Required(str, 32)
-    client = Required(Client)
-    description = Optional(str, 128)
-    file = Required(str, 128)
-    PrimaryKey(client, name)
+class Template(db.Model):
+    __tablename__ = 'template'
+    name = db.Column(db.String(32), primary_key=True)
+    client_id = db.Column(db.ForeignKey('client.id'), primary_key=True)
+
+    description = db.Column(db.String(128))
+    file = db.Column(db.String(128), nullable=False)
 
 
-class Solution(db.Entity):
-    name = Required(str, 32)
-    lang = Required(Language)
-    text = Required(LongStr)
-    finding_template = Required(FindingTemplate)
-    PrimaryKey(finding_template, name)
+class Solution(db.Model):
+    __tablename__ = 'solution'
+    name = db.Column(db.String(32), primary_key=True)
+    finding_template_id = db.Column(db.ForeignKey('finding_template.id'), primary_key=True)
+
+    lang = db.Column(db.Enum(Language), nullable=False)
+    text = db.Column(db.String(), nullable=False)
 
 
-class Image(db.Entity):
-    name = Required(str)
-    assessment = Required(Assessment)
-    label = Optional(str)
-    PrimaryKey(assessment, name)
+class Image(db.Model):
+    __tablename__ = 'image'
+    name = db.Column(db.String(128), primary_key=True)
+    assessment_id = db.Column(db.ForeignKey('assessment.id'), primary_key=True)
+    label = db.Column(db.String())
 
 
-class Approval(db.Entity):
-    id = PrimaryKey(UUID, default=uuid4)
-    date = Required(datetime, default=lambda: datetime.now())
-    assessment = Required(Assessment)
-    user = Required('User')
+class User(db.Model):
+    __tablename__ = 'user'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(128), unique=True)
+    is_admin = db.Column(db.Boolean(), default=False, nullable=False)
+    passwd = db.Column(db.String())
 
+    creation_date = db.Column(db.DateTime, default=lambda: datetime.now(), nullable=False)
+    last_access = db.Column(db.DateTime)
 
-class User(db.Entity):
-    username = PrimaryKey(str)
-    is_admin = Required(bool, default=False)
-    passwd = Optional(str)
-    creation_date = Required(datetime, default=lambda: datetime.now())
-    last_access = Optional(datetime)
-    is_locked = Required(bool, default=False)
-    otp_enabled = Required(bool, default=False)
-    otp_seed = Optional(str)
+    is_locked = db.Column(db.Boolean(), default=False, nullable=False)
+    otp_enabled = db.Column(db.Boolean(), default=False, nullable=False)
+    otp_seed = db.Column(db.String(16))
 
-    approvals = Set(Approval)
+    ## TODO: approvals = Set(Approval)
 
-    manages = Set('Client', reverse='managers')
+    ## TODO: manages = Set('Client', reverse='managers')
 
-    created_clients = Set('Client', reverse='creator')
-    created_findings = Set('FindingTemplate', reverse='creator')
-    created_assessments = Set('Assessment', reverse='creator')
+    ## TODO: created_clients = Set('Client', reverse='creator')
+    ## TODO: created_findings = Set('FindingTemplate', reverse='creator')
+    ## TODO: created_assessments = Set('Assessment', reverse='creator')
 
-    audits_assessments = Set('Assessment', reverse='auditors')
-    audits_clients = Set('Client', reverse='auditors')
+    ## TODO: audits_assessments = Set('Assessment', reverse='auditors')
+    ## TODO: audits_clients = Set('Client', reverse='auditors')
 
     def login(self):
         from flask_login import login_user
@@ -363,20 +433,3 @@ class User(db.Entity):
     def check_otp(self, otp):
         totp = pyotp.TOTP(self.otp_seed)
         return totp.verify(otp)
-
-
-def init_database():
-    from os import path
-
-    database_path = path.join(config.DATABASE_PATH, 'database.sqlite')
-
-    db.bind(provider='sqlite', filename=database_path, create_db=True)
-
-    for cls in (Language, AssessmentStatus, AssessmentType, FindingStatus, FindingType, Score, OWASPCategory):
-        db.provider.converter_classes.append((cls, ChoiceEnumConverter))
-
-    db.generate_mapping(create_tables=True)
-
-
-if __name__ == '__main__':
-    init_database()
