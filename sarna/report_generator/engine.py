@@ -11,7 +11,7 @@ from docxtpl import DocxTemplate
 from werkzeug.utils import secure_filename
 
 from sarna.core.config import config
-from sarna.model import Assessment, Template, db_session
+from sarna.model import Assessment, Template
 from sarna.report_generator.locale_choice import locale_choice
 from sarna.report_generator.markdown import markdown_to_docx, DOCXRenderer
 from sarna.report_generator.scores import score_to_docx
@@ -49,7 +49,6 @@ def mk_working_dir():
     return tempfile.mkdtemp(prefix='sarna-', dir='/tmp')
 
 
-@db_session
 def generate_reports_bundle(assessment: Assessment, templates: Collection[Template]) -> Tuple[AnyStr, AnyStr]:
     """
     :param assessment: Assessment object

@@ -8,14 +8,12 @@ from sarna.core.auth import login_required, current_user
 from sarna.forms import AssessmentForm, TemplateCreateNewForm
 from sarna.forms import ClientForm
 from sarna.model import Client, Assessment, Template
-from sarna.model import db_session, select, commit, TransactionIntegrityError
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('clients', __name__)
 
 
 @blueprint.route('/')
-@db_session
 @login_required
 def index():
     context = dict(
@@ -26,7 +24,6 @@ def index():
 
 
 @blueprint.route('/new', methods=('POST', 'GET'))
-@db_session
 @login_required
 def new():
     form = ClientForm(request.form)
@@ -46,7 +43,6 @@ def new():
 
 
 @blueprint.route('/delete/<client_id>', methods=('POST',))
-@db_session
 @login_required
 def delete(client_id: int):
     Client[client_id].delete()
@@ -54,7 +50,6 @@ def delete(client_id: int):
 
 
 @blueprint.route('/<client_id>', methods=('POST', 'GET'))
-@db_session
 @login_required
 def edit(client_id: int):
     client = Client[client_id]
@@ -75,7 +70,6 @@ def edit(client_id: int):
 
 
 @blueprint.route('/<client_id>/add_assessment', methods=('POST', 'GET'))
-@db_session
 @login_required
 def add_assessment(client_id: int):
     client = Client[client_id]
@@ -96,7 +90,6 @@ def add_assessment(client_id: int):
 
 
 @blueprint.route('/<client_id>/add_template', methods=('POST', 'GET'))
-@db_session
 @login_required
 def add_template(client_id: int):
     client = Client[client_id]
@@ -132,7 +125,6 @@ def add_template(client_id: int):
 
 
 @blueprint.route('/<client_id>/template/<template_name>/delete', methods=('POST',))
-@db_session
 @login_required
 def delete_template(client_id: int, template_name):
     client = Client[client_id]
@@ -143,7 +135,6 @@ def delete_template(client_id: int, template_name):
 
 
 @blueprint.route('/<client_id>/template/<template_name>/download')
-@db_session
 @login_required
 def download_template(client_id: int, template_name):
     client = Client[client_id]

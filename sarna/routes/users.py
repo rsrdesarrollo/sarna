@@ -5,14 +5,13 @@ from flask import Blueprint, render_template, request, flash
 from sarna.auxiliary import redirect_back
 from sarna.core.auth import login_required, current_user
 from sarna.forms import OtpConfirmForm, ChangePasswordForm
-from sarna.model import db_session, User
+from sarna.model import User
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('users', __name__)
 
 
 @blueprint.route('/profile')
-@db_session
 @login_required
 def index():
     context = dict(
@@ -24,7 +23,6 @@ def index():
 
 
 @blueprint.route('/enable_otp', methods=('POST',))
-@db_session
 @login_required
 def enable_otp():
     form = OtpConfirmForm(request.form)
@@ -42,7 +40,6 @@ def enable_otp():
 
 
 @blueprint.route('/disable_otp', methods=('POST',))
-@db_session
 @login_required
 def disable_otp():
     form = OtpConfirmForm(request.form)
@@ -61,7 +58,6 @@ def disable_otp():
 
 
 @blueprint.route('/changepass_otp', methods=('POST',))
-@db_session
 @login_required
 def change_passwd():
     form = ChangePasswordForm()

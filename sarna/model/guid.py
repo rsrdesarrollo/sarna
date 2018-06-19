@@ -2,6 +2,7 @@ from sqlalchemy.types import TypeDecorator, CHAR
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
+
 class GUID(TypeDecorator):
     """Platform-independent GUID type.
 

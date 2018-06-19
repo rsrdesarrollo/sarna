@@ -12,7 +12,6 @@ blueprint = Blueprint('findings', __name__)
 
 
 @blueprint.route('/')
-@db_session
 @login_required
 def index():
     context = dict(
@@ -23,7 +22,6 @@ def index():
 
 
 @blueprint.route('/new', methods=('GET', 'POST'))
-@db_session
 @login_required
 def new():
     form = FindingTemplateCreateNewForm(request.form)
@@ -45,7 +43,6 @@ def new():
 
 
 @blueprint.route('/<finding_id>', methods=('POST', 'GET'))
-@db_session
 @login_required
 def edit(finding_id: int):
     finding = FindingTemplate[finding_id]
@@ -66,7 +63,6 @@ def edit(finding_id: int):
 
 
 @blueprint.route('/<finding_id>/delete', methods=('POST',))
-@db_session
 @login_required
 def delete(finding_id: int):
     FindingTemplate[finding_id].delete()
@@ -74,7 +70,6 @@ def delete(finding_id: int):
 
 
 @blueprint.route('/<finding_id>/add_translation', methods=('POST', 'GET'))
-@db_session
 @login_required
 def add_translation(finding_id: int):
     finding = FindingTemplate[finding_id]
@@ -110,7 +105,6 @@ def add_translation(finding_id: int):
 
 
 @blueprint.route('/<finding_id>/delete/<language>', methods=('POST',))
-@db_session
 @login_required
 def delete_translation(finding_id: int, language: str):
     FindingTemplateTranslation[finding_id, Language[language]].delete()
@@ -118,7 +112,6 @@ def delete_translation(finding_id: int, language: str):
 
 
 @blueprint.route('/<finding_id>/edit/<language>', methods=('POST', 'GET'))
-@db_session
 @login_required
 def edit_translation(finding_id: int, language: str):
     language = Language[language]
@@ -147,7 +140,6 @@ def edit_translation(finding_id: int, language: str):
 
 
 @blueprint.route('/<finding_id>/add_solution', methods=('POST', 'GET'))
-@db_session
 @login_required
 def add_solution(finding_id: int):
     finding = FindingTemplate[finding_id]
@@ -177,7 +169,6 @@ def add_solution(finding_id: int):
 
 
 @blueprint.route('/<finding_id>/solution/<solution_name>/delete', methods=('POST',))
-@db_session
 @login_required
 def delete_solution(finding_id: int, solution_name: str):
     Solution[finding_id, solution_name].delete()
@@ -185,7 +176,6 @@ def delete_solution(finding_id: int, solution_name: str):
 
 
 @blueprint.route('/<finding_id>/solution/<solution_name>', methods=('POST', 'GET'))
-@db_session
 @login_required
 def edit_solution(finding_id: int, solution_name: str):
     solution = Solution[finding_id, solution_name]

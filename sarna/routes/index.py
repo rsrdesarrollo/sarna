@@ -5,14 +5,13 @@ from flask import Blueprint, render_template, request, flash
 from sarna.auxiliary import redirect_back
 from sarna.core.auth import login_required, logout_user
 from sarna.forms import LoginForm
-from sarna.model import User, db_session, ObjectNotFound
+from sarna.model import User
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('index', __name__)
 
 
 @blueprint.route('/', methods=('GET', 'POST'))
-@db_session
 def index():
     form = LoginForm(request.form)
     context = dict(
@@ -46,7 +45,6 @@ def index():
 
 
 @blueprint.route('/logout')
-@db_session
 @login_required
 def logout():
     logout_user()

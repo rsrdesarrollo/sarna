@@ -30,21 +30,21 @@ Client
 """
 
 client_management = db.Table('client_management',
-    db.Column('managed_client_id', db.Integer, db.ForeignKey('client.id'), primary_key=True),
-    db.Column('manager_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
-)
+                             db.Column('managed_client_id', db.Integer, db.ForeignKey('client.id'), primary_key=True),
+                             db.Column('manager_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+                             )
 
 client_audit = db.Table('client_audit',
-    db.Column('audited_client_id', db.Integer, db.ForeignKey('client.id'), primary_key=True),
-    db.Column('auditor_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
-)
+                        db.Column('audited_client_id', db.Integer, db.ForeignKey('client.id'), primary_key=True),
+                        db.Column('auditor_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+                        )
 
 
 class Client(db.Model):
     __tablename__ = 'client'
     id = db.Column(db.Integer, primary_key=True)
     assessments = db.relationship('Assessment', back_populates='client')
-    templates = db.relationship('Template', back_populates='client')
+    templates = db.relationship('Template', backref='client')
     short_name = db.Column(db.String(64), nullable=False)
     long_name = db.Column(db.String(128), nullable=False)
 
@@ -63,15 +63,16 @@ Assessment
 """
 
 auditor_approval = db.Table('auditor_approval',
-    db.Column('approving_user_id', db.ForeignKey('user.id', primary_key=True)),
-    db.Column('approved_assessment_id', db.ForeignKey('assessment.id', primary_key=True)),
-    db.Column('approved_at', db.DateTime, default=lambda: datetime.now(), nullable=False)
-)
+                            db.Column('approving_user_id', db.ForeignKey('user.id', primary_key=True)),
+                            db.Column('approved_assessment_id', db.ForeignKey('assessment.id', primary_key=True)),
+                            db.Column('approved_at', db.DateTime, default=lambda: datetime.now(), nullable=False)
+                            )
 
 assessment_audit = db.Table('assessment_audit',
-    db.Column('audited_assessment_id', db.Integer, db.ForeignKey('assessment.id', primary_key=True)),
-    db.Column('auditor_id', db.Integer, db.ForeignKey('user.id', primary_key=True))
-)
+                            db.Column('audited_assessment_id', db.Integer,
+                                      db.ForeignKey('assessment.id', primary_key=True)),
+                            db.Column('auditor_id', db.Integer, db.ForeignKey('user.id', primary_key=True))
+                            )
 
 
 class Assessment(db.Model):
@@ -85,11 +86,11 @@ class Assessment(db.Model):
     status = db.Column(db.Enum(AssessmentStatus), nullable=False)
 
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'), nullable=False)
-    client = db.relationship("User", back_populates="assessments", uselist=False)
+    client = db.relationship(Client, back_populates="assessments", uselist=False)
 
-    actives = db.relationship('Active', back_populates='assessment')
+    actives = db.relationship('Active', backref='assessment')
     findings = db.relationship('Finding', back_populates='assessment')
-    images = db.relationship('Image', back_populates='assessment')
+    images = db.relationship('Image', backref='assessment')
 
     creation_date = db.Column(db.DateTime, default=lambda: datetime.now(), nullable=False)
     start_date = db.Column(db.Date)
@@ -97,7 +98,7 @@ class Assessment(db.Model):
     estimated_hours = db.Column(db.Integer)
     effective_hours = db.Column(db.Integer)
 
-    approvals = db.relationship('User', secondary=auditor_approval, back_populates='approved_assessments')
+    approvals = db.relationship('User', secondary=auditor_approval, back_populates='approvals')
 
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     creator = db.relationship("User", back_populates="created_assessments", uselist=False)
@@ -373,16 +374,15 @@ class User(db.Model):
     otp_enabled = db.Column(db.Boolean(), default=False, nullable=False)
     otp_seed = db.Column(db.String(16))
 
-    ## TODO: approvals = Set(Approval)
+    managed_clients = db.relationship(Client, secondary=client_management, back_populates='managers')
+    created_clients = db.relationship(Client, back_populates="creator")
+    audited_clients = db.relationship(Client, secondary=client_audit, back_populates='auditors')
 
-    ## TODO: manages = Set('Client', reverse='managers')
+    approvals = db.relationship(Assessment, secondary=auditor_approval, back_populates='approvals')
+    created_assessments = db.relationship(Assessment, back_populates="creator")
+    audited_assessments = db.relationship(Assessment, secondary=assessment_audit, back_populates='auditors')
 
-    ## TODO: created_clients = Set('Client', reverse='creator')
-    ## TODO: created_findings = Set('FindingTemplate', reverse='creator')
-    ## TODO: created_assessments = Set('Assessment', reverse='creator')
-
-    ## TODO: audits_assessments = Set('Assessment', reverse='auditors')
-    ## TODO: audits_clients = Set('Client', reverse='auditors')
+    created_findings = db.relationship(FindingTemplate, back_populates='creator')
 
     def login(self):
         from flask_login import login_user

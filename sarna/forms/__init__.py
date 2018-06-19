@@ -2,12 +2,15 @@ import datetime
 
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
-from pony.orm.core import Entity, Attribute
-from pony.orm.core import Required, LongStr
 from wtforms import validators
 from wtforms.fields import BooleanField, SelectField, StringField, TextAreaField
 from wtforms.fields.html5 import IntegerField, DateField
 
+from flask_sqlalchemy.model import DefaultMeta as Entity
+from sqlalchemy.sql.schema import Column
+from sqlalchemy.orm.properties import ColumnProperty
+from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.sql.sqltypes import Integer, String, Boolean, Enum, Date
 from sarna.auxiliary.upload_helpers import *
 from sarna.model import *
 from sarna.model.enumerations import Choice
@@ -22,6 +25,10 @@ __all__ = [
 ]
 
 
+def props(cls):
+    return (i for i in cls.__dict__.keys() if not i.startswith('_'))
+
+
 class EntityForm(type):
     def __new__(mcs, entity: Entity, skip_attrs=None, custom_validators=None, skip_pk=True):
         if skip_attrs is None:
@@ -32,17 +39,23 @@ class EntityForm(type):
         class Form(FlaskForm):
             pass
 
-        for k, _ in entity._adict_.items():
+        for k in props(entity):
             if k in skip_attrs:
                 continue
-
-            field: Attribute = getattr(entity, k)
-            if skip_pk and field.is_pk:
+            if not isinstance(getattr(entity, k), InstrumentedAttribute):
                 continue
 
-            if field.is_basic and not field.is_discriminator:
+            f = getattr(entity, k).prop
+            if not isinstance(f, ColumnProperty):
+                continue
+
+            colum: Column = f.columns[0]
+            if skip_pk and colum.primary_key:
+                continue
+
+            if not colum.foreign_keys:
                 vals = []
-                required = isinstance(field, Required)
+                required = not colum.nullable
 
                 if k in custom_validators:
                     vals.extend(custom_validators[k])
@@ -50,29 +63,30 @@ class EntityForm(type):
                 if required:
                     vals.append(validators.DataRequired())
 
-                if field.is_pk and field.py_type == str:
+                if colum.primary_key and isinstance(colum.type, String):
                     # Just use things that wont mess the uri: Issue: pallets/flask#900
                     vals.append(simple_str_validator)
 
                 t = None
-                if field.py_type == str:
-                    t = StringField(validators=vals)
-                elif issubclass(field.py_type, Choice):
+
+                if isinstance(colum.type, Enum):
                     label = k[0].upper() + k[1:]
                     t = SelectField(
                         " ".join(label.split('_')),
                         validators=vals,
-                        choices=field.py_type.choices(),
-                        coerce=field.py_type.coerce
+                        choices=colum.type.enum_class.choices(),
+                        coerce=colum.type.enum_class.coerce
                     )
-                elif field.py_type == LongStr:
-                    t = TextAreaField(validators=vals)
-                elif field.py_type == bool:
+                elif isinstance(colum.type, Boolean):
                     t = BooleanField(validators=vals)
-                elif field.py_type == int:
+                elif isinstance(colum.type, Integer):
                     t = IntegerField(validators=vals if required else [validators.Optional()])
-                elif field.py_type == datetime.date:
+                elif isinstance(colum.type, Date):
                     t = DateField(validators=vals if required else [validators.Optional()])
+                elif isinstance(colum.type, String) and colum.type.length:
+                    t = StringField(validators=vals)
+                elif isinstance(colum.type, String):
+                    t = TextAreaField(validators=vals)
 
                 if t is not None:
                     setattr(Form, k, t)
@@ -170,7 +184,7 @@ TEMPLATES
 
 
 class TemplateCreateNewForm(
-    EntityForm(Template)
+    EntityForm(Template, skip_pk=False)
 ):
     file = FileField(validators=[FileRequired(), is_valid_template], description="Allowed templates: .docx")
 

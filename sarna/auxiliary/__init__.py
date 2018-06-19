@@ -10,7 +10,7 @@ def is_safe_url(target):
 
 
 def get_redirect_target():
-    for target in request.values.get('next'), :
+    for target in request.values.get('next'),:
         if not target:
             continue
         if is_safe_url(target):

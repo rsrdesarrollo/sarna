@@ -17,7 +17,6 @@ blueprint = Blueprint('assessments', __name__)
 
 
 @blueprint.route('/')
-@db_session
 @login_required
 def index():
     context = dict(
@@ -28,7 +27,6 @@ def index():
 
 
 @blueprint.route('/<assessment_id>', methods=('GET', 'POST'))
-@db_session
 @login_required
 def edit(assessment_id):
     assessment = Assessment[assessment_id]
@@ -52,7 +50,6 @@ def edit(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/delete', methods=('POST',))
-@db_session
 @login_required
 def delete(assessment_id):
     Assessment[assessment_id].delete()
@@ -60,7 +57,6 @@ def delete(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/summary')
-@db_session
 @login_required
 def summary(assessment_id):
     assessment = Assessment[assessment_id]
@@ -74,7 +70,6 @@ def summary(assessment_id):
 
 @blueprint.route('/<assessment_id>/findings/resource/<affected_resource_id>')
 @blueprint.route('/<assessment_id>/findings')
-@db_session
 @login_required
 def findings(assessment_id, affected_resource_id=None):
     assessment = Assessment[assessment_id]
@@ -98,7 +93,6 @@ def findings(assessment_id, affected_resource_id=None):
 
 
 @blueprint.route('/<assessment_id>/findings/<finding_id>', methods=('GET', 'POST'))
-@db_session
 @login_required
 def edit_finding(assessment_id, finding_id):
     assessment = Assessment[assessment_id]
@@ -135,7 +129,6 @@ def edit_finding(assessment_id, finding_id):
 
 
 @blueprint.route('/<assessment_id>/findings/<finding_id>/delete', methods=('POST',))
-@db_session
 @login_required
 def delete_findings(assessment_id, finding_id):
     Finding[finding_id].delete()
@@ -144,7 +137,6 @@ def delete_findings(assessment_id, finding_id):
 
 
 @blueprint.route('/<assessment_id>/add')
-@db_session
 @login_required
 def add_findings(assessment_id):
     assessment = Assessment[assessment_id]
@@ -158,7 +150,6 @@ def add_findings(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/add/<finding_id>')
-@db_session
 @login_required
 def add_finding(assessment_id, finding_id):
     # TODO: Change to POST
@@ -172,7 +163,6 @@ def add_finding(assessment_id, finding_id):
 
 
 @blueprint.route('/<assessment_id>/edit_add/<finding_id>')
-@db_session
 @login_required
 def edit_add_finding(assessment_id, finding_id):
     assessment = Assessment[assessment_id]
@@ -192,7 +182,6 @@ def edit_add_finding(assessment_id, finding_id):
 
 
 @blueprint.route('/<assessment_id>/bulk_action', methods=("POST",))
-@db_session
 @login_required
 def bulk_action_finding(assessment_id):
     data = request.form.to_dict()
@@ -234,7 +223,6 @@ def bulk_action_finding(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/actives', methods=("POST", "GET"))
-@db_session
 @login_required
 def actives(assessment_id):
     assessment = Assessment[assessment_id]
@@ -265,7 +253,6 @@ def actives(assessment_id):
 
 @blueprint.route('/<assessment_id>/evidences', methods=("POST", "GET"))
 @limiter.exempt
-@db_session
 @login_required
 def evidences(assessment_id):
     assessment = Assessment[assessment_id]
@@ -300,7 +287,6 @@ def evidences(assessment_id):
 
 @blueprint.route('/<assessment_id>/evidences/<evidence_name>')
 @limiter.exempt
-@db_session
 @login_required
 def get_evidence(assessment_id, evidence_name):
     assessment = Assessment[assessment_id]
@@ -314,7 +300,6 @@ def get_evidence(assessment_id, evidence_name):
 
 
 @blueprint.route('/<assessment_id>/reports')
-@db_session
 @login_required
 def reports(assessment_id):
     assessment = Assessment[assessment_id]
@@ -327,7 +312,6 @@ def reports(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/reports/download', methods=('POST',))
-@db_session
 @login_required
 def download_reports(assessment_id):
     assessment = Assessment[assessment_id]
@@ -360,7 +344,6 @@ def download_reports(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/reports/download/<template_name>', methods=('GET',))
-@db_session
 @login_required
 def download_report(assessment_id, template_name):
     assessment = Assessment[assessment_id]

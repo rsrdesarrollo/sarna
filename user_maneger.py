@@ -2,16 +2,17 @@ import argparse
 import getpass
 import sys
 
+from sqlalchemy.exc import IntegrityError
 from terminaltables import AsciiTable
 
-from sarna.model import User, select, init_database, db_session, ObjectNotFound, commit
+from sarna.core import app
+from sarna.model import db, User
 
 parser = argparse.ArgumentParser()
 parser.add_argument('command', help="command", choices=('add', 'list', 'del', 'mod', 'help'))
 parser.add_argument('args', nargs=argparse.REMAINDER)
 
 ops = parser.parse_args()
-init_database()
 
 
 def error(msg, code=1):
@@ -19,7 +20,7 @@ def error(msg, code=1):
     sys.exit(code)
 
 
-with db_session():
+with app.app_context():
     if ops.command == 'list':
         # noinspection PyTypeChecker
         table = AsciiTable(
@@ -31,25 +32,20 @@ with db_session():
                     user.last_access,
                     user.otp_enabled
                 )
-                for user in select(u for u in User)
+                for user in User.query.all()
             ],
             title='List of users'
         )
 
         print(table.table)
 
-
-
     elif ops.command == 'del':
         parser = argparse.ArgumentParser(prog='user_manager.py del')
         parser.add_argument('username', help='username')
         ops = parser.parse_args(ops.args)
 
-        try:
-            User[ops.username].delete()
-            commit()
-        except ObjectNotFound:
-            error("ERROR: User {} not found.".format(ops.username))
+        User.query.filter_by(username=ops.username).delete()
+        db.session.commit()
 
     elif ops.command == 'add':
         parser = argparse.ArgumentParser(prog='user_manager.py add')
@@ -63,6 +59,11 @@ with db_session():
         if pswd == pswd2:
             user = User(username=ops.username, is_admin=ops.is_admin)
             user.set_passwd(pswd)
+            db.session.add(user)
+            try:
+                db.session.commit()
+            except IntegrityError:
+                error('User {} already exist'.format(ops.username))
         else:
             error('Password confirmation mismatch.')
 
@@ -73,11 +74,8 @@ with db_session():
         parser.add_argument('username')
         ops = parser.parse_args(ops.args)
 
-        user = None
-        try:
-            user = User[ops.username]
-            commit()
-        except ObjectNotFound:
+        user = User.query.filter_by(username=ops.username).first()
+        if not user:
             error("ERROR: User {} not found.".format(ops.username))
 
         if ops.change_passwd:
@@ -89,8 +87,8 @@ with db_session():
             else:
                 error('Password confirmation mismatch.')
 
-        if ops.is_admin:
-            user.is_admin = True
+        user.is_admin = ops.is_admin
 
+        db.session.commit()
     else:
         parser.error('form more help with a command use <command> help.')
