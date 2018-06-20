@@ -27,4 +27,4 @@ def admin_required(func):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User[user_id]
+    return User.query.filter_by(username=user_id).first()

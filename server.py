@@ -8,6 +8,7 @@ from sarna.core import assets
 from sarna.core.auth import login_manager
 from sarna.core.security import csrf, limiter
 from sarna.routes import clients, index, findings, users, assessments
+from sqlalchemy.orm.exc import NoResultFound
 
 def error_handler(err):
     if request.headers.get('x-requested-with', '') == "XMLHttpRequest":
@@ -15,7 +16,7 @@ def error_handler(err):
 
     if isinstance(err, ValueError):
         err = exceptions.BadRequest()
-    elif isinstance(err, ObjectNotFound):
+    elif isinstance(err, NoResultFound):
         err = exceptions.NotFound()
 
     context = dict(

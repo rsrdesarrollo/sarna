@@ -6,14 +6,14 @@
         <div class="col-md-12">
             <h1 class="text-center text-uppercase text-info">
                 <span class="badge badge-info">
-                    {{ assessment.findings.count() }}
+                    {{ assessment.findings|length }}
                 </span>
             </h1>
             <h3 class="text-center text-uppercase text-info">Findings
             </h3>
         </div>
     </div>
-    {% if assessment.findings.count() > 0 %}
+    {% if assessment.findings|length > 0 %}
         <div class="row mt-2">
             <div class="col-md-6 offset-3">
                 <h5 class="text-center">Findings Status</h5>

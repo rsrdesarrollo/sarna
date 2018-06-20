@@ -11,6 +11,7 @@ from rfc3986.uri import URIReference
 from sqlalchemy.ext.associationproxy import association_proxy
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from sqlalchemy.orm import Query
 from sarna.core import app
 from sarna.core.config import config
 from sarna.model.enumerations import *
@@ -18,6 +19,22 @@ from sarna.model.guid import GUID
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+
+class CustomModel:
+    query: Query
+
+    def set(self, **kwargs):
+        for key, val in kwargs.items():
+            setattr(self, key, val)
+
+    def to_dict(self):
+        d = {}
+        for column in self.__table__.columns:
+            d[column.name] = getattr(self, column.name)
+
+        return d
+
 
 __all__ = [
     'db', 'Client', 'Assessment', 'FindingTemplate', 'FindingTemplateTranslation',
@@ -40,7 +57,7 @@ client_audit = db.Table('client_audit',
                         )
 
 
-class Client(db.Model):
+class Client(db.Model, CustomModel):
     __tablename__ = 'client'
     id = db.Column(db.Integer, primary_key=True)
     assessments = db.relationship('Assessment', back_populates='client')
@@ -75,7 +92,7 @@ assessment_audit = db.Table('assessment_audit',
                             )
 
 
-class Assessment(db.Model):
+class Assessment(db.Model, CustomModel):
     __tablename__ = 'assessment'
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(GUID, default=uuid4, unique=True, nullable=False)
@@ -138,7 +155,7 @@ Finding template
 """
 
 
-class FindingTemplate(db.Model):
+class FindingTemplate(db.Model, CustomModel):
     __tablename__ = 'finding_template'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
@@ -156,14 +173,15 @@ class FindingTemplate(db.Model):
 
     @property
     def langs(self):
-        return self.translations.distinct(FindingTemplateTranslation.lang)
+        return {t.lang for t in self.translations}
 
 
-class FindingTemplateTranslation(db.Model):
+class FindingTemplateTranslation(db.Model, CustomModel):
     __tablename__ = 'finding_template_translation'
 
     lang = db.Column(db.Enum(Language), primary_key=True)
     finding_id = db.Column(db.ForeignKey('finding_template.id'), primary_key=True)
+    finding = db.relationship(FindingTemplate, uselist=False)
 
     title = db.Column(db.String(), nullable=False)
     definition = db.Column(db.String(), nullable=False)
@@ -176,7 +194,7 @@ Actives
 """
 
 
-class Active(db.Model):
+class Active(db.Model, CustomModel):
     __tablename__ = 'active'
     assessment_id = db.Column(db.ForeignKey('assessment.id'), primary_key=True)
     name = db.Column(db.String(), primary_key=True)
@@ -189,7 +207,7 @@ class Active(db.Model):
             yield resource.uri
 
 
-class AffectedResource(db.Model):
+class AffectedResource(db.Model, CustomModel):
     __tablename__ = 'affected_resource'
     active_id = db.Column(db.String, db.ForeignKey('active.name'), primary_key=True)
     active = db.relationship(Active, backref='active_resources', uselist=False)
@@ -205,7 +223,7 @@ class AffectedResource(db.Model):
         return "{}{}".format(self.active.name, self.route or '')
 
 
-class Finding(db.Model):
+class Finding(db.Model, CustomModel):
     __tablename__ = 'finding'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
@@ -233,6 +251,7 @@ class Finding(db.Model):
     definition = db.Column(db.String(), nullable=False)
     references = db.Column(db.String(), nullable=False)
 
+    #TODO: many to many not working
     affected_resources = association_proxy('finding_resources', 'affected_resources')
 
     cvss_v3_vector = db.Column(db.String(128))
@@ -335,7 +354,7 @@ class Finding(db.Model):
         )
 
 
-class Template(db.Model):
+class Template(db.Model, CustomModel):
     __tablename__ = 'template'
     name = db.Column(db.String(32), primary_key=True)
     client_id = db.Column(db.ForeignKey('client.id'), primary_key=True)
@@ -344,23 +363,24 @@ class Template(db.Model):
     file = db.Column(db.String(128), nullable=False)
 
 
-class Solution(db.Model):
+class Solution(db.Model, CustomModel):
     __tablename__ = 'solution'
     name = db.Column(db.String(32), primary_key=True)
     finding_template_id = db.Column(db.ForeignKey('finding_template.id'), primary_key=True)
+    finding_template = db.relationship(FindingTemplate, uselist=False)
 
     lang = db.Column(db.Enum(Language), nullable=False)
     text = db.Column(db.String(), nullable=False)
 
 
-class Image(db.Model):
+class Image(db.Model, CustomModel):
     __tablename__ = 'image'
     name = db.Column(db.String(128), primary_key=True)
     assessment_id = db.Column(db.ForeignKey('assessment.id'), primary_key=True)
     label = db.Column(db.String())
 
 
-class User(db.Model):
+class User(db.Model, CustomModel):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), unique=True)

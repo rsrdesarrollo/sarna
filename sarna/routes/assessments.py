@@ -21,7 +21,7 @@ blueprint = Blueprint('assessments', __name__)
 def index():
     context = dict(
         route=ROUTE_NAME,
-        assessments=select(assessment for assessment in Assessment)
+        assessments=Assessment.query.all()
     )
     return render_template('assessments/list.html', **context)
 
@@ -29,7 +29,7 @@ def index():
 @blueprint.route('/<assessment_id>', methods=('GET', 'POST'))
 @login_required
 def edit(assessment_id):
-    assessment = Assessment[assessment_id]
+    assessment = Assessment.query.get(assessment_id)
     form_data = request.form.to_dict() or assessment.to_dict()
     form = AssessmentForm(**form_data)
 
@@ -43,6 +43,7 @@ def edit(assessment_id):
         data = dict(form.data)
         data.pop('csrf_token', None)
         assessment.set(**data)
+        db.session.commit()
 
         return redirect_back('.index')
 
@@ -52,14 +53,16 @@ def edit(assessment_id):
 @blueprint.route('/<assessment_id>/delete', methods=('POST',))
 @login_required
 def delete(assessment_id):
-    Assessment[assessment_id].delete()
+    assesment = Assessment.query.get(assessment_id)
+    db.session.delete(assesment)
+    db.session.commit()
     return redirect_back('.index')
 
 
 @blueprint.route('/<assessment_id>/summary')
 @login_required
 def summary(assessment_id):
-    assessment = Assessment[assessment_id]
+    assessment = Assessment.query.get(assessment_id)
     context = dict(
         route=ROUTE_NAME,
         endpoint=request.url_rule.endpoint.split('.')[-1],
@@ -72,7 +75,7 @@ def summary(assessment_id):
 @blueprint.route('/<assessment_id>/findings')
 @login_required
 def findings(assessment_id, affected_resource_id=None):
-    assessment = Assessment[assessment_id]
+    assessment = Assessment.query.get(assessment_id)
     context = dict(
         route=ROUTE_NAME,
         endpoint='findings',
@@ -80,13 +83,13 @@ def findings(assessment_id, affected_resource_id=None):
     )
 
     if affected_resource_id is not None:
-        affected = AffectedResource[affected_resource_id]
+        affected = AffectedResource.query.get(affected_resource_id)
         if affected.active.assessment != assessment:
             return abort(401)
 
         list_findings = affected.findings
     else:
-        list_findings = assessment.findings.order_by(Finding.id)
+        list_findings = assessment.findings
 
     context['findings'] = list_findings
     return render_template('assessments/panel/list_findings.html', **context)
@@ -95,10 +98,10 @@ def findings(assessment_id, affected_resource_id=None):
 @blueprint.route('/<assessment_id>/findings/<finding_id>', methods=('GET', 'POST'))
 @login_required
 def edit_finding(assessment_id, finding_id):
-    assessment = Assessment[assessment_id]
-    finding = Finding[finding_id]
+    assessment = Assessment.query.get(assessment_id)
+    finding = Finding.query.get(finding_id)
 
-    finding_dict = finding.to_dict(with_lazy=True)
+    finding_dict = finding.to_dict()
     finding_dict['affected_resources'] = "\r\n".join(r.uri for r in finding.affected_resources)
     form_data = request.form.to_dict() or finding_dict
     form = FindingEditForm(**form_data)
@@ -121,6 +124,7 @@ def edit_finding(assessment_id, finding_id):
         try:
             finding.update_affected_resources(affected_resources)  # TODO: Raise different exception
             finding.set(**data)
+            db.session.commit()
             return redirect_back('.findings', assessment_id=assessment_id)
         except ValueError as ex:
             form.affected_resources.errors.append(str(ex))
@@ -131,7 +135,7 @@ def edit_finding(assessment_id, finding_id):
 @blueprint.route('/<assessment_id>/findings/<finding_id>/delete', methods=('POST',))
 @login_required
 def delete_findings(assessment_id, finding_id):
-    Finding[finding_id].delete()
+    Finding.query.get(finding_id).delete()
     flash("Findign deleted", "success")
     return redirect_back('.findings', assessment_id=assessment_id)
 
@@ -139,12 +143,12 @@ def delete_findings(assessment_id, finding_id):
 @blueprint.route('/<assessment_id>/add')
 @login_required
 def add_findings(assessment_id):
-    assessment = Assessment[assessment_id]
+    assessment = Assessment.query.get(assessment_id)
     context = dict(
         route=ROUTE_NAME,
         endpoint=request.url_rule.endpoint.split('.')[-1],
         assessment=assessment,
-        findings=select(elem for elem in FindingTemplate)
+        findings=FindingTemplate.query.all()
     )
     return render_template('assessments/panel/add_finding.html', **context)
 
@@ -153,10 +157,11 @@ def add_findings(assessment_id):
 @login_required
 def add_finding(assessment_id, finding_id):
     # TODO: Change to POST
-    assessment = Assessment[assessment_id]
-    template = FindingTemplate[finding_id]
+    assessment = Assessment.query.get(assessment_id)
+    template = FindingTemplate.query.get(finding_id)
 
     finding = Finding.build_from_template(template, assessment)
+    db.session.commit()
     flash('Finding {} added successfully'.format(finding.name), 'success')
 
     return redirect_back('.add_findings', assessment_id=assessment.id)
@@ -165,13 +170,13 @@ def add_finding(assessment_id, finding_id):
 @blueprint.route('/<assessment_id>/edit_add/<finding_id>')
 @login_required
 def edit_add_finding(assessment_id, finding_id):
-    assessment = Assessment[assessment_id]
-    template = FindingTemplate[finding_id]
+    assessment = Assessment.query.get(assessment_id)
+    template = FindingTemplate.query.get(finding_id)
 
     finding = Finding.build_from_template(template, assessment)
 
     try:
-        commit()
+        db.session.commit()
     except Exception:
         flash('Error ading finding {}'.format(finding.name), 'danger')
         return redirect_back('add_findings', assessment_id=assessment.id)
@@ -196,8 +201,7 @@ def bulk_action_finding(assessment_id):
                 set_findings.add(int(k.split(':')[1]))
             except:
                 continue
-
-    target = select(elem for elem in Finding if elem.id in set_findings)
+    target = Finding.query.filter(Finding.id.in_(set_findings))
     if action == "delete":
         target.delete(bulk=True)
         flash("{} items deleted successfully.".format(len(set_findings)), "success")
@@ -217,6 +221,7 @@ def bulk_action_finding(assessment_id):
         for elem in target:
             elem.status = status
 
+        db.session.commit()
         flash("{} items set to {} status successfully.".format(len(set_findings), status.name), "success")
 
     return redirect_back('.findings', assessment_id=assessment_id)
@@ -225,9 +230,9 @@ def bulk_action_finding(assessment_id):
 @blueprint.route('/<assessment_id>/actives', methods=("POST", "GET"))
 @login_required
 def actives(assessment_id):
-    assessment = Assessment[assessment_id]
+    assessment = Assessment.query.get(assessment_id)
     form = ActiveCreateNewForm(request.form)
-    list_actives = assessment.actives.order_by(Active.name)
+    list_actives = assessment.actives
     context = dict(
         route=ROUTE_NAME,
         endpoint=request.url_rule.endpoint.split('.')[-1],
@@ -245,7 +250,7 @@ def actives(assessment_id):
             active = Active(name=data['name'], assessment=assessment)
 
         AffectedResource(active=active, route=data['route'])
-
+        db.session.commit()
         return redirect_back('.actives', assessment_id=assessment_id)
 
     return render_template('assessments/panel/list_actives.html', **context)
@@ -255,7 +260,7 @@ def actives(assessment_id):
 @limiter.exempt
 @login_required
 def evidences(assessment_id):
-    assessment = Assessment[assessment_id]
+    assessment = Assessment.query.get(assessment_id)
     form = EvidenceCreateNewForm()
     context = dict(
         route=ROUTE_NAME,
@@ -275,9 +280,9 @@ def evidences(assessment_id):
             filename = secure_filename(file.filename)
             try:
                 Image(assessment=assessment, name=filename)
-                commit()
+                db.session.commit()
                 file.save(os.path.join(upload_path, filename))
-            except TransactionIntegrityError:
+            except Exception:
                 return "Duplicate image name {}".format(filename), 400
             return "OK", 200
         else:
@@ -289,7 +294,7 @@ def evidences(assessment_id):
 @limiter.exempt
 @login_required
 def get_evidence(assessment_id, evidence_name):
-    assessment = Assessment[assessment_id]
+    assessment = Assessment.query.get(assessment_id)
     image = Image[assessment, evidence_name]
 
     return send_from_directory(
@@ -302,7 +307,7 @@ def get_evidence(assessment_id, evidence_name):
 @blueprint.route('/<assessment_id>/reports')
 @login_required
 def reports(assessment_id):
-    assessment = Assessment[assessment_id]
+    assessment = Assessment.query.get(assessment_id)
     context = dict(
         route=ROUTE_NAME,
         endpoint=request.url_rule.endpoint.split('.')[-1],
@@ -314,7 +319,7 @@ def reports(assessment_id):
 @blueprint.route('/<assessment_id>/reports/download', methods=('POST',))
 @login_required
 def download_reports(assessment_id):
-    assessment = Assessment[assessment_id]
+    assessment = Assessment.query.get(assessment_id)
     data = request.form.to_dict()
     data.pop('action', None)
     data.pop('csrf_token', None)
@@ -346,7 +351,7 @@ def download_reports(assessment_id):
 @blueprint.route('/<assessment_id>/reports/download/<template_name>', methods=('GET',))
 @login_required
 def download_report(assessment_id, template_name):
-    assessment = Assessment[assessment_id]
+    assessment = Assessment.query.get(assessment_id)
     template = Template[assessment.client, template_name]
     report_path, report_file = generate_reports_bundle(assessment, [template])
     return send_from_directory(

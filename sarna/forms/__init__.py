@@ -63,7 +63,7 @@ class EntityForm(type):
                 if required:
                     vals.append(validators.DataRequired())
 
-                if colum.primary_key and isinstance(colum.type, String):
+                if colum.primary_key and type(colum.type) == String:
                     # Just use things that wont mess the uri: Issue: pallets/flask#900
                     vals.append(simple_str_validator)
 
@@ -129,7 +129,10 @@ class FindingTemplateEditForm(EntityForm(FindingTemplate)):
     pass
 
 
-class FindingTemplateAddTranslationForm(EntityForm(FindingTemplateTranslation)):
+class FindingTemplateAddTranslationForm(EntityForm(
+    FindingTemplateTranslation,
+    skip_pk=False
+)):
     pass
 
 
@@ -139,6 +142,7 @@ class FindingTemplateEditTranslationForm(EntityForm(FindingTemplateTranslation, 
 
 class FindingTemplateAddSolutionForm(EntityForm(
     Solution,
+    skip_pk=False,
     custom_validators=dict(
         name=[validators.Regexp('[\w_-]+')]
     )
@@ -148,7 +152,7 @@ class FindingTemplateAddSolutionForm(EntityForm(
 
 class FindingTemplateEditSolutionForm(EntityForm(
     Solution,
-    skip_attrs={'lang', 'name'},
+    skip_attrs={'lang'},
     custom_validators=dict(
         name=[validators.Regexp('[\w_-]+')]
     )

@@ -21,11 +21,7 @@ def index():
     )
 
     if form.validate_on_submit():
-        user: User = None
-        try:
-            user = User[form.username.data]
-        except ObjectNotFound:
-            pass
+        user = User.query.filter_by(username=form.username.data).first()
 
         if user and user.check_password(form.password.data):
             if not user.otp_enabled or user.otp_enabled and user.confirm_otp(form.otp.data):

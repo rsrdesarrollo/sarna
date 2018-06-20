@@ -25,7 +25,7 @@
                                 {% endfor %}
                             </td>
                             <td>{{ render_score_label(finding.tech_risk) }}</td>
-                            <td>{{ finding.solutions.count() }}</td>
+                            <td>{{ finding.solutions|length }}</td>
                             <td>
                                 <div class="btn-group float-right">
                                     <a class="need-confirm btn btn-danger" title="Delete Finding"
