@@ -21,5 +21,10 @@ WORKDIR /sarna
 COPY ./ /sarna/
 RUN ls -lahtr /sarna/static
 
+RUN echo "sarna:x:3000:3000:sarna:/sarna:/bin/sh" >> /etc/passwd && \
+    echo "sarna:x:3000:" >> /etc/group && \
+    chown sarna:sarna /sarna/database /sarna/uploaded_data
+USER sarna
+
 EXPOSE 5000
 ENTRYPOINT ["python3", "/sarna/server.py"]
