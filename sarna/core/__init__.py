@@ -3,6 +3,7 @@ from os import path
 from flask import Flask
 
 from sarna.config import DevelopmentConfig as ConfigClass
+from werkzeug.contrib.fixers import ProxyFix
 
 app = Flask(
     __name__,
@@ -11,6 +12,7 @@ app = Flask(
 )
 
 app.config.from_object(ConfigClass)
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 __all__ = [
     'app'
