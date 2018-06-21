@@ -17,6 +17,11 @@ def get_redirect_target():
             return target
 
 
+def redirect_endpoint(endpoint, **values):
+    target = url_for(endpoint, **values)
+    return redirect(target)
+
+
 def redirect_back(endpoint, **values):
     if not endpoint:
         AttributeError('need default uri')

@@ -17,11 +17,11 @@
                     <tbody>
                     {% for active in actives %}
                         <tr>
-                            <td rowspan="{{ active.affected_resources.count() }}">{{ active.name }}</td>
+                            <td rowspan="{{ active.active_resources|length }}">{{ active.name }}</td>
 
-                            {% for resource in active.affected_resources %}
+                            {% for resource in active.active_resources %}
                                 <td>{{ resource.route or '' }}</td>
-                                <td><a>{{ resource.findings.count() }}</a></td>
+                                <td><a>{{ resource.findings|length }}</a></td>
                         </tr>
                             {% else %}
                                 <td></td>

@@ -84,7 +84,7 @@ class EntityForm(type):
                 elif isinstance(colum.type, Date):
                     t = DateField(validators=vals if required else [validators.Optional()])
                 elif isinstance(colum.type, String) and colum.type.length:
-                    t = StringField(validators=vals)
+                    t = StringField(validators=vals, render_kw=dict(maxlength=colum.type.length))
                 elif isinstance(colum.type, String):
                     t = TextAreaField(validators=vals)
 
@@ -121,7 +121,10 @@ FINDING DATABASE
 """
 
 
-class FindingTemplateCreateNewForm(EntityForm(FindingTemplate), EntityForm(FindingTemplateTranslation)):
+class FindingTemplateCreateNewForm(
+    EntityForm(FindingTemplate),
+    EntityForm(FindingTemplateTranslation, skip_pk=False)
+):
     pass
 
 
@@ -176,7 +179,7 @@ ACTIVES
 
 
 class ActiveCreateNewForm(
-    EntityForm(Active, skip_pk=False),
+    EntityForm(Active),
     EntityForm(AffectedResource)
 ):
     pass

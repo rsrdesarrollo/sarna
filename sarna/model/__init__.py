@@ -2,13 +2,13 @@ import os
 from datetime import datetime
 from typing import *
 from uuid import uuid4
+from collections import Counter
 
 import pyotp
 from cvsslib import cvss3, calculate_vector
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from rfc3986.uri import URIReference
-from sqlalchemy.ext.associationproxy import association_proxy
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from sqlalchemy.orm import Query
@@ -79,24 +79,25 @@ class Client(db.Model, CustomModel):
 Assessment
 """
 
-auditor_approval = db.Table('auditor_approval',
-                            db.Column('approving_user_id', db.ForeignKey('user.id', primary_key=True)),
-                            db.Column('approved_assessment_id', db.ForeignKey('assessment.id', primary_key=True)),
-                            db.Column('approved_at', db.DateTime, default=lambda: datetime.now(), nullable=False)
-                            )
+auditor_approval = db.Table(
+    'auditor_approval',
+    db.Column('approving_user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('approved_assessment_id', db.Integer, db.ForeignKey('assessment.id'), primary_key=True),
+    db.Column('approved_at', db.DateTime, default=lambda: datetime.now(), nullable=False)
+)
 
-assessment_audit = db.Table('assessment_audit',
-                            db.Column('audited_assessment_id', db.Integer,
-                                      db.ForeignKey('assessment.id', primary_key=True)),
-                            db.Column('auditor_id', db.Integer, db.ForeignKey('user.id', primary_key=True))
-                            )
+assessment_audit = db.Table(
+    'assessment_audit',
+    db.Column('audited_assessment_id', db.Integer,  db.ForeignKey('assessment.id'), primary_key=True),
+    db.Column('auditor_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
 
 
 class Assessment(db.Model, CustomModel):
     __tablename__ = 'assessment'
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(GUID, default=uuid4, unique=True, nullable=False)
-    name = db.Column(db.String(32), nullable=False)
+    name = db.Column(db.String(64), nullable=False)
     platform = db.Column(db.String(64), nullable=False)
     lang = db.Column(db.Enum(Language), nullable=False)
     type = db.Column(db.Enum(AssessmentType), nullable=False)
@@ -105,9 +106,9 @@ class Assessment(db.Model, CustomModel):
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'), nullable=False)
     client = db.relationship(Client, back_populates="assessments", uselist=False)
 
-    actives = db.relationship('Active', backref='assessment')
+    actives = db.relationship('Active', back_populates='assessment')
     findings = db.relationship('Finding', back_populates='assessment')
-    images = db.relationship('Image', backref='assessment')
+    images = db.relationship('Image', back_populates='assessment')
 
     creation_date = db.Column(db.DateTime, default=lambda: datetime.now(), nullable=False)
     start_date = db.Column(db.Date)
@@ -123,21 +124,34 @@ class Assessment(db.Model, CustomModel):
     auditors = db.relationship('User', secondary=assessment_audit, back_populates='audited_assessments')
 
     def _aggregate_score(self, field):
+        counter = Counter(
+            map(
+                lambda x: getattr(x, field),
+                self.findings
+            )
+        )
+
         return [
-            self.findings.filter(Finding.has(**{field: Score.Info})).count(),
-            self.findings.filter(Finding.has(**{field: Score.Low})).count(),
-            self.findings.filter(Finding.has(**{field: Score.Medium})).count(),
-            self.findings.filter(Finding.has(**{field: Score.High})).count(),
-            self.findings.filter(Finding.has(**{field: Score.Critical})).count()
+            counter[Score.Info],
+            counter[Score.Low],
+            counter[Score.Medium],
+            counter[Score.High],
+            counter[Score.Critical]
         ]
 
     def aggregate_finding_status(self):
+        counter = Counter(
+            map(
+                lambda x: x.status,
+                self.findings
+            )
+        )
         return [
-            self.findings.filter(Finding.has(status=FindingStatus.Pending)).count(),
-            self.findings.filter(Finding.has(status=FindingStatus.Reviewed)).count(),
-            self.findings.filter(Finding.has(status=FindingStatus.Confirmed)).count(),
-            self.findings.filter(Finding.has(status=FindingStatus.False_Positive)).count(),
-            self.findings.filter(Finding.has(status=FindingStatus.Other)).count()
+            counter[FindingStatus.Pending],
+            counter[FindingStatus.Reviewed],
+            counter[FindingStatus.Confirmed],
+            counter[FindingStatus.False_Positive],
+            counter[FindingStatus.Other]
         ]
 
     def aggregate_technical_risk(self):
@@ -180,10 +194,10 @@ class FindingTemplateTranslation(db.Model, CustomModel):
     __tablename__ = 'finding_template_translation'
 
     lang = db.Column(db.Enum(Language), primary_key=True)
-    finding_id = db.Column(db.ForeignKey('finding_template.id'), primary_key=True)
+    finding_id = db.Column(db.Integer, db.ForeignKey('finding_template.id'), primary_key=True)
     finding = db.relationship(FindingTemplate, uselist=False)
 
-    title = db.Column(db.String(), nullable=False)
+    title = db.Column(db.String(128), nullable=False)
     definition = db.Column(db.String(), nullable=False)
     references = db.Column(db.String(), nullable=False)
     description = db.Column(db.String())
@@ -196,27 +210,42 @@ Actives
 
 class Active(db.Model, CustomModel):
     __tablename__ = 'active'
-    assessment_id = db.Column(db.ForeignKey('assessment.id'), primary_key=True)
-    name = db.Column(db.String(), primary_key=True)
+    __table_args__ = (db.UniqueConstraint('assessment_id', 'name'),)
 
-    affected_resources = association_proxy('active_resources', 'affected_resources')
+    id = db.Column(db.Integer, primary_key=True)
+
+    assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'))
+    assessment = db.relationship(Assessment, uselist=False)
+
+    name = db.Column(db.String(128))
+
+    active_resources = db.relationship('AffectedResource', back_populates='active')
 
     @property
     def uris(self):
-        for resource in self.affected_resources.all():
+        for resource in self.active_resources:
             yield resource.uri
+
+
+finding_affected_resource = db.Table(
+    'finding_affected_resource',
+    db.Column('affected_resource_id', db.Integer, db.ForeignKey('affected_resource.id'), primary_key=True),
+    db.Column('finding_id', db.Integer, db.ForeignKey('finding.id'), primary_key=True)
+)
 
 
 class AffectedResource(db.Model, CustomModel):
     __tablename__ = 'affected_resource'
-    active_id = db.Column(db.String, db.ForeignKey('active.name'), primary_key=True)
-    active = db.relationship(Active, backref='active_resources', uselist=False)
+    __table_args__ = (db.UniqueConstraint('active_id', 'route'),)
 
-    finding_id = db.Column(db.Integer, db.ForeignKey('finding.id'), primary_key=True)
-    finding = db.relationship(Active, backref='finding_resources', uselist=False)
+    id = db.Column(db.Integer, primary_key=True)
 
-    route = db.Column(db.String(), nullable=True)
-    db.UniqueConstraint('active_id', 'route')
+    active_id = db.Column(db.Integer, db.ForeignKey('active.id'))
+    active = db.relationship(Active, uselist=False, back_populates='active_resources')
+
+    route = db.Column(db.String(256), default='/')
+
+    findings = db.relationship('Finding', secondary=finding_affected_resource)
 
     @property
     def uri(self):
@@ -235,7 +264,7 @@ class Finding(db.Model, CustomModel):
     template_id = db.Column(db.Integer, db.ForeignKey('finding_template.id'))
     template = db.relationship(FindingTemplate, uselist=False)
 
-    title = db.Column(db.String(), nullable=False)
+    title = db.Column(db.String(128), nullable=False)
     status = db.Column(db.Enum(FindingStatus), nullable=False, default=FindingStatus.Pending)
     owasp_category = db.Column(db.Enum(OWASPCategory))
 
@@ -251,8 +280,7 @@ class Finding(db.Model, CustomModel):
     definition = db.Column(db.String(), nullable=False)
     references = db.Column(db.String(), nullable=False)
 
-    #TODO: many to many not working
-    affected_resources = association_proxy('finding_resources', 'affected_resources')
+    affected_resources = db.relationship(AffectedResource, secondary=finding_affected_resource)
 
     cvss_v3_vector = db.Column(db.String(128))
 
@@ -289,21 +317,27 @@ class Finding(db.Model, CustomModel):
                 # TODO: this should never happen. Make some warning.
                 continue
 
-            try:
-                active = Active[self.assessment, active_name]
-                affected_resource = len(
-                    r for r in AffectedResource if r.active == active and r.route == resource_rute
-                ).first()
+            resource_rute = resource_rute or '/'
+            active = Active.query.filter_by(
+                assessment=self.assessment,
+                name=active_name
+            ).first()
 
-                if not affected_resource:
-                    affected_resource = AffectedResource(active=active, route=resource_rute)
-
-            except Exception as objectNotFound:
+            if not active:
                 active = Active(assessment=self.assessment, name=active_name)
+
+            affected_resource = AffectedResource.query.filter_by(
+                active=active, route=resource_rute
+            ).first()
+
+            if not affected_resource:
                 affected_resource = AffectedResource(active=active, route=resource_rute)
+                active.active_resources.append(affected_resource)
+
+            if affected_resource and affected_resource not in self.affected_resources:
+                self.affected_resources.append(affected_resource)
 
             db.session.commit()
-            self.affected_resources.add(affected_resource)
 
     @property
     def cvss_v3_score(self):
@@ -357,7 +391,7 @@ class Finding(db.Model, CustomModel):
 class Template(db.Model, CustomModel):
     __tablename__ = 'template'
     name = db.Column(db.String(32), primary_key=True)
-    client_id = db.Column(db.ForeignKey('client.id'), primary_key=True)
+    client_id = db.Column(db.Integer, db.ForeignKey('client.id'), primary_key=True)
 
     description = db.Column(db.String(128))
     file = db.Column(db.String(128), nullable=False)
@@ -366,7 +400,7 @@ class Template(db.Model, CustomModel):
 class Solution(db.Model, CustomModel):
     __tablename__ = 'solution'
     name = db.Column(db.String(32), primary_key=True)
-    finding_template_id = db.Column(db.ForeignKey('finding_template.id'), primary_key=True)
+    finding_template_id = db.Column(db.Integer, db.ForeignKey('finding_template.id'), primary_key=True)
     finding_template = db.relationship(FindingTemplate, uselist=False)
 
     lang = db.Column(db.Enum(Language), nullable=False)
@@ -376,7 +410,9 @@ class Solution(db.Model, CustomModel):
 class Image(db.Model, CustomModel):
     __tablename__ = 'image'
     name = db.Column(db.String(128), primary_key=True)
-    assessment_id = db.Column(db.ForeignKey('assessment.id'), primary_key=True)
+    assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'), primary_key=True)
+    assessment = db.relationship(Assessment, uselist=False)
+
     label = db.Column(db.String())
 
 
@@ -385,7 +421,7 @@ class User(db.Model, CustomModel):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), unique=True)
     is_admin = db.Column(db.Boolean(), default=False, nullable=False)
-    passwd = db.Column(db.String())
+    passwd = db.Column(db.String(128))
 
     creation_date = db.Column(db.DateTime, default=lambda: datetime.now(), nullable=False)
     last_access = db.Column(db.DateTime)

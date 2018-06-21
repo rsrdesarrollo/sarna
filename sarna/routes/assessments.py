@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, flash, send_from_director
 from flask import abort
 from werkzeug.utils import secure_filename
 
-from sarna.auxiliary import redirect_back
+from sarna.auxiliary import redirect_back, redirect_endpoint
 from sarna.core.security import limiter
 from sarna.core.auth import login_required
 from sarna.forms import *
@@ -111,7 +111,7 @@ def edit_finding(assessment_id, finding_id):
         assessment=assessment,
         form=form,
         finding=finding,
-        solutions=finding.template.solutions.order_by(Solution.name),
+        solutions=finding.template.solutions,
         solutions_dict={
             a.name: a.text
             for a in finding.template.solutions
@@ -183,7 +183,7 @@ def edit_add_finding(assessment_id, finding_id):
 
     flash('Finding {} added successfully'.format(finding.name), 'success')
 
-    return redirect_back('.edit_finding', assessment_id=assessment.id, finding_id=finding.id)
+    return redirect_endpoint('.edit_finding', assessment_id=assessment.id, finding_id=finding.id)
 
 
 @blueprint.route('/<assessment_id>/bulk_action', methods=("POST",))
@@ -295,7 +295,10 @@ def evidences(assessment_id):
 @login_required
 def get_evidence(assessment_id, evidence_name):
     assessment = Assessment.query.get(assessment_id)
-    image = Image[assessment, evidence_name]
+    image = Image.query.filter_by(
+        assessment=assessment,
+        name=evidence_name
+    ).one()
 
     return send_from_directory(
         assessment.evidence_path(),
@@ -352,7 +355,7 @@ def download_reports(assessment_id):
 @login_required
 def download_report(assessment_id, template_name):
     assessment = Assessment.query.get(assessment_id)
-    template = Template[assessment.client, template_name]
+    template = Template.query.filter_by(client=assessment.client, name=template_name).one()
     report_path, report_file = generate_reports_bundle(assessment, [template])
     return send_from_directory(
         report_path,
