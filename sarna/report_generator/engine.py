@@ -12,6 +12,7 @@ from werkzeug.utils import secure_filename
 
 from sarna.core.config import config
 from sarna.model import Assessment, Template
+from sarna.model import FindingStatus
 from sarna.report_generator.locale_choice import locale_choice
 from sarna.report_generator.markdown import markdown_to_docx, DOCXRenderer
 from sarna.report_generator.scores import score_to_docx
@@ -93,6 +94,11 @@ def generate_reports_bundle(assessment: Assessment, templates: Collection[Templa
         def locale(choice):
             return locale_choice(choice, assessment.lang)
 
+        assessment_data = assessment.to_dict()
+        assessment_data['findings'] = list(
+            filter(lambda f: f.status == FindingStatus.Confirmed, assessment.findings)
+        )
+
         # apply jinja template
         jinja2_env = jinja2.Environment()
         jinja2_env.filters['markdown'] = markdown
@@ -105,7 +111,7 @@ def generate_reports_bundle(assessment: Assessment, templates: Collection[Templa
         template_render.render(
             dict(
                 client=assessment.client,
-                assessment=assessment,
+                assessment=assessment_data,
                 date=datetime.date(datetime.now())
             ),
             jinja_env=jinja2_env

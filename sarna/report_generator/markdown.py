@@ -120,9 +120,6 @@ class DOCXRenderer(BaseRenderer):
 
         return make_paragraph(style, inner)
 
-    def render_line_break(self, token):
-        return ''
-
     def render_block_code(self, token):
         style = self.style.code
         return make_paragraph(style, self.render_inner(token))
@@ -147,6 +144,25 @@ class DOCXRenderer(BaseRenderer):
         self._suppress_ptag_stack.pop()
         return make_paragraph(list_level_style(style, self._list_level), inner, self._list_level > 0)
 
+    def render_escape_sequence(self, token):
+        return self.render_inner(token)
+
+    def render_line_break(self, token):
+        # TODO: break raw in line
+        return ''
+
+    def render_thematic_break(self, token):
+        self.warnings.add('Markdown ThematicBreak is not implemented. It will be ignored')
+        return ''
+
+    def render_quote(self, token):
+        self.warnings.add('Markdown Quote is not implemented. It will be ignored')
+        return ''
+
+    def render_auto_link(self, token):
+        self.warnings.add('Markdown AutoLink is not implemented. It will be ignored')
+        return ''
+
     def render_table(self, token):
         self.warnings.add('Markdown Table is not implemented. It will be ignored')
         return ''
@@ -170,7 +186,7 @@ class DOCXRenderer(BaseRenderer):
 
 
 def markdown_to_docx(markdown, render: DOCXRenderer):
-    ret = mistletoe.markdown('\n'.join(markdown.split('\r\n')), render)
+    ret = mistletoe.markdown(markdown+"\r\n", render)
     for warn in render.warnings:
         # TODO: something
         print(warn)
