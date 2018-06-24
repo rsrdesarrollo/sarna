@@ -1,5 +1,3 @@
-import os
-
 from flask import render_template, request
 from werkzeug import exceptions
 
@@ -8,7 +6,9 @@ from sarna.core import assets
 from sarna.core.auth import login_manager
 from sarna.core.security import csrf, limiter
 from sarna.routes import clients, index, findings, users, assessments
+from sarna.commands import user_cli
 from sqlalchemy.orm.exc import NoResultFound
+
 
 def error_handler(err):
     if request.headers.get('x-requested-with', '') == "XMLHttpRequest":
@@ -48,19 +48,9 @@ app.register_error_handler(502, error_handler)
 app.register_error_handler(503, error_handler)
 app.register_error_handler(504, error_handler)
 
-if __name__ == '__main__':
+csrf.init_app(app)
+limiter.init_app(app)
+assets.init_app(app)
+login_manager.init_app(app)
 
-    csrf.init_app(app)
-    limiter.init_app(app)
-    assets.init_app(app)
-    login_manager.init_app(app)
-
-    extra_files = ["templates"]
-    for dirname, dirs, files in os.walk("templates"):
-        for file in files:
-            extra_files.append(os.path.join(dirname, file))
-
-    app.run(
-        '0.0.0.0',
-        extra_files=extra_files
-    )
+user_cli.init_app(app)

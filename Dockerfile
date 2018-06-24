@@ -22,4 +22,4 @@ COPY ./ /sarna/
 RUN ls -lahtr /sarna/static
 
 EXPOSE 5000
-ENTRYPOINT ["python3", "/sarna/server.py"]
+ENTRYPOINT ["flask", "run"]
