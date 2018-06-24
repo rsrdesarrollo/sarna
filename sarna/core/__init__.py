@@ -3,6 +3,7 @@ from os import path
 from flask import Flask
 
 from sarna.config import DevelopmentConfig, ProductionConfig, BaseConfig
+from werkzeug.contrib.fixers import ProxyFix
 
 app = Flask(
     __name__,
@@ -14,6 +15,8 @@ if app.config['ENV'] == 'development':
     app.config.from_object(DevelopmentConfig)
 else:
     app.config.from_object(ProductionConfig)
+
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 __all__ = [
     'app'
