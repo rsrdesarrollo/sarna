@@ -11,15 +11,14 @@ RUN apk --no-cache add build-base libxslt-dev python3-dev jpeg-dev zlib-dev && \
     pip install -r /tmp/requirements.txt && \
     apk del build-base libxslt-dev python3-dev jpeg-dev zlib-dev
 
-RUN ls -lahtr /sarna/static
 ADD static/package.json /sarna/static/
 RUN cd /sarna/static && yarn install
 RUN apk --no-cache add libmagic libxslt jpeg zlib
 
-RUN ls -lahtr /sarna/static
 WORKDIR /sarna
 COPY ./ /sarna/
-RUN ls -lahtr /sarna/static
+
+ENV FLASK_ENV=development
 
 EXPOSE 5000
-ENTRYPOINT ["flask", "run"]
+ENTRYPOINT ["flask", "run", "--host", "0.0.0.0"]

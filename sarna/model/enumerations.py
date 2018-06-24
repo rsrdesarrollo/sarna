@@ -1,9 +1,4 @@
-from aenum import OrderedEnum, Enum
-from pony.orm.dbapiprovider import IntConverter, Json
-
-
-class LocaleText(Json):
-    pass
+from aenum import OrderedEnum
 
 
 class Choice(OrderedEnum):
@@ -457,17 +452,3 @@ class OWASPCategory(Choice):
         Language.Spanish: 'Pruebas de almacenamiento local'
     }
 
-
-class ChoiceEnumConverter(IntConverter):
-    def validate(self, val, obj=None):
-        if not isinstance(val, Enum):
-            raise ValueError('Must be an Enum.  Got {}'.format(type(val)))
-        return val
-
-    def sql2py(self, val):
-        if not val:
-            return None
-        return self.py_type(val)
-
-    def py2sql(self, val):
-        return val.value

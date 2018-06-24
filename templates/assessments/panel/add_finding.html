@@ -27,18 +27,22 @@
                             <td>{{ render_score_label(finding.tech_risk) }}</td>
                             <td>{{ finding.solutions|length }}</td>
                             <td>
-                                <div class="btn-group float-right">
-                                    <a class="btn btn-success"
-                                       href="{{ url_for('.add_finding', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}">
-                                        <span class="fa fa-plus"></span>
-                                    </a>
+                                <form action="{{ url_for('.add_finding', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}"
+                                      method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                                    <a class="btn btn-info"
-                                       href="{{ url_for('.edit_add_finding', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}">
-                                        <span class="fa fa-pencil"></span>
-                                        <span class="fa fa-plus"></span>
-                                    </a>
-                                </div>
+                                    <div class="btn-group float-right">
+                                        <button type="submit" class="btn btn-success" name="action" value="add">
+                                            <span class="fa fa-plus"></span>
+                                        </button>
+
+                                        <button type="submit" class="btn btn-info" name="action" value="edit_add">
+                                            <span class="fa fa-pencil"></span>
+                                            <span class="fa fa-plus"></span>
+                                        </button>
+                                    </div>
+
+                                </form>
                             </td>
                         </tr>
                     {% endfor %}
@@ -46,7 +50,8 @@
                 </table>
             {% else %}
                 <h4 class="text-center">No findings on global database</h4>
-                <h5 class="text-center"><a href="{{ url_for('findings.new', next=request.path) }}">Do your work and add some
+                <h5 class="text-center"><a href="{{ url_for('findings.new', next=request.path) }}">Do your work and add
+                    some
                     findings!</a></h5>
 
             {% endif %}

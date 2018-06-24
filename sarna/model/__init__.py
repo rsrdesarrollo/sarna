@@ -6,6 +6,7 @@ from collections import Counter
 
 import pyotp
 from cvsslib import cvss3, calculate_vector
+from flask_login import login_user
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from rfc3986.uri import URIReference
@@ -21,6 +22,12 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
+@app.after_request
+def auto_commit(resp):
+    db.session.commit()
+    return resp
+
+
 class CustomModel:
     query: Query
 
@@ -34,6 +41,11 @@ class CustomModel:
             d[column.name] = getattr(self, column.name)
 
         return d
+
+    def delete(self, commit=True):
+        db.session.delete(self)
+        if commit:
+            db.session.commit()
 
 
 __all__ = [
@@ -60,10 +72,11 @@ client_audit = db.Table('client_audit',
 class Client(db.Model, CustomModel):
     __tablename__ = 'client'
     id = db.Column(db.Integer, primary_key=True)
-    assessments = db.relationship('Assessment', back_populates='client')
-    templates = db.relationship('Template', backref='client')
     short_name = db.Column(db.String(64), nullable=False)
     long_name = db.Column(db.String(128), nullable=False)
+
+    assessments = db.relationship('Assessment', back_populates='client', cascade='all')
+    templates = db.relationship('Template', backref='client', cascade='all')
 
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     creator = db.relationship("User", back_populates="created_clients", uselist=False)
@@ -88,7 +101,7 @@ auditor_approval = db.Table(
 
 assessment_audit = db.Table(
     'assessment_audit',
-    db.Column('audited_assessment_id', db.Integer,  db.ForeignKey('assessment.id'), primary_key=True),
+    db.Column('audited_assessment_id', db.Integer, db.ForeignKey('assessment.id'), primary_key=True),
     db.Column('auditor_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
 )
 
@@ -106,9 +119,9 @@ class Assessment(db.Model, CustomModel):
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'), nullable=False)
     client = db.relationship(Client, back_populates="assessments", uselist=False)
 
-    actives = db.relationship('Active', back_populates='assessment')
     findings = db.relationship('Finding', back_populates='assessment')
-    images = db.relationship('Image', back_populates='assessment')
+    actives = db.relationship('Active', back_populates='assessment', cascade='all')
+    images = db.relationship('Image', back_populates='assessment', cascade='all')
 
     creation_date = db.Column(db.DateTime, default=lambda: datetime.now(), nullable=False)
     start_date = db.Column(db.Date)
@@ -182,8 +195,8 @@ class FindingTemplate(db.Model, CustomModel):
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     creator = db.relationship('User', back_populates='created_findings', uselist=False)
 
-    solutions = db.relationship('Solution')
-    translations = db.relationship('FindingTemplateTranslation')
+    solutions = db.relationship('Solution', back_populates='finding_template', cascade='all')
+    translations = db.relationship('FindingTemplateTranslation', back_populates='finding_template', cascade='all')
 
     @property
     def langs(self):
@@ -194,8 +207,8 @@ class FindingTemplateTranslation(db.Model, CustomModel):
     __tablename__ = 'finding_template_translation'
 
     lang = db.Column(db.Enum(Language), primary_key=True)
-    finding_id = db.Column(db.Integer, db.ForeignKey('finding_template.id'), primary_key=True)
-    finding = db.relationship(FindingTemplate, uselist=False)
+    finding_template_id = db.Column(db.Integer, db.ForeignKey('finding_template.id'), primary_key=True)
+    finding_template = db.relationship(FindingTemplate, back_populates='translations', uselist=False)
 
     title = db.Column(db.String(128), nullable=False)
     definition = db.Column(db.String(), nullable=False)
@@ -285,7 +298,6 @@ class Finding(db.Model, CustomModel):
     cvss_v3_vector = db.Column(db.String(128))
 
     def update_affected_resources(self, resources: Collection[AnyStr]):
-        ## TODO: migrate to SQLAlchemy
         resource_uris = []
         for resource in resources:
             resource = resource.strip()
@@ -362,7 +374,6 @@ class Finding(db.Model, CustomModel):
 
     @classmethod
     def build_from_template(cls, template: FindingTemplate, assessment: Assessment):
-        # TODO: Migrate to SQLAlchemy
         lang = assessment.lang
         translation: FindingTemplateTranslation = None
         for t in template.translations:
@@ -401,7 +412,7 @@ class Solution(db.Model, CustomModel):
     __tablename__ = 'solution'
     name = db.Column(db.String(32), primary_key=True)
     finding_template_id = db.Column(db.Integer, db.ForeignKey('finding_template.id'), primary_key=True)
-    finding_template = db.relationship(FindingTemplate, uselist=False)
+    finding_template = db.relationship(FindingTemplate, back_populates='solutions', uselist=False)
 
     lang = db.Column(db.Enum(Language), nullable=False)
     text = db.Column(db.String(), nullable=False)
@@ -411,7 +422,7 @@ class Image(db.Model, CustomModel):
     __tablename__ = 'image'
     name = db.Column(db.String(128), primary_key=True)
     assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'), primary_key=True)
-    assessment = db.relationship(Assessment, uselist=False)
+    assessment = db.relationship(Assessment, back_populates='images', uselist=False)
 
     label = db.Column(db.String())
 
@@ -441,8 +452,8 @@ class User(db.Model, CustomModel):
     created_findings = db.relationship(FindingTemplate, back_populates='creator')
 
     def login(self):
-        from flask_login import login_user
         self.last_access = datetime.now()
+        db.session.commit()
         login_user(self)
 
     def get_id(self):
@@ -462,6 +473,7 @@ class User(db.Model, CustomModel):
 
     def set_passwd(self, passwd):
         self.passwd = generate_password_hash(passwd)
+        db.session.commit()
 
     def check_password(self, password):
         return check_password_hash(self.passwd, password)
@@ -471,6 +483,7 @@ class User(db.Model, CustomModel):
             raise ValueError('otp already set')
 
         self.otp_seed = pyotp.random_base32()
+        db.session.commit()
         return pyotp.totp.TOTP(self.otp_seed).provisioning_uri(self.username, issuer_name="SARNA")
 
     def enable_otp(self, otp):
@@ -478,7 +491,16 @@ class User(db.Model, CustomModel):
             raise ValueError('otp already set')
 
         self.otp_enabled = self.check_otp(otp)
+        db.session.commit()
         return self.otp_enabled
+
+    def disable_otp(self, otp):
+        if not self.otp_enabled:
+            raise ValueError('otp already disabled')
+
+        self.otp_enabled = self.check_otp(otp)
+        db.session.commit()
+        return not self.otp_enabled
 
     def confirm_otp(self, otp):
         if not self.otp_enabled:

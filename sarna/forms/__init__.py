@@ -39,17 +39,10 @@ class EntityForm(type):
         class Form(FlaskForm):
             pass
 
-        for k in props(entity):
-            if k in skip_attrs:
-                continue
-            if not isinstance(getattr(entity, k), InstrumentedAttribute):
+        for colum in entity.__table__.columns:
+            if colum.name in skip_attrs:
                 continue
 
-            f = getattr(entity, k).prop
-            if not isinstance(f, ColumnProperty):
-                continue
-
-            colum: Column = f.columns[0]
             if skip_pk and colum.primary_key:
                 continue
 
@@ -57,8 +50,8 @@ class EntityForm(type):
                 vals = []
                 required = not colum.nullable
 
-                if k in custom_validators:
-                    vals.extend(custom_validators[k])
+                if colum.name in custom_validators:
+                    vals.extend(custom_validators[colum.name])
 
                 if required:
                     vals.append(validators.DataRequired())
@@ -70,7 +63,7 @@ class EntityForm(type):
                 t = None
 
                 if isinstance(colum.type, Enum):
-                    label = k[0].upper() + k[1:]
+                    label = colum.name[0].upper() + colum.name[1:]
                     t = SelectField(
                         " ".join(label.split('_')),
                         validators=vals,
@@ -89,7 +82,7 @@ class EntityForm(type):
                     t = TextAreaField(validators=vals)
 
                 if t is not None:
-                    setattr(Form, k, t)
+                    setattr(Form, colum.name, t)
 
         return Form
 
@@ -228,3 +221,14 @@ class ChangePasswordForm(FlaskForm):
     newpassword = StringField(validators=[validators.DataRequired()], label='New Password')
     newpasswordrep = StringField(validators=[validators.DataRequired()], label='Repeat new Password')
     otp = StringField(label='Google Authenticator')
+
+
+"""
+User managment Forms
+"""
+
+
+class AddUserForm(FlaskForm):
+    username = StringField(validators=[validators.DataRequired()])
+    password = StringField(validators=[validators.DataRequired()])
+    passwordrep = StringField(validators=[validators.DataRequired()])

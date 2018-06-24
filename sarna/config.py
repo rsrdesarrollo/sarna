@@ -38,6 +38,7 @@ class DevelopmentConfig(BaseConfig):
     ASSETS_DEBUG = True
     WTF_CSRF_SECRET_KEY = "SECRET RANDOM STR CHANGE ME"
     SECRET_KEY = "SECRET RANDOM STR CHANGE ME"
+    TEMPLATES_AUTO_RELOAD = True
 
 
 class ProductionConfig(DevelopmentConfig):
@@ -45,3 +46,4 @@ class ProductionConfig(DevelopmentConfig):
     ASSETS_DEBUG = False
     WTF_CSRF_SECRET_KEY = token_urlsafe(64)
     SECRET_KEY = token_urlsafe(64)
+    TEMPLATES_AUTO_RELOAD = False

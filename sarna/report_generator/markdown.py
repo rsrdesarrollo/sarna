@@ -120,6 +120,9 @@ class DOCXRenderer(BaseRenderer):
 
         return make_paragraph(style, inner)
 
+    def render_line_break(self, token):
+        return ''
+
     def render_block_code(self, token):
         style = self.style.code
         return make_paragraph(style, self.render_inner(token))

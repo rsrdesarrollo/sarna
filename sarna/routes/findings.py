@@ -6,7 +6,7 @@ from sarna.auxiliary import redirect_back
 from sarna.model.enumerations import *
 from sarna.model import *
 from sarna.forms import *
-from sqlalchemy.orm.exc import FlushError
+from sqlalchemy.exc import IntegrityError
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('findings', __name__)
@@ -37,9 +37,7 @@ def new():
         data_translation = {k: v for k, v in data.items() if k in FindingTemplateTranslation.__dict__}
 
         finding = FindingTemplate(creator=current_user, **data_finding)
-        translation = FindingTemplateTranslation(finding=finding, **data_translation)
-        finding.translations.append(translation)
-        db.session.commit()
+        FindingTemplateTranslation(finding_template=finding, **data_translation)
         return redirect_back('.index')
 
     return render_template('findings/new.html', **context)
@@ -48,7 +46,7 @@ def new():
 @blueprint.route('/<finding_id>', methods=('POST', 'GET'))
 @login_required
 def edit(finding_id: int):
-    finding = FindingTemplate.query.get(finding_id)
+    finding = FindingTemplate.query.filter_by(id=finding_id).one()
 
     form_data = request.form.to_dict() or finding.to_dict()
     form = FindingTemplateEditForm(**form_data)
@@ -69,7 +67,7 @@ def edit(finding_id: int):
 @blueprint.route('/<finding_id>/delete', methods=('POST',))
 @login_required
 def delete(finding_id: int):
-    finding_template = FindingTemplate.query.get(finding_id)
+    finding_template = FindingTemplate.query.filter_by(id=finding_id).one()
     db.session.delete(finding_template)
     db.session.commit()
     return redirect_back('.index')
@@ -78,7 +76,7 @@ def delete(finding_id: int):
 @blueprint.route('/<finding_id>/add_translation', methods=('POST', 'GET'))
 @login_required
 def add_translation(finding_id: int):
-    finding = FindingTemplate.query.get(finding_id)
+    finding = FindingTemplate.query.filter_by(id=finding_id).one()
     form = FindingTemplateAddTranslationForm(request.form)
 
     current_langs = finding.langs
@@ -102,9 +100,7 @@ def add_translation(finding_id: int):
             data = dict(form.data)
             data.pop('csrf_token', None)
 
-            translation = FindingTemplateTranslation(finding=finding, **data)
-            finding.translations.append(translation)
-            db.session.commit()
+            FindingTemplateTranslation(finding_template=finding, **data)
         else:
             flash('Language {} already created for this finding.'.format(form.lang.data), category='danger')
 
@@ -116,7 +112,13 @@ def add_translation(finding_id: int):
 @blueprint.route('/<finding_id>/delete/<language>', methods=('POST',))
 @login_required
 def delete_translation(finding_id: int, language: str):
-    FindingTemplateTranslation[finding_id, Language[language]].delete()
+    tranlsation = FindingTemplateTranslation.query.filter_by(
+        finding_template_id=finding_id,
+        lang=Language[language]
+    ).one()
+
+    db.session.delete(tranlsation)
+    db.session.commit()
     return redirect_back('.edit', finding_id=finding_id)
 
 
@@ -124,7 +126,10 @@ def delete_translation(finding_id: int, language: str):
 @login_required
 def edit_translation(finding_id: int, language: str):
     language = Language[language]
-    translation = FindingTemplateTranslation[finding_id, language]
+    translation = FindingTemplateTranslation.query.filter_by(
+        finding_template_id=finding_id,
+        lang=language
+    ).one()
 
     form_data = request.form.to_dict() or translation.to_dict(with_lazy=True)
     form = FindingTemplateEditTranslationForm(**form_data)
@@ -151,7 +156,7 @@ def edit_translation(finding_id: int, language: str):
 @blueprint.route('/<finding_id>/add_solution', methods=('POST', 'GET'))
 @login_required
 def add_solution(finding_id: int):
-    finding = FindingTemplate.query.get(finding_id)
+    finding = FindingTemplate.query.filter_by(id=finding_id).one()
     form = FindingTemplateAddSolutionForm(request.form)
 
     context = dict(
@@ -167,11 +172,10 @@ def add_solution(finding_id: int):
         name = data.get('name')
 
         try:
-            solution = Solution(finding_template=finding, **data)
-            finding.solutions.append(solution)
+            Solution(finding_template=finding, **data)
             db.session.commit()
             return redirect_back('.index')
-        except FlushError:
+        except IntegrityError:
             db.session.rollback()
             error = 'Solution name {} already exist for this finding.'.format(name, lang)
             form.name.errors.append(error)
@@ -182,16 +186,24 @@ def add_solution(finding_id: int):
 @blueprint.route('/<finding_id>/solution/<solution_name>/delete', methods=('POST',))
 @login_required
 def delete_solution(finding_id: int, solution_name: str):
-    Solution[finding_id, solution_name].delete()
+    solution = Solution.query.filter_by(
+        finding_template_id=finding_id,
+        name=solution_name
+    ).one()
+    db.session.delete(solution)
+    db.session.commit()
     return redirect_back('.edit', finding_id=finding_id)
 
 
 @blueprint.route('/<finding_id>/solution/<solution_name>', methods=('POST', 'GET'))
 @login_required
 def edit_solution(finding_id: int, solution_name: str):
-    solution = Solution[finding_id, solution_name]
+    solution = Solution.query.filter_by(
+        finding_template_id=finding_id,
+        name=solution_name
+    ).one()
 
-    form_data = request.form.to_dict() or solution.to_dict(with_lazy=True)
+    form_data = request.form.to_dict() or solution.to_dict()
     form = FindingTemplateEditSolutionForm(**form_data)
 
     context = dict(

@@ -29,7 +29,9 @@
 .modal-dialog.modal-xxl {
     max-width: 95% !important;
 }
-
+.modal{
+    z-index: 199999 !important;
+}
 /*Custom custom_checkbox*/
 /* The container */
 .custom_checkbox {

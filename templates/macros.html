@@ -1,3 +1,11 @@
+{% macro boolean_pill(value) %}
+    {% if value %}
+        <span class="badge badge-pill badge-success">True</span>
+    {% else %}
+        <span class="badge badge-pill badge-danger">False</span>
+    {% endif %}
+{% endmacro %}
+
 {% macro render_field(field) -%}
 
     {% set with_label = kwargs.pop('with_label', True) %}

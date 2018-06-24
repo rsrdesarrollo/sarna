@@ -47,6 +47,7 @@ def add_user(username, super_user):
             db.session.commit()
         except IntegrityError:
             click.echo('User {} already exist'.format(username), err=True)
+            db.session.rollback()
     else:
         click.echo('Password confirmation mismatch.', err=True)
 
