@@ -27,6 +27,13 @@ def error_handler(err):
     return render_template('error.html', **context), context['code']
 
 
+csrf.init_app(app)
+limiter.init_app(app)
+assets.init_app(app)
+login_manager.init_app(app)
+
+user_cli.init_app(app)
+
 app.register_blueprint(index.blueprint)
 app.register_blueprint(clients.blueprint, url_prefix='/clients')
 app.register_blueprint(assessments.blueprint, url_prefix='/assessments')
@@ -47,10 +54,3 @@ app.register_error_handler(501, error_handler)
 app.register_error_handler(502, error_handler)
 app.register_error_handler(503, error_handler)
 app.register_error_handler(504, error_handler)
-
-csrf.init_app(app)
-limiter.init_app(app)
-assets.init_app(app)
-login_manager.init_app(app)
-
-user_cli.init_app(app)

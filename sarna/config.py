@@ -3,12 +3,7 @@ from os import path
 from secrets import token_urlsafe
 
 
-class DevelopmentConfig:
-    DEBUG = True
-    WTF_CSRF_SECRET_KEY = "SECRET RANDOM STR CHANGE ME"
-    SECRET_KEY = "SECRET RANDOM STR CHANGE ME"
-    MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10 Mb limit
-    ASSETS_DEBUG = True
+class BaseConfig:
     PROJECT_PATH = path.realpath(
         path.join(
             __file__,
@@ -21,10 +16,8 @@ class DevelopmentConfig:
     _default_templates_path = path.join(PROJECT_PATH, 'uploaded_data', 'templates')
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = "sqlite:///{}".format(path.join(
-        path.abspath(os.getenv('SARNA_DATABASE_PATH', _default_database_path)),
-        'databse.db'
-    ))
+
+    MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10 Mb limit
 
     EVIDENCES_PATH = path.abspath(os.getenv('SARNA_EVIDENCES_PATH', _default_evidences_path))
     EVIDENCES_ALLOW_EXTENSIONS = {'png', 'jpeg', 'jpg', 'bmp'}
@@ -33,6 +26,18 @@ class DevelopmentConfig:
     TEMPLATES_PATH = path.abspath(os.getenv('SARNA_TEMPLATES_PATH', _default_templates_path))
     TEMPLATES_ALLOW_EXTENSIONS = {'docx'}
     TEMPLATES_ALLOW_MIME = 'application/.*'
+
+    SQLALCHEMY_DATABASE_URI = "sqlite:///{}".format(path.join(
+        path.abspath(os.getenv('SARNA_DATABASE_PATH', _default_database_path)),
+        'databse.db'
+    ))
+
+
+class DevelopmentConfig(BaseConfig):
+    DEBUG = True
+    ASSETS_DEBUG = True
+    WTF_CSRF_SECRET_KEY = "SECRET RANDOM STR CHANGE ME"
+    SECRET_KEY = "SECRET RANDOM STR CHANGE ME"
 
 
 class ProductionConfig(DevelopmentConfig):
