@@ -6,8 +6,8 @@ from docx.section import Section
 from docxtpl import DocxTemplate
 from mistletoe.base_renderer import BaseRenderer
 
-from sarna.report_generator.style import RenderStyle
 from sarna.report_generator import *
+from sarna.report_generator.style import RenderStyle
 
 
 def _get_img_prefered_size(img: AnyStr, section: Section):
@@ -186,7 +186,7 @@ class DOCXRenderer(BaseRenderer):
 
 
 def markdown_to_docx(markdown, render: DOCXRenderer):
-    ret = mistletoe.markdown(markdown+"\r\n", render)
+    ret = mistletoe.markdown(markdown + "\r\n", render)
     for warn in render.warnings:
         # TODO: something
         print(warn)

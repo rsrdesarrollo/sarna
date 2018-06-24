@@ -1,18 +1,18 @@
 import os
 
+from PIL import Image as PillowImage
 from flask import Blueprint, render_template, request, flash, send_from_directory
 from flask import abort
+from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 
 from sarna.auxiliary import redirect_back, redirect_endpoint
-from sarna.core.security import limiter
 from sarna.core.auth import login_required
+from sarna.core.security import limiter
 from sarna.forms import *
 from sarna.model import *
 from sarna.model.enumerations import *
 from sarna.report_generator.engine import generate_reports_bundle
-from sqlalchemy.exc import IntegrityError
-from PIL import Image as PillowImage
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('assessments', __name__)

@@ -1,13 +1,13 @@
 from flask import render_template, request
+from sqlalchemy.orm.exc import NoResultFound
 from werkzeug import exceptions
 
+from sarna.commands import user_cli
 from sarna.core import app
 from sarna.core import assets
 from sarna.core.auth import login_manager
 from sarna.core.security import csrf, limiter
 from sarna.routes import clients, index, findings, users, assessments
-from sarna.commands import user_cli
-from sqlalchemy.orm.exc import NoResultFound
 
 
 def error_handler(err):
@@ -54,4 +54,3 @@ app.register_error_handler(501, error_handler)
 app.register_error_handler(502, error_handler)
 app.register_error_handler(503, error_handler)
 app.register_error_handler(504, error_handler)
-

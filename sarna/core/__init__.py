@@ -1,9 +1,9 @@
 from os import path
 
 from flask import Flask
+from werkzeug.contrib.fixers import ProxyFix
 
 from sarna.config import DevelopmentConfig, ProductionConfig, BaseConfig
-from werkzeug.contrib.fixers import ProxyFix
 
 app = Flask(
     __name__,

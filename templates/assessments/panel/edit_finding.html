@@ -76,10 +76,10 @@
                         ev.preventDefault();
                     });
 
-                    var actives = [{% for active in assessment.actives %}{% for uri in active.uris %}{{ uri | tojson }},{% endfor %}{% endfor %}];
+                    var actives = [{% for active in assessment.actives %}{% for uri in active.uris %}{{ uri | tojson }}, {% endfor %}{% endfor %}];
                     horsey(document.querySelector('#affected_resources'), {
                         source: [{list: actives}],
-                        blankSearch:false,
+                        blankSearch: false,
                         anchor: ':'
                     });
 

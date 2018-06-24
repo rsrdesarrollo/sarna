@@ -1,12 +1,13 @@
 import os
-from flask import Blueprint, render_template, request, flash
 
-from sarna.core.auth import login_required, current_user
-from sarna.auxiliary import redirect_back
-from sarna.model.enumerations import *
-from sarna.model import *
-from sarna.forms import *
+from flask import Blueprint, render_template, request, flash
 from sqlalchemy.exc import IntegrityError
+
+from sarna.auxiliary import redirect_back
+from sarna.core.auth import login_required, current_user
+from sarna.forms import *
+from sarna.model import *
+from sarna.model.enumerations import *
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('findings', __name__)

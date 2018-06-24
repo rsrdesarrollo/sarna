@@ -22,6 +22,7 @@ RUN echo "sarna:x:3000:3000:sarna:/sarna:/bin/sh" >> /etc/passwd && \
     echo "sarna:x:3000:" >> /etc/group && \
     chown sarna:sarna /sarna/database /sarna/uploaded_data
 USER sarna
+
 ENV FLASK_ENV=development
 
 EXPOSE 5000

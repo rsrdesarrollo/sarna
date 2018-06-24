@@ -1,9 +1,9 @@
 import os
 
 from flask import Blueprint, render_template, request, flash
+from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back
-from sqlalchemy.exc import IntegrityError
 from sarna.core.auth import login_required, current_user, admin_required
 from sarna.forms import OtpConfirmForm, ChangePasswordForm, AddUserForm
 from sarna.model import User, db

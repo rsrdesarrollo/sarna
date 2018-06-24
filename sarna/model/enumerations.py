@@ -451,4 +451,3 @@ class OWASPCategory(Choice):
         Language.English: 'Test Local Storage',
         Language.Spanish: 'Pruebas de almacenamiento local'
     }
-

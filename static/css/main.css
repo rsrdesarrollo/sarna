@@ -3,21 +3,22 @@
     padding: 0;
 }
 
-.show.dropdown-menu{
+.show.dropdown-menu {
     min-width: 9rem;
 }
 
-.md-preview img{
-    max-height:500px;
-    max-width:500px;
-    height:auto;
-    width:auto;
+.md-preview img {
+    max-height: 500px;
+    max-width: 500px;
+    height: auto;
+    width: auto;
 }
-.md-editor~.invalid-feedback{
+
+.md-editor ~ .invalid-feedback {
     display: block;
 }
 
-.hidden{
+.hidden {
     display: none !important;
 }
 
@@ -29,9 +30,11 @@
 .modal-dialog.modal-xxl {
     max-width: 95% !important;
 }
-.modal{
+
+.modal {
     z-index: 199999 !important;
 }
+
 /*Custom custom_checkbox*/
 /* The container */
 .custom_checkbox {

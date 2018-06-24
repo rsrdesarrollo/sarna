@@ -1,8 +1,8 @@
 import os
+from collections import Counter
 from datetime import datetime
 from typing import *
 from uuid import uuid4
-from collections import Counter
 
 import pyotp
 from cvsslib import cvss3, calculate_vector
@@ -10,9 +10,9 @@ from flask_login import login_user
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from rfc3986.uri import URIReference
+from sqlalchemy.orm import Query
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from sqlalchemy.orm import Query
 from sarna.core import app
 from sarna.core.config import config
 from sarna.model.enumerations import *

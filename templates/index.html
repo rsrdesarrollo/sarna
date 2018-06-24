@@ -33,13 +33,13 @@
                         {{ render_field(form.password, with_label=False, type='password') }}
                     </div>
                     {% if need_otp %}
-                    <div class="input-group mt-3 px-5">
-                        <div class="input-group-append">
-                            <i class="fa fa-clock input-group-text" style="min-width: 41px;"></i>
-                        </div>
+                        <div class="input-group mt-3 px-5">
+                            <div class="input-group-append">
+                                <i class="fa fa-clock input-group-text" style="min-width: 41px;"></i>
+                            </div>
 
-                        {{ render_field(form.otp, with_label=False, maxlength="6", pattern="[0-9]{6}") }}
-                    </div>
+                            {{ render_field(form.otp, with_label=False, maxlength="6", pattern="[0-9]{6}") }}
+                        </div>
                     {% endif %}
                     <div class="input-group mt-4 px-5">
                         <button type="submit" class="btn btn-primary btn-block">Login</button>

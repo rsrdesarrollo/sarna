@@ -2,13 +2,13 @@ import os
 from uuid import uuid4
 
 from flask import Blueprint, render_template, request, send_from_directory
+from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back
 from sarna.core.auth import login_required, current_user
 from sarna.forms import AssessmentForm, TemplateCreateNewForm
 from sarna.forms import ClientForm
 from sarna.model import Client, Assessment, Template, db
-from sqlalchemy.exc import IntegrityError
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('clients', __name__)

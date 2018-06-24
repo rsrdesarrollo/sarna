@@ -1,6 +1,6 @@
 import getpass
-import click
 
+import click
 from flask.cli import AppGroup
 from sqlalchemy.exc import IntegrityError
 from terminaltables import AsciiTable

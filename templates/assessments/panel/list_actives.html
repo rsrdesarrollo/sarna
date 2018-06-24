@@ -22,12 +22,12 @@
                             {% for resource in active.active_resources %}
                                 <td>{{ resource.route or '' }}</td>
                                 <td><a>{{ resource.findings|length }}</a></td>
-                        </tr>
+                                </tr>
                             {% else %}
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                        </tr>
+                                </tr>
                             {% endfor %}
                     {% endfor %}
                     </tbody>
@@ -37,7 +37,7 @@
 
             {% endif %}
         </div>
-    {#
+        {#
         <div class="col">
             <h3>Add Active</h3>
             {{ render_form(form) }}

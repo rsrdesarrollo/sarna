@@ -179,7 +179,7 @@ var CVSS = function (id, options) {
             }
         }
     };
-    
+
     this.bme = {};
     this.bmgReg = {
         AV: 'NALP',
@@ -249,7 +249,7 @@ var CVSS = function (id, options) {
     l.appendChild(this.vector = e('a'));
     this.vector.className = 'vector';
     this.vector.innerHTML = 'CVSS:3.0/AV:_/AC:_/PR:_/UI:_/S:_/C:_/I:_/A:_';
-    
+
     if (options.onsubmit) {
         f.appendChild(e('hr'));
         this.submitButton = f.appendChild(e('input'));
@@ -295,8 +295,8 @@ CVSS.prototype.severityRating = function (score) {
     };
 };
 
-CVSS.prototype.valueofradio = function(e) {
-    for(var i = 0; i < e.length; i++) {
+CVSS.prototype.valueofradio = function (e) {
+    for (var i = 0; i < e.length; i++) {
         if (e[i].checked) {
             return e[i].value;
         }
@@ -380,44 +380,45 @@ CVSS.prototype.calculate = function () {
     // CALCULATE THE CVSS BASE SCORE
     //
     try {
-    var baseScore;
-    var impactSubScore;
-    var exploitabalitySubScore = exploitabilityCoefficient * metricWeight.AV * metricWeight.AC * metricWeight.PR * metricWeight.UI;
-    var impactSubScoreMultiplier = (1 - ((1 - metricWeight.C) * (1 - metricWeight.I) * (1 - metricWeight.A)));
-    if (val.S === 'U') {
-        impactSubScore = metricWeight.S * impactSubScoreMultiplier;
-    } else {
-        impactSubScore = metricWeight.S * (impactSubScoreMultiplier - 0.029) - 3.25 * Math.pow(impactSubScoreMultiplier - 0.02, 15);
-    }
-
-
-    if (impactSubScore <= 0) {
-        baseScore = 0;
-    } else {
+        var baseScore;
+        var impactSubScore;
+        var exploitabalitySubScore = exploitabilityCoefficient * metricWeight.AV * metricWeight.AC * metricWeight.PR * metricWeight.UI;
+        var impactSubScoreMultiplier = (1 - ((1 - metricWeight.C) * (1 - metricWeight.I) * (1 - metricWeight.A)));
         if (val.S === 'U') {
-            baseScore = Math.min((exploitabalitySubScore + impactSubScore), 10);
+            impactSubScore = metricWeight.S * impactSubScoreMultiplier;
         } else {
-            baseScore = Math.min((exploitabalitySubScore + impactSubScore) * scopeCoefficient, 10);
+            impactSubScore = metricWeight.S * (impactSubScoreMultiplier - 0.029) - 3.25 * Math.pow(impactSubScoreMultiplier - 0.02, 15);
         }
-    }
 
-    baseScore = Math.ceil(baseScore * 10) / 10;
-    return baseScore;
+
+        if (impactSubScore <= 0) {
+            baseScore = 0;
+        } else {
+            if (val.S === 'U') {
+                baseScore = Math.min((exploitabalitySubScore + impactSubScore), 10);
+            } else {
+                baseScore = Math.min((exploitabalitySubScore + impactSubScore) * scopeCoefficient, 10);
+            }
+        }
+
+        baseScore = Math.ceil(baseScore * 10) / 10;
+        return baseScore;
     } catch (err) {
         return err;
     }
 };
 
-CVSS.prototype.get = function() {
+CVSS.prototype.get = function () {
     return {
         score: this.score.innerHTML,
         vector: this.vector.innerHTML
     };
 };
 
-CVSS.prototype.setMetric = function(a) {
+CVSS.prototype.setMetric = function (a) {
     var vectorString = this.vector.innerHTML;
-    if (/AV:.\/AC:.\/PR:.\/UI:.\/S:.\/C:.\/I:.\/A:./.test(vectorString)) {} else {
+    if (/AV:.\/AC:.\/PR:.\/UI:.\/S:.\/C:.\/I:.\/A:./.test(vectorString)) {
+    } else {
         vectorString = 'AV:_/AC:_/PR:_/UI:_/S:_/C:_/I:_/A:_';
     }
     //e("E" + a.id).checked = true;
@@ -425,7 +426,7 @@ CVSS.prototype.setMetric = function(a) {
     this.set(newVec);
 };
 
-CVSS.prototype.set = function(vec) {
+CVSS.prototype.set = function (vec) {
     var newVec = 'CVSS:3.0/';
     var sep = '';
     for (var m in this.bm) {
@@ -434,7 +435,7 @@ CVSS.prototype.set = function(vec) {
             var check = match[0].replace(':', '');
             this.bme[check].checked = true;
             newVec = newVec + sep + match[0];
-        } else if ((m in {C:'', I:'', A:''}) && (match = (new RegExp('\\b(' + m + ':C)')).exec(vec)) !== null) {
+        } else if ((m in {C: '', I: '', A: ''}) && (match = (new RegExp('\\b(' + m + ':C)')).exec(vec)) !== null) {
             // compatibility with v2 only for CIA:C
             this.bme[m + 'H'].checked = true;
             newVec = newVec + sep + m + ':H';
@@ -449,7 +450,7 @@ CVSS.prototype.set = function(vec) {
     this.update(newVec);
 };
 
-CVSS.prototype.update = function(newVec) {
+CVSS.prototype.update = function (newVec) {
     this.vector.innerHTML = newVec;
     var s = this.calculate();
     this.score.innerHTML = s;
