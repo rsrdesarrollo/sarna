@@ -138,11 +138,11 @@ def edit_translation(finding_id: int, language: str):
     context = dict(
         route=ROUTE_NAME,
         form=form,
-        finding=translation.finding
+        finding=translation.finding_template
     )
 
     if form.validate_on_submit():
-        if language in translation.finding.langs:
+        if language in translation.finding_template.langs:
             data = dict(form.data)
             data.pop('csrf_token', None)
             translation.set(**data)
