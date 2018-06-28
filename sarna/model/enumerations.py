@@ -75,8 +75,9 @@ class AssessmentType(Choice):
 
 class FindingType(Choice):
     Web = 1
-    Infra = 3
-    Config = 4
+    Infra = 2
+    Mobile = 3
+    WiFi = 4
 
 
 class FindingStatus(Choice):
@@ -91,6 +92,266 @@ class AssessmentStatus(Choice):
     Open = 1
     Closed = 2
     Archived = 3
+
+
+class OWISAMCategory(Choice):
+    _init_ = "value code desc translation"
+    DI_001 = 1, 'DI-001', 'Discovering of access points', {
+        Language.English: 'Discovering of access points',
+        Language.Spanish: 'Descubrimiento de puntos de acceso'
+    }
+    DI_002 = 2, 'DI-002', 'Hidden networks discovering', {
+        Language.English: 'Hidden networks discovering',
+        Language.Spanish: 'Descubrimiento de redes ocultas'
+    }
+    DI_003 = 3, 'DI-003', 'Passive MAC address identification', {
+        Language.English: 'Passive MAC address identification',
+        Language.Spanish: 'Identificación pasiva de direcciones MAC'
+    }
+    DI_004 = 4, 'DI-004', 'Discovering of client Preferred Network Lists (PNL)', {
+        Language.English: 'Discovering of client Preferred Network Lists (PNL)',
+        Language.Spanish: 'Descubrimiento de redes preferidas de clientes'
+    }
+    DI_005 = 5, 'DI-005', 'Active device and network discovering', {
+        Language.English: 'Active device and network discovering',
+        Language.Spanish: 'Descubrimiento activo de clientes y redes'
+    }
+    DI_006 = 6, 'DI-006', 'Identification of relationships between devices', {
+        Language.English: 'Identification of relationships between devices',
+        Language.Spanish: 'Identificación de relaciones entre dispositivos'
+    }
+    FP_001 = 7, 'FP-001', 'Devices identification', {
+        Language.English: 'Devices identification',
+        Language.Spanish: 'Identificación del dispositivos'
+    }
+    FP_002 = 8, 'FP-002', 'Identification of device supported functionality', {
+        Language.English: 'Identification of device supported functionality',
+        Language.Spanish: 'Identificación de funcionalidades soportadas por el dispositivo'
+    }
+    FP_003 = 9, 'FP-003', 'Enumeration of RADIUS authentication mechanisms (802.1x)', {
+        Language.English: 'Enumeration of RADIUS authentication mechanisms (802.1x)',
+        Language.Spanish: 'Enumeración de mecanismos de autenticación radius (802.1x)'
+    }
+    FP_004 = 10, 'FP-004', 'Detection of Rogue APs', {
+        Language.English: 'Detection of Rogue APs',
+        Language.Spanish: 'Detección de Rogue APs'
+    }
+    FP_005 = 11, 'FP-005', 'Client isolation tests', {
+        Language.English: 'Client isolation tests',
+        Language.Spanish: 'Pruebas de client isolation'
+    }
+    FP_006 = 12, 'FP-006', 'Detection of attacks by Wi-Fi devices', {
+        Language.English: 'Detection of attacks by Wi-Fi devices',
+        Language.Spanish: 'Detección de ataques por parte de dispositivos Wi-Fi'
+    }
+    AU_001 = 13, 'AU-001', 'MAC-based access protection detection', {
+        Language.English: 'MAC-based access protection detection',
+        Language.Spanish: 'Detección de protección de acceso basado en MAC'
+    }
+    AU_002 = 14, 'AU-002', 'Tests on WPS', {
+        Language.English: 'Tests on WPS',
+        Language.Spanish: 'Pruebas sobre WPS'
+    }
+    AU_003 = 15, 'AU-003', 'Downgrade tests of the authentication method', {
+        Language.English: 'Downgrade tests of the authentication method',
+        Language.Spanish: 'Pruebas de downgrade del método de autenticación'
+    }
+    AU_004 = 16, 'AU-004', 'Capture and cracking of transmitted keys in the authentication process', {
+        Language.English: 'Capture and cracking of transmitted keys in the authentication process',
+        Language.Spanish: 'Captura y cracking de claves transmitidas en el proceso de autenticación'
+    }
+    AU_005 = 17, 'AU-005', 'Use of insecure authentication protocols', {
+        Language.English: 'Use of insecure authentication protocols',
+        Language.Spanish: 'Uso de protocolos de autenticación inseguros'
+    }
+    AU_006 = 18, 'AU-006', 'Brute force testing of RADIUS users and passwords (802.1x)', {
+        Language.English: 'Brute force testing of RADIUS users and passwords (802.1x)',
+        Language.Spanish: 'Pruebas de fuerza bruta de usuarios contraseñas de radius (802.1x)'
+    }
+    AU_007 = 19, 'AU-007', 'Brute force testing of passwords against the authentication process (PSK)', {
+        Language.English: 'Brute force testing of passwords against the authentication process (PSK)',
+        Language.Spanish: 'Pruebas de fuerza bruta de contraseñas contra el proceso de autenticación (PSK)'
+    }
+    AU_008 = 20, 'AU-008', 'Weaknesses in credential repository', {
+        Language.English: 'Weaknesses in credential repository',
+        Language.Spanish: 'Debilidades en repositorio de credenciales'
+    }
+    CP_001 = 21, 'CP-001', 'Open network capture and trafic analisys', {
+        Language.English: 'Open network capture and trafic analisys',
+        Language.Spanish: 'Captura y análisis de tráfico en red abierta'
+    }
+    CP_002 = 22, 'CP-002', 'Decryption of encrypted traffic', {
+        Language.English: 'Decryption of encrypted traffic',
+        Language.Spanish: 'Descifrado de trafico cifrado'
+    }
+    CP_003 = 23, 'CP-003', 'Tests of analysis of information transmitted through Wireless', {
+        Language.English: 'Tests of analysis of information transmitted through Wireless',
+        Language.Spanish: 'Pruebas de análisis de información transmitida a través de Wireless'
+    }
+    CP_004 = 24, 'CP-004', 'Analysis of insecure encryption protocols', {
+        Language.English: 'Analysis of insecure encryption protocols',
+        Language.Spanish: 'Análisis de protocolos de cifrado inseguro'
+    }
+    CP_005 = 25, 'CP-005', 'Renewal tests for encryption keys', {
+        Language.English: 'Renewal tests for encryption keys',
+        Language.Spanish: 'Pruebas de renovación de claves de cifrado'
+    }
+    CP_006 = 26, 'CP-006', 'Traffic re-injection tests', {
+        Language.English: 'Traffic re-injection tests',
+        Language.Spanish: 'Pruebas de re-inyección de tráfico'
+    }
+    CF_001 = 27, 'CF-001', 'Identification of wireless networks with generic ESSID', {
+        Language.English: 'Identification of wireless networks with generic ESSID',
+        Language.Spanish: 'Identificación de redes wireless con ESSID genérico'
+    }
+    CF_002 = 28, 'CF-002', 'Generic passwords in the administrative interface of the access point', {
+        Language.English: 'Generic passwords in the administrative interface of the access point',
+        Language.Spanish: 'Contraseñas genéricas en interfaz administrativa del punto de acceso'
+    }
+    CF_003 = 29, 'CF-003', 'Verification of signal strength level or coverage area', {
+        Language.English: 'Verification of signal strength level or coverage area',
+        Language.Spanish: 'Verificación del nivel de intensidad de señal o área de cobertura'
+    }
+    CF_004 = 30, 'CF-004', 'Analysis of the overlap of networks in the same communications channel', {
+        Language.English: 'Analysis of the overlap of networks in the same communications channel',
+        Language.Spanish: 'Análisis del solapamiento de redes en el mismo canal de comunicaciones'
+    }
+    CF_005 = 31, 'CF-005', 'Generation of keys based on known algorithms', {
+        Language.English: 'Generation of keys based on known algorithms',
+        Language.Spanish: 'Generación de claves en base a algoritmos conocidos'
+    }
+    CF_006 = 32, 'CF-006', 'Tests on UPnP', {
+        Language.English: 'Tests on UPnP',
+        Language.Spanish: 'Pruebas sobre Upnp'
+    }
+    IF_001 = 33, 'IF-001', 'Weaknesses in the AP firmware', {
+        Language.English: 'Weaknesses in the AP firmware',
+        Language.Spanish: 'Debilidades en el firmware del AP'
+    }
+    IF_002 = 34, 'IF-002', 'Administrative interfaces exposed to the network', {
+        Language.English: 'Administrative interfaces exposed to the network',
+        Language.Spanish: 'Interfaces administrativas expuestas a la red'
+    }
+    IF_003 = 35, 'IF-003', 'Incorrect firewall policy', {
+        Language.English: 'Incorrect firewall policy',
+        Language.Spanish: 'Política de firewall incorrecta'
+    }
+    IF_004 = 36, 'IF-004', 'Controls on intrusion detection mechanisms', {
+        Language.English: 'Controls on intrusion detection mechanisms',
+        Language.Spanish: 'Controles sobre mecanismos de detección de intrusos'
+    }
+    IF_005 = 37, 'IF-005', 'Verification tests of VPN tunnels', {
+        Language.English: 'Verification tests of VPN tunnels',
+        Language.Spanish: 'Pruebas de verificación de túneles VPN'
+    }
+    IF_006 = 38, 'IF-006', 'Weaknesses in RADIUS server', {
+        Language.English: 'Weaknesses in RADIUS server',
+        Language.Spanish: 'Debilidades en servidor radius'
+    }
+    IF_007 = 39, 'IF-007', 'Vulnerabilities incubated', {
+        Language.English: 'Vulnerabilities incubated',
+        Language.Spanish: 'Vulnerabilidades incubadas'
+    }
+    IF_008 = 40, 'IF-008', 'Management of keys and certificates life cycle', {
+        Language.English: 'Management of keys and certificates life cycle',
+        Language.Spanish: 'Gestión del ciclo de vida de claves y certificados'
+    }
+    IF_009 = 41, 'IF-009', 'Accessible / physically exposed communication devices', {
+        Language.English: 'Accessible / physically exposed communication devices',
+        Language.Spanish: 'Dispositivos de comunicaciones accesible/expuestos físicamente'
+    }
+    IF_010 = 42, 'IF-010', 'Detection and analysis of SCADA systems', {
+        Language.English: 'Detection and analysis of SCADA systems',
+        Language.Spanish: 'Detección y análisis de sistemas SCADA'
+    }
+    DS_001 = 43, 'DS-001', 'Deauthentication tests', {
+        Language.English: 'Deauthentication tests',
+        Language.Spanish: 'Pruebas de deautenticación'
+    }
+    DS_002 = 44, 'DS-002', 'Saturation of the communications channel', {
+        Language.English: 'Saturation of the communications channel',
+        Language.Spanish: 'Saturación del canal de comunicaciones'
+    }
+    DS_003 = 45, 'DS-003', 'Blocking user accounts', {
+        Language.English: 'Blocking user accounts',
+        Language.Spanish: 'Bloqueo de cuentas de usuario'
+    }
+    DS_004 = 46, 'DS-004', 'Communication device lock', {
+        Language.English: 'Communication device lock',
+        Language.Spanish: 'Bloqueo de dispositivo de comunicaciones'
+    }
+    DS_005 = 47, 'DS-005', 'Degradation tests of the communications channel', {
+        Language.English: 'Degradation tests of the communications channel',
+        Language.Spanish: 'Pruebas de degradación del canal de comunicaciones'
+    }
+    GD_001 = 48, 'GD-001', 'Identification of devices that do not meet the standard / owners', {
+        Language.English: 'Identification of devices that do not meet the standard / owners',
+        Language.Spanish: 'Identificación de dispositivos que no cumplen el estándar / propietarios'
+    }
+    GD_002 = 49, 'GD-002', 'Detection of devices emitting at restricted frequencies', {
+        Language.English: 'Detection of devices emitting at restricted frequencies',
+        Language.Spanish: 'Detección de dispositivos emitiendo en frecuencias restringidas'
+    }
+    GD_003 = 50, 'GD-003', 'Analysis of the policy of use / restriction of use of wireless networks', {
+        Language.English: 'Analysis of the policy of use / restriction of use of wireless networks',
+        Language.Spanish: 'Análisis de la política de uso/restricción de uso de redes inalámbricas'
+    }
+    GD_004 = 51, 'GD-004', 'Analysis of device configuration', {
+        Language.English: 'Analysis of device configuration',
+        Language.Spanish: 'Análisis de la configuración de dispositivos'
+    }
+    GD_005 = 52, 'GD-005', 'Analysis of the management policy and change of keys', {
+        Language.English: 'Analysis of the management policy and change of keys',
+        Language.Spanish: 'Análisis de la política de gestión y cambio de claves'
+    }
+    GD_006 = 53, 'GD-006', 'Verification of authorized devices inventory', {
+        Language.English: 'Verification of authorized devices inventory',
+        Language.Spanish: 'Verificación de inventario de dispositivos autorizados'
+    }
+    CT_001 = 54, 'CT-001', 'Rogue AP tests and automatic association', {
+        Language.English: 'Rogue AP tests and automatic association',
+        Language.Spanish: 'Pruebas de Rogue Ap y asociación automática'
+    }
+    CT_002 = 55, 'CT-002', 'Analysis of APTs (Advanced Persistent Threats) on Wireless', {
+        Language.English: 'Analysis of APTs (Advanced Persistent Threats) on Wireless',
+        Language.Spanish: 'Analisis de APTs (Advanced Persistent Threats) sobre Wireless'
+    }
+    CT_003 = 56, 'CT-003', 'Client buffer overflow', {
+        Language.English: 'Client buffer overflow',
+        Language.Spanish: 'Desbordamiento de buffer en cliente'
+    }
+    CT_004 = 57, 'CT-004', 'Extraction of user identifiers (802.1x)', {
+        Language.English: 'Extraction of user identifiers (802.1x)',
+        Language.Spanish: 'Extracción de identificadores de usuarios (802.1x)'
+    }
+    CT_005 = 58, 'CT-005', 'Tests on weak or insecure supplicant', {
+        Language.English: 'Tests on weak or insecure supplicant',
+        Language.Spanish: 'Pruebas sobre suplicant débil o inseguro'
+    }
+    CT_006 = 59, 'CT-006', 'Attacks against clients', {
+        Language.English: 'Attacks against clients',
+        Language.Spanish: 'Ataques contra clientes'
+    }
+    CT_007 = 60, 'CT-007', 'Removing customer credentials', {
+        Language.English: 'Removing customer credentials',
+        Language.Spanish: 'Extracción de credenciales de los clientes'
+    }
+    HS_001 = 61, 'HS-001', 'Access to other network segments without authentication', {
+        Language.English: 'Access to other network segments without authentication',
+        Language.Spanish: 'Acceso a otros segmentos de red sin autenticación'
+    }
+    HS_002 = 62, 'HS-002', 'Weaknesses in the authentication mechanism', {
+        Language.English: 'Weaknesses in the authentication mechanism',
+        Language.Spanish: 'Debilidades en el mecanismo de autenticación'
+    }
+    HS_003 = 63, 'HS-003', 'Evidence of encapsulation of traffic with the exterior', {
+        Language.English: 'Evidence of encapsulation of traffic with the exterior',
+        Language.Spanish: 'Pruebas de encapsulación de tráfico con el exterior'
+    }
+    HS_004 = 64, 'HS-004', 'Weakness in captive portal', {
+        Language.English: 'Weakness in captive portal',
+        Language.Spanish: 'Debilidades en portal cautivo'
+    }
 
 
 class OWASPCategory(Choice):
