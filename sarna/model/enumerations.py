@@ -31,6 +31,11 @@ class Choice(OrderedEnum):
         return self.name.replace("_", " ")
 
 
+class AuthSource(Choice):
+    database = 1
+    ldap = 2
+
+
 class Language(Choice):
     Spanish = 1
     English = 2

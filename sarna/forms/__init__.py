@@ -1,13 +1,14 @@
 from flask_sqlalchemy.model import DefaultMeta as Entity
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
-from sqlalchemy.sql.sqltypes import Integer, String, Boolean, Enum, Date
+from sqlalchemy.sql.sqltypes import Integer, String, Boolean, Date
 from wtforms import validators
 from wtforms.fields import BooleanField, SelectField, StringField, TextAreaField
 from wtforms.fields.html5 import IntegerField, DateField
 
 from sarna.auxiliary.upload_helpers import *
 from sarna.model import *
+from sarna.model.sql_types.enum import Enum
 
 simple_str_validator = validators.Regexp('^[\w\d \t_\[\]\(\)<>"\'.*:|$!-]+$')
 

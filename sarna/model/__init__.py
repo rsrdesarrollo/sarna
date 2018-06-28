@@ -16,7 +16,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sarna.core import app
 from sarna.core.config import config
 from sarna.model.enumerations import *
-from sarna.model.guid import GUID
+from sarna.model.sql_types.guid import GUID
+from sarna.model.sql_types.enum import Enum
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -112,9 +113,9 @@ class Assessment(db.Model, CustomModel):
     uuid = db.Column(GUID, default=uuid4, unique=True, nullable=False)
     name = db.Column(db.String(64), nullable=False)
     platform = db.Column(db.String(64), nullable=False)
-    lang = db.Column(db.Enum(Language), nullable=False)
-    type = db.Column(db.Enum(AssessmentType), nullable=False)
-    status = db.Column(db.Enum(AssessmentStatus), nullable=False)
+    lang = db.Column(Enum(Language), nullable=False)
+    type = db.Column(Enum(AssessmentType), nullable=False)
+    status = db.Column(Enum(AssessmentStatus), nullable=False)
 
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'), nullable=False)
     client = db.relationship(Client, back_populates="assessments", uselist=False)
@@ -186,11 +187,14 @@ class FindingTemplate(db.Model, CustomModel):
     __tablename__ = 'finding_template'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
-    type = db.Column(db.Enum(FindingType), nullable=False)
-    owasp_category = db.Column(db.Enum(OWASPCategory))
-    tech_risk = db.Column(db.Enum(Score), nullable=False)
-    dissemination = db.Column(db.Enum(Score), nullable=False)
-    solution_complexity = db.Column(db.Enum(Score), nullable=False)
+    type = db.Column(Enum(FindingType), nullable=False)
+
+    owasp_category = db.Column(Enum(OWASPCategory))
+    owisam_category = db.Column(Enum(OWISAMCategory))
+
+    tech_risk = db.Column(Enum(Score), nullable=False)
+    dissemination = db.Column(Enum(Score), nullable=False)
+    solution_complexity = db.Column(Enum(Score), nullable=False)
 
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     creator = db.relationship('User', back_populates='created_findings', uselist=False)
@@ -206,7 +210,7 @@ class FindingTemplate(db.Model, CustomModel):
 class FindingTemplateTranslation(db.Model, CustomModel):
     __tablename__ = 'finding_template_translation'
 
-    lang = db.Column(db.Enum(Language), primary_key=True)
+    lang = db.Column(Enum(Language), primary_key=True)
     finding_template_id = db.Column(db.Integer, db.ForeignKey('finding_template.id'), primary_key=True)
     finding_template = db.relationship(FindingTemplate, back_populates='translations', uselist=False)
 
@@ -269,7 +273,7 @@ class Finding(db.Model, CustomModel):
     __tablename__ = 'finding'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
-    type = db.Column(db.Enum(FindingType), nullable=False)  # FindingType)
+    type = db.Column(Enum(FindingType), nullable=False)  # FindingType)
 
     assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'))
     assessment = db.relationship(Assessment, back_populates='findings', uselist=False)
@@ -278,17 +282,19 @@ class Finding(db.Model, CustomModel):
     template = db.relationship(FindingTemplate, uselist=False)
 
     title = db.Column(db.String(128), nullable=False)
-    status = db.Column(db.Enum(FindingStatus), nullable=False, default=FindingStatus.Pending)
-    owasp_category = db.Column(db.Enum(OWASPCategory))
+    status = db.Column(Enum(FindingStatus), nullable=False, default=FindingStatus.Pending)
+
+    owasp_category = db.Column(Enum(OWASPCategory))
+    owisam_category = db.Column(Enum(OWISAMCategory))
 
     description = db.Column(db.String())
     solution = db.Column(db.String())
 
-    tech_risk = db.Column(db.Enum(Score), nullable=False)
-    business_risk = db.Column(db.Enum(Score))
-    exploitability = db.Column(db.Enum(Score))
-    dissemination = db.Column(db.Enum(Score), nullable=False)
-    solution_complexity = db.Column(db.Enum(Score), nullable=False)
+    tech_risk = db.Column(Enum(Score), nullable=False)
+    business_risk = db.Column(Enum(Score))
+    exploitability = db.Column(Enum(Score))
+    dissemination = db.Column(Enum(Score), nullable=False)
+    solution_complexity = db.Column(Enum(Score), nullable=False)
 
     definition = db.Column(db.String(), nullable=False)
     references = db.Column(db.String(), nullable=False)
@@ -387,7 +393,10 @@ class Finding(db.Model, CustomModel):
             tech_risk=template.tech_risk,
             dissemination=template.dissemination,
             solution_complexity=template.solution_complexity,
+
             owasp_category=template.owasp_category,
+            owisam_category=template.owisam_category,
+
             template=template,
 
             title=translation.title,
@@ -414,7 +423,7 @@ class Solution(db.Model, CustomModel):
     finding_template_id = db.Column(db.Integer, db.ForeignKey('finding_template.id'), primary_key=True)
     finding_template = db.relationship(FindingTemplate, back_populates='solutions', uselist=False)
 
-    lang = db.Column(db.Enum(Language), nullable=False)
+    lang = db.Column(Enum(Language), nullable=False)
     text = db.Column(db.String(), nullable=False)
 
 
@@ -432,6 +441,7 @@ class User(db.Model, CustomModel):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), unique=True)
     is_admin = db.Column(db.Boolean(), default=False, nullable=False)
+    source = db.Column(Enum(AuthSource), default=AuthSource.database, nullable=False)
     passwd = db.Column(db.String(128))
 
     creation_date = db.Column(db.DateTime, default=lambda: datetime.now(), nullable=False)
