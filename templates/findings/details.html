@@ -90,6 +90,10 @@
                                                href="{{ url_for('.edit_solution', finding_id=finding.id, solution_name=solution.name, next=request.path) }}">
                                                 <span class="fa fa-pencil"></span>
                                             </a>
+                                            <a class="btn btn-primary"
+                                               href="{{ url_for('.add_solution', finding_id=finding.id, solution_name=solution.name, next=request.path) }}">
+                                                <span class="fa fa-copy"></span>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>

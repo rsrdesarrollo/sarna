@@ -35,3 +35,4 @@ webassets==0.12.1
 Werkzeug==0.14.1
 WTForms==2.2.1
 flask-migrate==2.2.1
+psycopg2-binary==2.7.5

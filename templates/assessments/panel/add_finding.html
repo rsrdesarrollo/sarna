@@ -1,6 +1,6 @@
 {% extends "assessments/panel/panel_base.html" %}
 
-{% from "macros.html" import render_form, render_score_label %}
+{% from "macros.html" import render_form, render_score_pill %}
 {% block content %}
     <div class="row">
         <div class="col">
@@ -24,7 +24,7 @@
                                     <span class="badge badge-pill badge-primary">{{ lang }}</span>
                                 {% endfor %}
                             </td>
-                            <td>{{ render_score_label(finding.tech_risk) }}</td>
+                            <td>{{ render_score_pill(finding.tech_risk) }}</td>
                             <td>{{ finding.solutions|length }}</td>
                             <td>
                                 <form action="{{ url_for('.add_finding', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}"

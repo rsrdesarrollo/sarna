@@ -1,6 +1,6 @@
 {% extends "findings/base.html" %}
 
-{% from "macros.html" import render_score_label %}
+{% from "macros.html" import render_score_pill, render_pill %}
 {% block body %}
     <div class="row mt-3">
         <div class="col-lg-12">
@@ -12,6 +12,7 @@
                     <th>Languages</th>
                     <th>Technical Risk</th>
                     <th># Solutions</th>
+                    <th>Creator</th>
                     <th class="text-right">Actions</th>
                     </thead>
                     <tbody>
@@ -19,13 +20,10 @@
                         <tr>
                             <td>{{ finding.name }}</td>
                             <td>{{ finding.type }}</td>
-                            <td>
-                                {% for lang in finding.langs %}
-                                    <span class="badge badge-pill badge-primary">{{ lang }}</span>
-                                {% endfor %}
-                            </td>
-                            <td>{{ render_score_label(finding.tech_risk) }}</td>
+                            <td>{% for lang in finding.langs %}{{ render_pill(lang, 'secondary') }}{% endfor %}</td>
+                            <td>{{ render_score_pill(finding.tech_risk) }}</td>
                             <td>{{ finding.solutions|length }}</td>
+                            <td>{{ finding.creator.name }}</td>
                             <td>
                                 <div class="btn-group float-right">
                                     <a class="need-confirm btn btn-danger" title="Delete Finding"

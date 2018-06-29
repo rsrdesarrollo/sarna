@@ -6,6 +6,7 @@
                 <table id="table_data" class="table table-striped">
                     <thead class="thead-dark">
                     <th>Name</th>
+                    <th>Creator</th>
                     <th style="width: 20%" class="text-right">Actions</th>
                     </thead>
                     <tbody>
@@ -17,6 +18,7 @@
                                     {{ client.long_name }}
                                 </a>
                             </td>
+                            <td>{{ client.creator.name }}</td>
                             <td>
                                 <div class="btn-group float-right">
                                     <a class="need-confirm btn btn-danger" title="Delete Client"

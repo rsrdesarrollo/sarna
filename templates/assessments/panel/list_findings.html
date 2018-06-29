@@ -1,6 +1,6 @@
 {% extends "assessments/panel/panel_base.html" %}
 
-{% from "macros.html" import render_form, render_score_label %}
+{% from "macros.html" import render_form, render_score_pill, render_finding_status_pill %}
 
 {% block body %}
     <form action="{{ url_for('.bulk_action_finding', assessment_id=assessment.id) }}" method="post">
@@ -71,9 +71,9 @@
                             </td>
                             <td>{{ finding.title }}</td>
                             <td>{{ finding.type }}</td>
-                            <td>{{ render_score_label(finding.tech_risk) }}</td>
-                            <td>{{ render_score_label(finding.business_risk) }}</td>
-                            <td>{{ finding.status }}</td>
+                            <td>{{ render_score_pill(finding.tech_risk) }}</td>
+                            <td>{{ render_score_pill(finding.business_risk) }}</td>
+                            <td>{{ render_finding_status_pill(finding.status) }}</td>
                             <td>
                                 <div class="btn-group float-right">
                                     <a class="btn btn-danger need-confirm"

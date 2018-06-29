@@ -1,13 +1,15 @@
+import itertools
 import os
 
 from PIL import Image as PillowImage
 from flask import Blueprint, render_template, request, flash, send_from_directory
 from flask import abort
+from sqlalchemy import and_
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 
 from sarna.auxiliary import redirect_back, redirect_endpoint
-from sarna.core.auth import login_required
+from sarna.core.auth import login_required, current_user
 from sarna.core.security import limiter
 from sarna.forms import *
 from sarna.model import *
@@ -21,9 +23,13 @@ blueprint = Blueprint('assessments', __name__)
 @blueprint.route('/')
 @login_required
 def index():
+    assessments = list(itertools.chain(
+        current_user.created_assessments,
+        current_user.audited_assessments
+    ))
     context = dict(
         route=ROUTE_NAME,
-        assessments=Assessment.query.all()
+        assessments=assessments
     )
     return render_template('assessments/list.html', **context)
 
@@ -32,6 +38,9 @@ def index():
 @login_required
 def edit(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
+    if not current_user.owns(assessment):
+        abort(403)
+
     form_data = request.form.to_dict() or assessment.to_dict()
     form = AssessmentForm(**form_data)
 
@@ -54,9 +63,11 @@ def edit(assessment_id):
 @blueprint.route('/<assessment_id>/delete', methods=('POST',))
 @login_required
 def delete(assessment_id):
-    assesment = Assessment.query.filter_by(id=assessment_id).one()
-    db.session.delete(assesment)
-    db.session.commit()
+    assessment = Assessment.query.filter_by(id=assessment_id).one()
+    if not current_user.owns(assessment):
+        abort(403)
+
+    assessment.delete()
     return redirect_back('.index')
 
 
@@ -64,6 +75,9 @@ def delete(assessment_id):
 @login_required
 def summary(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
+    if not current_user.audits(assessment):
+        abort(403)
+
     context = dict(
         route=ROUTE_NAME,
         endpoint=request.url_rule.endpoint.split('.')[-1],
@@ -77,6 +91,9 @@ def summary(assessment_id):
 @login_required
 def findings(assessment_id, affected_resource_id=None):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
+    if not current_user.audits(assessment):
+        abort(403)
+
     context = dict(
         route=ROUTE_NAME,
         endpoint='findings',
@@ -100,6 +117,9 @@ def findings(assessment_id, affected_resource_id=None):
 @login_required
 def edit_finding(assessment_id, finding_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
+    if not current_user.audits(assessment):
+        abort(403)
+
     finding = Finding.query.filter_by(id=finding_id).one()
 
     finding_dict = finding.to_dict()
@@ -136,6 +156,9 @@ def edit_finding(assessment_id, finding_id):
 @login_required
 def delete_findings(assessment_id, finding_id):
     finding = Finding.query.filter_by(id=finding_id).one()
+    if not current_user.audits(finding.assessment):
+        abort(403)
+
     db.session.delete(finding)
     db.session.commit()
     flash("Findign deleted", "success")
@@ -146,6 +169,9 @@ def delete_findings(assessment_id, finding_id):
 @login_required
 def add_findings(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
+    if not current_user.audits(assessment):
+        abort(403)
+
     context = dict(
         route=ROUTE_NAME,
         endpoint=request.url_rule.endpoint.split('.')[-1],
@@ -159,11 +185,13 @@ def add_findings(assessment_id):
 @login_required
 def add_finding(assessment_id, finding_id):
     action = request.form.get('action', None)
-
     if not action or action not in {'add', 'edit_add'}:
         abort(400)
 
     assessment = Assessment.query.filter_by(id=assessment_id).one()
+    if not current_user.audits(assessment):
+        abort(403)
+
     template = FindingTemplate.query.filter_by(id=finding_id).one()
 
     finding = Finding.build_from_template(template, assessment)
@@ -185,6 +213,10 @@ def bulk_action_finding(assessment_id):
     data.pop('csrf_token', None)
     data.pop('finding:all', None)
 
+    assessment = Assessment.query.filter_by(id=assessment_id).one()
+    if not current_user.audits(assessment):
+        abort(403)
+
     set_findings = set()
     for k, v in data.items():
         if k.startswith('finding'):
@@ -192,7 +224,10 @@ def bulk_action_finding(assessment_id):
                 set_findings.add(int(k.split(':')[1]))
             except:
                 continue
-    target = Finding.query.filter(Finding.id.in_(set_findings))
+
+    target = Finding.query.filter(
+        and_(Finding.id.in_(set_findings), Finding.assessment == assessment)
+    )
     if action == "delete":
         target.delete(bulk=True)
         flash("{} items deleted successfully.".format(len(set_findings)), "success")
@@ -222,6 +257,9 @@ def bulk_action_finding(assessment_id):
 @login_required
 def actives(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
+    if not current_user.audits(assessment):
+        abort(403)
+
     form = ActiveCreateNewForm(request.form)
     list_actives = assessment.actives
     context = dict(
@@ -252,6 +290,9 @@ def actives(assessment_id):
 @login_required
 def evidences(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
+    if not current_user.audits(assessment):
+        abort(403)
+
     form = EvidenceCreateNewForm()
     context = dict(
         route=ROUTE_NAME,
@@ -290,6 +331,9 @@ def evidences(assessment_id):
 @login_required
 def get_evidence(assessment_id, evidence_name):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
+    if not current_user.audits(assessment):
+        abort(403)
+
     image = Image.query.filter_by(
         assessment=assessment,
         name=evidence_name
@@ -306,6 +350,9 @@ def get_evidence(assessment_id, evidence_name):
 @login_required
 def reports(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
+    if not current_user.audits(assessment):
+        abort(403)
+
     context = dict(
         route=ROUTE_NAME,
         endpoint=request.url_rule.endpoint.split('.')[-1],
@@ -318,6 +365,9 @@ def reports(assessment_id):
 @login_required
 def download_reports(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
+    if not current_user.audits(assessment):
+        abort(403)
+
     data = request.form.to_dict()
     data.pop('action', None)
     data.pop('csrf_token', None)
@@ -350,7 +400,14 @@ def download_reports(assessment_id):
 @login_required
 def download_report(assessment_id, template_name):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
-    template = Template.query.filter_by(client=assessment.client, name=template_name).one()
+    if not current_user.audits(assessment):
+        abort(403)
+
+    template = Template.query.filter_by(
+        client=assessment.client,
+        name=template_name
+    ).one()
+
     report_path, report_file = generate_reports_bundle(assessment, [template])
     return send_from_directory(
         report_path,

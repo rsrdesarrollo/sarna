@@ -1,6 +1,6 @@
 import os
 
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, abort
 from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back
@@ -69,8 +69,10 @@ def edit(finding_id: int):
 @login_required
 def delete(finding_id: int):
     finding_template = FindingTemplate.query.filter_by(id=finding_id).one()
-    db.session.delete(finding_template)
-    db.session.commit()
+    if not current_user.owns(finding_template):
+        abort(403)
+
+    finding_template.delete()
     return redirect_back('.index')
 
 
@@ -154,11 +156,20 @@ def edit_translation(finding_id: int, language: str):
     return render_template('findings/edit_translation.html', **context)
 
 
+@blueprint.route('/<finding_id>/add_solution/<solution_name>', methods=('POST', 'GET'))
 @blueprint.route('/<finding_id>/add_solution', methods=('POST', 'GET'))
 @login_required
-def add_solution(finding_id: int):
+def add_solution(finding_id: int, solution_name=None):
     finding = FindingTemplate.query.filter_by(id=finding_id).one()
-    form = FindingTemplateAddSolutionForm(request.form)
+    solution = None
+    if solution_name:
+        solution = Solution.query.filter_by(
+            finding_template_id=finding_id,
+            name=solution_name
+        ).one()
+
+    form_data = solution.to_dict() if solution else request.form.to_dict()
+    form = FindingTemplateAddSolutionForm(**form_data)
 
     context = dict(
         route=ROUTE_NAME,

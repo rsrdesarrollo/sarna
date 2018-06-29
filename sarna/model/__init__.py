@@ -193,6 +193,8 @@ class FindingTemplate(db.Model, CustomModel):
     owisam_category = db.Column(Enum(OWISAMCategory))
 
     tech_risk = db.Column(Enum(Score), nullable=False)
+    business_risk = db.Column(Enum(Score), nullable=False)
+    exploitability = db.Column(Enum(Score), nullable=False)
     dissemination = db.Column(Enum(Score), nullable=False)
     solution_complexity = db.Column(Enum(Score), nullable=False)
 
@@ -291,8 +293,8 @@ class Finding(db.Model, CustomModel):
     solution = db.Column(db.String())
 
     tech_risk = db.Column(Enum(Score), nullable=False)
-    business_risk = db.Column(Enum(Score))
-    exploitability = db.Column(Enum(Score))
+    business_risk = db.Column(Enum(Score), nullable=False)
+    exploitability = db.Column(Enum(Score), nullable=False)
     dissemination = db.Column(Enum(Score), nullable=False)
     solution_complexity = db.Column(Enum(Score), nullable=False)
 
@@ -390,7 +392,10 @@ class Finding(db.Model, CustomModel):
         return Finding(
             name=template.name,
             type=template.type,
+
             tech_risk=template.tech_risk,
+            business_risk=template.business_risk,
+            exploitability=template.exploitability,
             dissemination=template.dissemination,
             solution_complexity=template.solution_complexity,
 
@@ -460,6 +465,40 @@ class User(db.Model, CustomModel):
     audited_assessments = db.relationship(Assessment, secondary=assessment_audit, back_populates='auditors')
 
     created_findings = db.relationship(FindingTemplate, back_populates='creator')
+
+    @property
+    def name(self):
+        return self.username
+
+    def owns(self, obj):
+        if isinstance(obj, Client):
+            return obj in self.created_clients
+        if isinstance(obj, Assessment):
+            return obj in self.created_assessments
+        elif isinstance(obj, FindingTemplate):
+            return obj in self.created_findings
+
+        return False
+
+    def manages(self, obj):
+        if self.owns(obj):
+            return True
+
+        if isinstance(obj, Client):
+            return obj in self.managed_clients
+
+        return False
+
+    def audits(self, obj):
+        if self.owns(obj) or self.manages(obj):
+            return True
+
+        if isinstance(obj, Client):
+            return obj in self.audited_clients
+        elif isinstance(obj, Assessment):
+            return obj in self.audited_assessments
+
+        return False
 
     def login(self):
         self.last_access = datetime.now()

@@ -15,12 +15,17 @@ blueprint = Blueprint('users', __name__)
 @blueprint.route('/profile')
 @login_required
 def index():
+    if current_user.is_admin:
+        users = User.query.all()
+    else:
+        users = []
+
     context = dict(
         route=ROUTE_NAME,
         otp_form=OtpConfirmForm(),
         change_passwd_form=ChangePasswordForm(),
         add_user_form=AddUserForm(request.form),
-        users=User.query.all()
+        users=users
     )
     return render_template('users/profile.html', **context)
 
@@ -29,10 +34,9 @@ def index():
 @login_required
 def enable_otp():
     form = OtpConfirmForm(request.form)
-    user: User = current_user
 
     try:
-        if user.enable_otp(form.otp.data):
+        if current_user.enable_otp(form.otp.data):
             flash('OTP enabled successfully', 'success')
         else:
             raise ValueError('invalid otp')
@@ -46,10 +50,9 @@ def enable_otp():
 @login_required
 def disable_otp():
     form = OtpConfirmForm(request.form)
-    user: User = current_user
 
     try:
-        if user.disable_otp(form.otp.data):
+        if current_user.disable_otp(form.otp.data):
             flash('OTP disabled successfully', 'success')
         else:
             raise ValueError('invalid otp')
@@ -63,11 +66,10 @@ def disable_otp():
 @login_required
 def change_passwd():
     form = ChangePasswordForm()
-    user: User = current_user
 
-    if (not user.otp_enabled or user.check_otp(form.otp.data)) and user.check_password(form.oldpassword.data):
+    if (not current_user.otp_enabled or current_user.check_otp(form.otp.data)) and current_user.check_password(form.oldpassword.data):
         if form.newpassword.data == form.newpasswordrep.data:
-            user.set_passwd(form.newpassword.data)
+            current_user.set_passwd(form.newpassword.data)
             flash('Password changed successfully', 'success')
         else:
             flash('Password repeat invalid', 'danger')
@@ -100,5 +102,10 @@ def add_user():
 @blueprint.route('/del_user/<username>', methods=('POST',))
 @admin_required
 def del_user(username):
-    User.query.filter_by(username=username).one().delete()
+    user = User.query.filter_by(username=username).one()
+    if user == current_user:
+        flash('You can not delete yourself', 'danger')
+    else:
+        user.delete()
+
     return redirect_back('users.index')

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros.html" import render_pill, render_assessment_status_pill %}
 {% block body %}
     <div class="row mt-3">
         <div class="col-lg-12">
@@ -11,6 +12,7 @@
                     <th>Type</th>
                     <th>Language</th>
                     <th>Status</th>
+                    <th>Creator</th>
                     <th class="text-right">Actions</th>
                     </thead>
                     <tbody>
@@ -23,9 +25,10 @@
                             </td>
                             <td>{{ assessment.client.short_name }}</td>
                             <td>{{ assessment.platform }}</td>
-                            <td>{{ assessment.type }}</td>
-                            <td>{{ assessment.lang }}</td>
-                            <td>{{ assessment.status }}</td>
+                            <td>{{ render_pill(assessment.type, 'secondary') }}</td>
+                            <td>{{ render_pill(assessment.lang, 'primary') }}</td>
+                            <td>{{ render_assessment_status_pill(assessment.status) }}</td>
+                            <td>{{ assessment.creator.name }}</td>
                             <td>
                                 <div class="btn-group float-right">
                                     <a class="need-confirm btn btn-danger" title="Delete Assessment"

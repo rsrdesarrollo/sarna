@@ -1,10 +1,29 @@
+{% macro render_pill(value, type) %}
+    <span class="badge badge-pill badge-{{ type }}">{{ value }}</span>
+{% endmacro %}
+
 {% macro boolean_pill(value) %}
     {% if value %}
-        <span class="badge badge-pill badge-success">True</span>
+        {{ render_pill(value, 'success') }}
     {% else %}
-        <span class="badge badge-pill badge-danger">False</span>
+        {{ render_pill(value, 'danger') }}
     {% endif %}
 {% endmacro %}
+
+{% macro render_score_pill(score) %}
+    {% set class = ['', 'info', 'success', 'warning', 'danger', 'critical'][score.value] %}
+    {{ render_pill(score, class) }}
+{%- endmacro %}
+
+{% macro render_finding_status_pill(score) %}
+    {% set class = ['', 'warning', 'info', 'success', 'danger', 'secondary'][score.value] %}
+    {{ render_pill(score, class) }}
+{%- endmacro %}
+
+{% macro render_assessment_status_pill(score) %}
+    {% set class = ['', 'success', 'danger', 'secondary'][score.value] %}
+    {{ render_pill(score, class) }}
+{%- endmacro %}
 
 {% macro render_field(field) -%}
 
@@ -82,9 +101,3 @@
 
 {%- endmacro %}
 
-{% macro render_score_label(score) %}
-    {% set class = ['', 'info', 'success', 'warning', 'danger', 'critical'][score.value] %}
-
-    <span class="badge badge-{{ class }}">{{ score.name }}</span>
-
-{%- endmacro %}

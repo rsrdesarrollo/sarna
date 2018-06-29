@@ -227,3 +227,4 @@ class AddUserForm(FlaskForm):
     username = StringField(validators=[validators.DataRequired()])
     password = StringField(validators=[validators.DataRequired()])
     passwordrep = StringField(validators=[validators.DataRequired()])
+    isadmin = BooleanField()

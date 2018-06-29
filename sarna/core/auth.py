@@ -12,6 +12,8 @@ login_manager.login_view = "index.index"
 login_manager.session_protection = "strong"
 login_manager.login_message_category = 'success'
 
+current_user: User = current_user
+
 
 def admin_required(func):
     @wraps(func)

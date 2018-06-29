@@ -11,7 +11,7 @@ class BaseConfig:
         )
     )
 
-    _default_database_uri = 'postgres.//user:password@localhost/sarna'
+    _default_database_uri = 'postgres://user:password@localhost/sarna'
     _default_evidences_path = path.join(PROJECT_PATH, 'uploaded_data', 'evidences')
     _default_templates_path = path.join(PROJECT_PATH, 'uploaded_data', 'templates')
 

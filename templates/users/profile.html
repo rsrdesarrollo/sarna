@@ -97,6 +97,7 @@
                 </div>
             </div>
         </div>
+    {% if current_user.is_admin %}
         <div class="col-lg-8 mt-3 px-3">
             <h3>List of users</h3>
             <table id="table_data" class="table table-striped">
@@ -125,6 +126,7 @@
                 </tbody>
             </table>
         </div>
+    {% endif %}
     </div>
 
 {% endblock %}

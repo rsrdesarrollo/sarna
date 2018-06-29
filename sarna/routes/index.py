@@ -4,6 +4,7 @@ from flask import Blueprint, render_template, request, flash
 
 from sarna.auxiliary import redirect_back
 from sarna.core.auth import login_required, logout_user
+from sarna.core.security import limiter
 from sarna.forms import LoginForm
 from sarna.model import User
 
@@ -12,6 +13,7 @@ blueprint = Blueprint('index', __name__)
 
 
 @blueprint.route('/', methods=('GET', 'POST'))
+@limiter.limit('10 per minute')
 def index():
     form = LoginForm(request.form)
     context = dict(

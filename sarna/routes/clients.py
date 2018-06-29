@@ -1,7 +1,8 @@
+import itertools
 import os
 from uuid import uuid4
 
-from flask import Blueprint, render_template, request, send_from_directory
+from flask import Blueprint, render_template, request, send_from_directory, abort
 from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back
@@ -17,9 +18,14 @@ blueprint = Blueprint('clients', __name__)
 @blueprint.route('/')
 @login_required
 def index():
+    clients = list(itertools.chain(
+        current_user.created_clients,
+        current_user.managed_clients,
+        current_user.audited_clients
+    ))
     context = dict(
         route=ROUTE_NAME,
-        clients=Client.query.all()
+        clients=clients
     )
     return render_template('clients/list.html', **context)
 
@@ -46,7 +52,13 @@ def new():
 @blueprint.route('/delete/<client_id>', methods=('POST',))
 @login_required
 def delete(client_id: int):
-    Client.query.filter_by(id=client_id).one().delete()
+    client = Client.query.filter_by(id=client_id).one()
+
+    if not current_user.owns(client):
+        abort(403)
+
+    client.delete()
+
     return redirect_back('.index')
 
 
@@ -54,6 +66,9 @@ def delete(client_id: int):
 @login_required
 def edit(client_id: int):
     client = Client.query.filter_by(id=client_id).one()
+
+    if not current_user.manages(client):
+        abort(403)
 
     form_data = request.form.to_dict() or client.to_dict()
     form = ClientForm(**form_data)
@@ -74,6 +89,10 @@ def edit(client_id: int):
 @login_required
 def add_assessment(client_id: int):
     client = Client.query.filter_by(id=client_id).one()
+
+    if not current_user.audits(client):
+        abort(403)
+
     form = AssessmentForm(request.form)
     context = dict(
         route=ROUTE_NAME,
@@ -94,6 +113,10 @@ def add_assessment(client_id: int):
 @login_required
 def add_template(client_id: int):
     client = Client.query.filter_by(id=client_id).one()
+
+    if not current_user.manages(client):
+        abort(403)
+
     form = TemplateCreateNewForm()
     context = dict(
         route=ROUTE_NAME,
@@ -130,6 +153,9 @@ def add_template(client_id: int):
 @login_required
 def delete_template(client_id: int, template_name):
     client = Client.query.filter_by(id=client_id).one()
+    if not current_user.manages(client):
+        abort(403)
+
     template = Template.query.filter_by(name=template_name, client=client).one()
     os.remove(os.path.join(client.template_path(), template.file))
     template.delete()
@@ -140,6 +166,9 @@ def delete_template(client_id: int, template_name):
 @login_required
 def download_template(client_id: int, template_name):
     client = Client.query.filter_by(id=client_id).one()
+    if not current_user.manages(client):
+        abort(403)
+
     template = Template.query.filter_by(name=template_name, client=client).one()
     return send_from_directory(
         client.template_path(),
