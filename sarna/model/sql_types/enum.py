@@ -1,9 +1,10 @@
 """
 SQLAlchemy Enum type based on Integer indices.
 """
+import inspect
+
 from aenum import Enum as PyEnum
 from sqlalchemy import types
-import inspect
 
 
 class Enum(types.TypeDecorator):

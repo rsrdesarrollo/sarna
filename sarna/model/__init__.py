@@ -16,8 +16,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sarna.core import app
 from sarna.core.config import config
 from sarna.model.enumerations import *
-from sarna.model.sql_types.guid import GUID
 from sarna.model.sql_types.enum import Enum
+from sarna.model.sql_types.guid import GUID
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)

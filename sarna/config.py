@@ -11,7 +11,7 @@ class BaseConfig:
         )
     )
 
-    _default_database_path = path.join(PROJECT_PATH, 'database')
+    _default_database_uri = 'postgres.//user:password@localhost/sarna'
     _default_evidences_path = path.join(PROJECT_PATH, 'uploaded_data', 'evidences')
     _default_templates_path = path.join(PROJECT_PATH, 'uploaded_data', 'templates')
 
@@ -27,10 +27,7 @@ class BaseConfig:
     TEMPLATES_ALLOW_EXTENSIONS = {'docx'}
     TEMPLATES_ALLOW_MIME = 'application/.*'
 
-    SQLALCHEMY_DATABASE_URI = "sqlite:///{}".format(path.join(
-        path.abspath(os.getenv('SARNA_DATABASE_PATH', _default_database_path)),
-        'databse.db'
-    ))
+    SQLALCHEMY_DATABASE_URI = os.getenv('SARNA_DATABASE_URI', _default_database_uri)
 
 
 class DevelopmentConfig(BaseConfig):
