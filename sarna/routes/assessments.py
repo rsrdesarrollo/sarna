@@ -37,12 +37,16 @@ def index():
 @blueprint.route('/<assessment_id>', methods=('GET', 'POST'))
 @login_required
 def edit(assessment_id):
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
+    assessment: Assessment = Assessment.query.filter_by(id=assessment_id).one()
     if not current_user.owns(assessment):
         abort(403)
 
-    form_data = request.form.to_dict() or assessment.to_dict()
-    form = AssessmentForm(**form_data)
+    if request.form:
+        form = AssessmentForm(request.form)
+    else:
+        form = AssessmentForm(**assessment.to_dict(), auditors=assessment.auditors)
+
+    form.auditors.choices = User.choices()
 
     context = dict(
         route=ROUTE_NAME,
@@ -53,7 +57,11 @@ def edit(assessment_id):
     if form.validate_on_submit():
         data = dict(form.data)
         data.pop('csrf_token', None)
+        auditors = data.pop('auditors', [])
+
         assessment.set(**data)
+        assessment.auditors.clear()
+        assessment.auditors.extend(auditors)
 
         return redirect_back('.index')
 

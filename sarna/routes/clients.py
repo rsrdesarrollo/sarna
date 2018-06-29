@@ -9,7 +9,7 @@ from sarna.auxiliary import redirect_back
 from sarna.core.auth import login_required, current_user
 from sarna.forms import AssessmentForm, TemplateCreateNewForm
 from sarna.forms import ClientForm
-from sarna.model import Client, Assessment, Template, db
+from sarna.model import Client, Assessment, Template, User, db
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('clients', __name__)
@@ -34,15 +34,19 @@ def index():
 @login_required
 def new():
     form = ClientForm(request.form)
+    form.managers.choices = form.auditors.choices = User.choices()
+
     context = dict(
         route=ROUTE_NAME,
         form=form
     )
     if form.validate_on_submit():
+        data = form.data
+        data.pop('csrf_token')
+
         Client(
-            short_name=form.short_name.data,
-            long_name=form.long_name.data,
-            creator=current_user
+            creator=current_user,
+            **data
         )
         return redirect_back('.index')
 
@@ -65,13 +69,18 @@ def delete(client_id: int):
 @blueprint.route('/<client_id>', methods=('POST', 'GET'))
 @login_required
 def edit(client_id: int):
-    client = Client.query.filter_by(id=client_id).one()
+    client: Client = Client.query.filter_by(id=client_id).one()
 
     if not current_user.manages(client):
         abort(403)
 
-    form_data = request.form.to_dict() or client.to_dict()
-    form = ClientForm(**form_data)
+    if request.form:
+        form = ClientForm(request.form)
+    else:
+        form = ClientForm(**client.to_dict(), managers=client.managers, auditors=client.auditors)
+
+    form.managers.choices = form.auditors.choices = User.choices()
+
     context = dict(
         route=ROUTE_NAME,
         form=form,
@@ -80,7 +89,17 @@ def edit(client_id: int):
     if form.validate_on_submit():
         data = dict(form.data)
         data.pop('csrf_token', None)
+        managers = data.pop('managers', [])
+        auditors = data.pop('auditors', [])
+
         client.set(**data)
+
+        client.managers.clear()
+        client.managers.extend(managers)
+
+        client.auditors.clear()
+        client.auditors.extend(auditors)
+
         return redirect_back('.index')
     return render_template('clients/details.html', **context)
 
@@ -94,6 +113,7 @@ def add_assessment(client_id: int):
         abort(403)
 
     form = AssessmentForm(request.form)
+    form.auditors.choices = User.choices()
     context = dict(
         route=ROUTE_NAME,
         form=form,

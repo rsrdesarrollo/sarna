@@ -39,7 +39,7 @@ class Base(object):
         return inflection.underscore(cls.__name__).lower()
 
     def __init__(self, *args, **kwargs):
-        pass
+        db.Model.__init__(self, *args, **kwargs)
 
     def set(self, **kwargs):
         for key, val in kwargs.items():
@@ -455,15 +455,28 @@ class User(Base, db.Model):
     otp_enabled = db.Column(db.Boolean(), default=False, nullable=False)
     otp_seed = db.Column(db.String(16))
 
-    managed_clients = db.relationship(Client, secondary=client_management, back_populates='managers')
-    created_clients = db.relationship(Client, back_populates="creator")
-    audited_clients = db.relationship(Client, secondary=client_audit, back_populates='auditors')
-
-    approvals = db.relationship(Assessment, secondary=auditor_approval, back_populates='approvals')
+    created_clients = db.relationship(Client, back_populates="creator", cascade='all,delete')
     created_assessments = db.relationship(Assessment, back_populates="creator")
+
+    managed_clients = db.relationship(Client, secondary=client_management, back_populates='managers')
+    audited_clients = db.relationship(Client, secondary=client_audit, back_populates='auditors')
     audited_assessments = db.relationship(Assessment, secondary=assessment_audit, back_populates='auditors')
+    approvals = db.relationship(Assessment, secondary=auditor_approval, back_populates='approvals')
 
     created_findings = db.relationship(FindingTemplate, back_populates='creator')
+
+    def __str__(self):
+        return self.username
+
+    @classmethod
+    def choices(cls):
+        return list((u, u.name) for u in User.query.order_by(User.username).all())
+
+    @classmethod
+    def coerce(cls, item):
+        if isinstance(item, User):
+            return item
+        return cls.query.filter_by(username=item).one()
 
     @property
     def name(self):

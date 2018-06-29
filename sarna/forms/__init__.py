@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
 from sqlalchemy.sql.sqltypes import Integer, String, Boolean, Date
 from wtforms import validators
-from wtforms.fields import BooleanField, SelectField, StringField, TextAreaField
+from wtforms.fields import BooleanField, SelectField, StringField, TextAreaField, SelectMultipleField
 from wtforms.fields.html5 import IntegerField, DateField
 
 from sarna.auxiliary.upload_helpers import *
@@ -92,7 +92,12 @@ CLIENTS
 
 
 class ClientForm(EntityForm(Client)):
-    pass
+    managers = SelectMultipleField(
+        coerce=User.coerce
+    )
+    auditors = SelectMultipleField(
+        coerce=User.coerce
+    )
 
 
 """
@@ -101,7 +106,9 @@ ASSESSMENTS
 
 
 class AssessmentForm(EntityForm(Assessment)):
-    pass
+    auditors = SelectMultipleField(
+        coerce=User.coerce
+    )
 
 
 """

@@ -56,7 +56,7 @@ def add_user(username, super_user):
 @click.argument('username')
 def add_user(username):
     user = User.query.filter_by(username=username)
-    db.session.delete(user)
+    user.delete()
     db.session.commit()
 
 
