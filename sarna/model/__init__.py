@@ -4,12 +4,14 @@ from datetime import datetime
 from typing import *
 from uuid import uuid4
 
+import inflection
 import pyotp
 from cvsslib import cvss3, calculate_vector
 from flask_login import login_user
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from rfc3986.uri import URIReference
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Query
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -29,8 +31,15 @@ def auto_commit(resp):
     return resp
 
 
-class CustomModel:
+class Base(object):
     query: Query
+
+    @declared_attr
+    def __tablename__(cls):
+        return inflection.underscore(cls.__name__).lower()
+
+    def __init__(self, *args, **kwargs):
+        pass
 
     def set(self, **kwargs):
         for key, val in kwargs.items():
@@ -59,19 +68,20 @@ __all__ = [
 Client
 """
 
-client_management = db.Table('client_management',
-                             db.Column('managed_client_id', db.Integer, db.ForeignKey('client.id'), primary_key=True),
-                             db.Column('manager_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
-                             )
+client_management = db.Table(
+    'client_management',
+    db.Column('managed_client_id', db.Integer, db.ForeignKey('client.id'), primary_key=True),
+    db.Column('manager_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
 
-client_audit = db.Table('client_audit',
-                        db.Column('audited_client_id', db.Integer, db.ForeignKey('client.id'), primary_key=True),
-                        db.Column('auditor_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
-                        )
+client_audit = db.Table(
+    'client_audit',
+    db.Column('audited_client_id', db.Integer, db.ForeignKey('client.id'), primary_key=True),
+    db.Column('auditor_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
 
 
-class Client(db.Model, CustomModel):
-    __tablename__ = 'client'
+class Client(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     short_name = db.Column(db.String(64), nullable=False)
     long_name = db.Column(db.String(128), nullable=False)
@@ -107,8 +117,7 @@ assessment_audit = db.Table(
 )
 
 
-class Assessment(db.Model, CustomModel):
-    __tablename__ = 'assessment'
+class Assessment(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(GUID, default=uuid4, unique=True, nullable=False)
     name = db.Column(db.String(64), nullable=False)
@@ -183,8 +192,7 @@ Finding template
 """
 
 
-class FindingTemplate(db.Model, CustomModel):
-    __tablename__ = 'finding_template'
+class FindingTemplate(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     type = db.Column(Enum(FindingType), nullable=False)
@@ -209,9 +217,7 @@ class FindingTemplate(db.Model, CustomModel):
         return {t.lang for t in self.translations}
 
 
-class FindingTemplateTranslation(db.Model, CustomModel):
-    __tablename__ = 'finding_template_translation'
-
+class FindingTemplateTranslation(Base, db.Model):
     lang = db.Column(Enum(Language), primary_key=True)
     finding_template_id = db.Column(db.Integer, db.ForeignKey('finding_template.id'), primary_key=True)
     finding_template = db.relationship(FindingTemplate, back_populates='translations', uselist=False)
@@ -227,8 +233,7 @@ Actives
 """
 
 
-class Active(db.Model, CustomModel):
-    __tablename__ = 'active'
+class Active(Base, db.Model):
     __table_args__ = (db.UniqueConstraint('assessment_id', 'name'),)
 
     id = db.Column(db.Integer, primary_key=True)
@@ -253,8 +258,7 @@ finding_affected_resource = db.Table(
 )
 
 
-class AffectedResource(db.Model, CustomModel):
-    __tablename__ = 'affected_resource'
+class AffectedResource(Base, db.Model):
     __table_args__ = (db.UniqueConstraint('active_id', 'route'),)
 
     id = db.Column(db.Integer, primary_key=True)
@@ -271,8 +275,7 @@ class AffectedResource(db.Model, CustomModel):
         return "{}{}".format(self.active.name, self.route or '')
 
 
-class Finding(db.Model, CustomModel):
-    __tablename__ = 'finding'
+class Finding(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     type = db.Column(Enum(FindingType), nullable=False)  # FindingType)
@@ -413,8 +416,7 @@ class Finding(db.Model, CustomModel):
         )
 
 
-class Template(db.Model, CustomModel):
-    __tablename__ = 'template'
+class Template(Base, db.Model):
     name = db.Column(db.String(32), primary_key=True)
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'), primary_key=True)
 
@@ -422,8 +424,7 @@ class Template(db.Model, CustomModel):
     file = db.Column(db.String(128), nullable=False)
 
 
-class Solution(db.Model, CustomModel):
-    __tablename__ = 'solution'
+class Solution(Base, db.Model):
     name = db.Column(db.String(32), primary_key=True)
     finding_template_id = db.Column(db.Integer, db.ForeignKey('finding_template.id'), primary_key=True)
     finding_template = db.relationship(FindingTemplate, back_populates='solutions', uselist=False)
@@ -432,8 +433,7 @@ class Solution(db.Model, CustomModel):
     text = db.Column(db.String(), nullable=False)
 
 
-class Image(db.Model, CustomModel):
-    __tablename__ = 'image'
+class Image(Base, db.Model):
     name = db.Column(db.String(128), primary_key=True)
     assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'), primary_key=True)
     assessment = db.relationship(Assessment, back_populates='images', uselist=False)
@@ -441,8 +441,7 @@ class Image(db.Model, CustomModel):
     label = db.Column(db.String())
 
 
-class User(db.Model, CustomModel):
-    __tablename__ = 'user'
+class User(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), unique=True)
     is_admin = db.Column(db.Boolean(), default=False, nullable=False)

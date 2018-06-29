@@ -16,7 +16,7 @@ __all__ = [
     'ClientForm', 'AssessmentForm', 'FindingTemplateEditForm', 'FindingTemplateCreateNewForm',
     'FindingTemplateEditSolutionForm', 'FindingEditForm', 'FindingTemplateAddSolutionForm',
     'FindingTemplateAddTranslationForm', 'FindingTemplateEditTranslationForm', 'ActiveCreateNewForm',
-    'TemplateCreateNewForm', 'EvidenceCreateNewForm'
+    'TemplateCreateNewForm', 'EvidenceCreateNewForm', 'OtpConfirmForm', 'ChangePasswordForm', 'AddUserForm'
 ]
 
 
