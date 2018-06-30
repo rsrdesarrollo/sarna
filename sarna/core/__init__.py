@@ -13,6 +13,11 @@ app = Flask(
 
 if app.config['ENV'] == 'development':
     app.config.from_object(DevelopmentConfig)
+    try:
+        from flask_debugtoolbar import DebugToolbarExtension
+        toolbar = DebugToolbarExtension(app)
+    except ImportError:
+        pass
 else:
     app.config.from_object(ProductionConfig)
 
