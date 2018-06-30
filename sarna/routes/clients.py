@@ -18,11 +18,11 @@ blueprint = Blueprint('clients', __name__)
 @blueprint.route('/')
 @login_required
 def index():
-    clients = list(itertools.chain(
-        current_user.created_clients,
-        current_user.managed_clients,
-        current_user.audited_clients
-    ))
+    clients = Client.query.filter(
+        (Client.creator == current_user) |
+        (Client.managers.any(User.id == current_user.id)) |
+        (Client.auditors.any(User.id == current_user.id))
+    )
     context = dict(
         route=ROUTE_NAME,
         clients=clients

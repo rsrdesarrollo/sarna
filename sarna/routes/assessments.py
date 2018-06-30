@@ -23,10 +23,12 @@ blueprint = Blueprint('assessments', __name__)
 @blueprint.route('/')
 @login_required
 def index():
-    assessments = list(itertools.chain(
-        current_user.created_assessments,
-        current_user.audited_assessments
-    ))
+    assessments = Assessment.query.filter(
+        (Assessment.creator == current_user) |
+        (Assessment.client_id.in_(map(lambda x: x.id, current_user.managed_clients))) |
+        (Assessment.client_id.in_(map(lambda x: x.id, current_user.audited_clients))) |
+        (Assessment.auditors.any(User.id == current_user.id))
+    )
     context = dict(
         route=ROUTE_NAME,
         assessments=assessments
