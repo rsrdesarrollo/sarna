@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from terminaltables import AsciiTable
 
 from sarna.model import User, db
+from sarna.model.enumerations import AccountType
 
 user_cli = AppGroup('user', help='User management')
 
@@ -17,10 +18,10 @@ def init_app(app):
 @user_cli.command('list', help='list all users')
 def list_users():
     table = AsciiTable(
-        [('username', 'isAdmin', 'creation', 'lastLogin', 'hasOtp')] + [
+        [('username', 'role', 'creation', 'lastLogin', 'hasOtp')] + [
             (
                 user.username,
-                user.is_admin,
+                user.user_type.name,
                 user.creation_date,
                 user.last_access,
                 user.otp_enabled
@@ -33,14 +34,14 @@ def list_users():
 
 
 @user_cli.command('add', help='add a new user')
-@click.option('-s', '--super-user', default=False, is_flag=True)
+@click.option('-r', '--role', type=click.Choice(a.name for a in AccountType), default=AccountType.auditor.name)
 @click.argument('username')
-def add_user(username, super_user):
+def add_user(username, role):
     pswd = getpass.getpass('Password: ')
     pswd2 = getpass.getpass('Repeat password: ')
 
     if pswd == pswd2:
-        user = User(username=username, is_admin=super_user)
+        user = User(username=username, user_type=AccountType[role])
         user.set_passwd(pswd)
         db.session.add(user)
         try:
@@ -61,13 +62,16 @@ def del_user(username):
 
 
 @user_cli.command('mod', help='modify a existing user')
-@click.option('-s', '--super-user', default=False, is_flag=True)
+@click.option('-r', '--role', type=click.Choice(a.name for a in AccountType))
 @click.option('-p', '--change-passwd', default=False, is_flag=True)
 @click.argument('username')
-def mod_user(username, super_user, change_passwd):
+def mod_user(username, role, change_passwd):
     user = User.query.filter_by(username=username).first()
     if not user:
         click.echo("ERROR: User {} not found.".format(username), err=True)
+
+    if role:
+        user.user_type = AccountType[role]
 
     if change_passwd:
         pswd = getpass.getpass('Password: ')
@@ -77,6 +81,6 @@ def mod_user(username, super_user, change_passwd):
             user.set_passwd(pswd)
         else:
             click.echo('Password confirmation mismatch.', err=True)
+            db.session.rollback()
 
-    user.is_admin = super_user
     db.session.commit()

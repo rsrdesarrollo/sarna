@@ -442,9 +442,13 @@ class Image(Base, db.Model):
 
 
 class User(Base, db.Model):
+    __table_args__ = (db.CheckConstraint('NOT (is_manager AND is_admin)'),)
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), unique=True)
-    is_admin = db.Column(db.Boolean(), default=False, nullable=False)
+
+    user_type = db.Column(Enum(AccountType), default=AccountType.auditor, nullable=False)
+
     source = db.Column(Enum(AuthSource), default=AuthSource.database, nullable=False)
     passwd = db.Column(db.String(128))
 

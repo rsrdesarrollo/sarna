@@ -36,6 +36,12 @@ class AuthSource(Choice):
     ldap = 2
 
 
+class AccountType(Choice):
+    auditor = 1
+    manager = 2
+    admin = 3
+
+
 class Language(Choice):
     Spanish = 1
     English = 2
