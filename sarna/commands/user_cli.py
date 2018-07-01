@@ -54,7 +54,7 @@ def add_user(username, super_user):
 
 @user_cli.command('del', help='delete a existing user')
 @click.argument('username')
-def add_user(username):
+def del_user(username):
     user = User.query.filter_by(username=username)
     user.delete()
     db.session.commit()
@@ -64,7 +64,7 @@ def add_user(username):
 @click.option('-s', '--super-user', default=False, is_flag=True)
 @click.option('-p', '--change-passwd', default=False, is_flag=True)
 @click.argument('username')
-def add_user(username, super_user, change_passwd):
+def mod_user(username, super_user, change_passwd):
     user = User.query.filter_by(username=username).first()
     if not user:
         click.echo("ERROR: User {} not found.".format(username), err=True)
