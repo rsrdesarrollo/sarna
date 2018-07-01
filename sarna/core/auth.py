@@ -2,7 +2,8 @@ from functools import wraps
 
 from flask_login import LoginManager, login_required, current_user, logout_user
 
-from sarna.model import User
+from sarna.model.enums.account import AccountType
+from sarna.model.user import User
 
 __all__ = ['login_manager', 'logout_user', 'login_required', 'current_user', 'admin_required']
 
@@ -19,7 +20,7 @@ def admin_required(func):
     @wraps(func)
     @login_required
     def decorated_view(*args, **kwargs):
-        if not current_user.is_admin:
+        if not current_user.user_type == AccountType.admin:
             return login_manager.unauthorized()
         else:
             return func(*args, **kwargs)

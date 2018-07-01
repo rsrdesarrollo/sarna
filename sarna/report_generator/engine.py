@@ -1,18 +1,19 @@
 import os
 import shutil
 import tempfile
-import time
 import zipfile
 from datetime import datetime
 from typing import *
 
 import jinja2
+import time
 from docxtpl import DocxTemplate
 from werkzeug.utils import secure_filename
 
 from sarna.core.config import config
-from sarna.model import Assessment, Template
-from sarna.model import FindingStatus
+from sarna.model import Assessment
+from sarna.model.client import Template
+from sarna.model.enums import FindingStatus
 from sarna.report_generator.locale_choice import locale_choice
 from sarna.report_generator.markdown import markdown_to_docx, DOCXRenderer
 from sarna.report_generator.scores import score_to_docx

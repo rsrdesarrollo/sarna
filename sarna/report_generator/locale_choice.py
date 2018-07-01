@@ -1,7 +1,8 @@
-from sarna.model.enumerations import Language, Choice
+from sarna.model.enums.base_choice import BaseChoice
+from sarna.model.enums.language import Language
 
 
-def locale_choice(choice: Choice, lang: Language):
+def locale_choice(choice: BaseChoice, lang: Language):
     translation = getattr(choice, 'translation', None)
     if translation is None or lang not in translation or not translation[lang]:
         desc = getattr(choice, 'desc', None)

@@ -1,4 +1,3 @@
-import itertools
 import os
 from uuid import uuid4
 
@@ -7,9 +6,11 @@ from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back
 from sarna.core.auth import login_required, current_user
-from sarna.forms import AssessmentForm, TemplateCreateNewForm
-from sarna.forms import ClientForm
-from sarna.model import Client, Assessment, Template, User, db
+from sarna.forms.assessment import AssessmentForm
+from sarna.forms.client import ClientForm, TemplateCreateNewForm
+from sarna.model import Assessment, db
+from sarna.model.client import Client, Template
+from sarna.model.user import User
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('clients', __name__)

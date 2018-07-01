@@ -1,9 +1,10 @@
 import re
 from typing import AnyStr, Set, Dict
 
+from jinja2.exceptions import TemplateSyntaxError
+
 from docx import Document
 from docx.document import Document as DocType
-from jinja2.exceptions import TemplateSyntaxError
 
 _BEGIN_STYLE = re.compile('##\s*begin\s*style\s*(\w+)\s*##', re.IGNORECASE)
 _END_STYLE = re.compile('##\s*end\s*style\s*##', re.IGNORECASE)

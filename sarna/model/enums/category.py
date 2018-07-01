@@ -1,111 +1,8 @@
-from aenum import OrderedEnum
+from sarna.model.enums.base_choice import BaseChoice
+from sarna.model.enums.language import Language
 
 
-class Choice(OrderedEnum):
-    @classmethod
-    def choices(cls):
-        return [(None, "---")] + [cls.choice(elem) for elem in cls]
-
-    @classmethod
-    def choice(cls, elem):
-        if isinstance(elem, cls):
-            desc = getattr(elem, 'desc', None)
-            name = getattr(elem, 'code', elem.name.replace("_", " "))
-            if desc:
-                return elem, "{} - {}".format(name, desc)
-            else:
-                return elem, name
-        elif elem:
-            return cls[elem], cls[elem].name.replace("_", " ")
-        else:
-            return None
-
-    @classmethod
-    def coerce(cls, item):
-        if not item or item == 'None':
-            return None
-
-        return cls[item.replace(" ", "_")] if not isinstance(item, cls) else item
-
-    def __str__(self):
-        return self.name.replace("_", " ")
-
-
-class AuthSource(Choice):
-    database = 1
-    ldap = 2
-
-
-class AccountType(Choice):
-    auditor = 1
-    manager = 2
-    admin = 3
-
-
-class Language(Choice):
-    Spanish = 1
-    English = 2
-
-
-class Score(Choice):
-    _init_ = "value translation"
-    Info = 1, {
-        Language.English: 'Info',
-        Language.Spanish: 'Informativo'
-    }
-    Low = 2, {
-        Language.English: 'Low',
-        Language.Spanish: 'Bajo'
-    }
-    Medium = 3, {
-        Language.English: 'Medium',
-        Language.Spanish: 'Medio'
-    }
-    High = 4, {
-        Language.English: 'High',
-        Language.Spanish: 'Alto'
-    }
-    Critical = 5, {
-        Language.English: 'Critical',
-        Language.Spanish: 'Crítico'
-    }
-    NA = 6, {
-        Language.English: 'N/A',
-        Language.Spanish: 'N/A'
-    }
-
-
-class AssessmentType(Choice):
-    Web = 1
-    External_pentest = 2
-    Mobile = 3
-    iOS = 4
-    Android = 5
-    WiFi = 6
-
-
-class FindingType(Choice):
-    Web = 1
-    Infra = 2
-    Mobile = 3
-    WiFi = 4
-
-
-class FindingStatus(Choice):
-    Pending = 1
-    Reviewed = 2
-    Confirmed = 3
-    False_Positive = 4
-    Other = 5
-
-
-class AssessmentStatus(Choice):
-    Open = 1
-    Closed = 2
-    Archived = 3
-
-
-class OWISAMCategory(Choice):
+class OWISAMCategory(BaseChoice):
     _init_ = "value code desc translation"
     DI_001 = 1, 'DI-001', 'Discovering of access points', {
         Language.English: 'Discovering of access points',
@@ -365,7 +262,7 @@ class OWISAMCategory(Choice):
     }
 
 
-class OWASPCategory(Choice):
+class OWASPCategory(BaseChoice):
     _init_ = "value code desc translation"
     OTG_INFO_001 = 1, 'OTG-INFO-001', 'Conduct Search Engine Discovery and Reconnaissance for Information Leakage', {
         Language.English: 'Conduct Search Engine Discovery and Reconnaissance for Information Leakage',

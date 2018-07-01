@@ -2,6 +2,11 @@
     <span class="badge badge-pill badge-{{ type }}">{{ value }}</span>
 {% endmacro %}
 
+{% macro render_user_type_pill(type) %}
+    {% set class = ['', 'primary', 'warning', 'danger'][type.value] %}
+    {{ render_pill(type, class) }}
+{% endmacro %}
+
 {% macro boolean_pill(value) %}
     {% if value %}
         {{ render_pill(value, 'success') }}

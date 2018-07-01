@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% from "macros.html" import render_field, render_form, boolean_pill %}
+{% from "macros.html" import render_field, render_form, boolean_pill, render_user_type_pill %}
 {% block body %}
     <div class="row">
         <div class="col-lg-4 pl-3">
@@ -103,7 +103,7 @@
             <table id="table_data" class="table table-striped">
                 <thead class="thead-dark">
                 <th>Username</th>
-                <th>Is Admin</th>
+                <th>Role</th>
                 <th>OTP</th>
                 <th>Creation</th>
                 <th>Last Login</th>
@@ -113,7 +113,7 @@
                 {% for user in users %}
                     <tr>
                         <td>{{ user.username }}</td>
-                        <td>{{ boolean_pill(user.is_admin) }}</td>
+                        <td>{{ render_user_type_pill(user.user_type) }}</td>
                         <td>{{ boolean_pill(user.otp_enabled) }}</td>
                         <td>{{ user.creation_date }}</td>
                         <td>{{ user.last_access }}</td>

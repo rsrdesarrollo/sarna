@@ -5,8 +5,9 @@ from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back
 from sarna.core.auth import login_required, current_user, admin_required
-from sarna.forms import OtpConfirmForm, ChangePasswordForm, AddUserForm
-from sarna.model import User, db
+from sarna.forms.auth import OtpConfirmForm, ChangePasswordForm, AddUserForm
+from sarna.model import db
+from sarna.model.user import User
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('users', __name__)
@@ -67,7 +68,8 @@ def disable_otp():
 def change_passwd():
     form = ChangePasswordForm()
 
-    if (not current_user.otp_enabled or current_user.check_otp(form.otp.data)) and current_user.check_password(form.oldpassword.data):
+    if (not current_user.otp_enabled or current_user.check_otp(form.otp.data)) and current_user.check_password(
+            form.oldpassword.data):
         if form.newpassword.data == form.newpasswordrep.data:
             current_user.set_passwd(form.newpassword.data)
             flash('Password changed successfully', 'success')

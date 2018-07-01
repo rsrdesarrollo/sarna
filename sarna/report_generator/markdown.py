@@ -2,10 +2,10 @@ from typing import *
 
 import mistletoe
 from PIL import Image
-from docx.section import Section
 from docxtpl import DocxTemplate
 from mistletoe.base_renderer import BaseRenderer
 
+from docx.section import Section
 from sarna.report_generator import *
 from sarna.report_generator.style import RenderStyle
 

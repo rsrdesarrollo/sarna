@@ -5,8 +5,9 @@ from flask.cli import AppGroup
 from sqlalchemy.exc import IntegrityError
 from terminaltables import AsciiTable
 
-from sarna.model import User, db
-from sarna.model.enumerations import AccountType
+from sarna.model import db
+from sarna.model.enums import AccountType
+from sarna.model.user import User
 
 user_cli = AppGroup('user', help='User management')
 

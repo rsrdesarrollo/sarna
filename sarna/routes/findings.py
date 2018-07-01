@@ -5,9 +5,10 @@ from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back
 from sarna.core.auth import login_required, current_user
-from sarna.forms import *
-from sarna.model import *
-from sarna.model.enumerations import *
+from sarna.forms.finding_template import *
+from sarna.model import FindingTemplate, FindingTemplateTranslation, db
+from sarna.model.enums import Language
+from sarna.model.finding_template import Solution
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('findings', __name__)

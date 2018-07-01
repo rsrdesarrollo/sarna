@@ -5,8 +5,8 @@ from flask import Blueprint, render_template, request, flash
 from sarna.auxiliary import redirect_back
 from sarna.core.auth import login_required, logout_user
 from sarna.core.security import limiter
-from sarna.forms import LoginForm
-from sarna.model import User
+from sarna.forms.auth import LoginForm
+from sarna.model.user import User
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('index', __name__)

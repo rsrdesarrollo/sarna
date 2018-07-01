@@ -1,4 +1,3 @@
-import itertools
 import os
 
 from PIL import Image as PillowImage
@@ -11,9 +10,9 @@ from werkzeug.utils import secure_filename
 from sarna.auxiliary import redirect_back, redirect_endpoint
 from sarna.core.auth import login_required, current_user
 from sarna.core.security import limiter
-from sarna.forms import *
+from sarna.forms.assessment import AssessmentForm, FindingEditForm, ActiveCreateNewForm, EvidenceCreateNewForm
 from sarna.model import *
-from sarna.model.enumerations import *
+from sarna.model.enums import FindingStatus
 from sarna.report_generator.engine import generate_reports_bundle
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
