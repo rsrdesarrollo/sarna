@@ -7,13 +7,29 @@ __all__ = ['Client', 'Template', 'client_management', 'client_audit']
 
 client_management = db.Table(
     'client_management',
-    db.Column('managed_client_id', db.Integer, db.ForeignKey('client.id'), primary_key=True),
-    db.Column('manager_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    db.Column(
+        'managed_client_id',
+        db.Integer,
+        db.ForeignKey('client.id', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True
+    ),
+    db.Column(
+        'manager_id',
+        db.Integer,
+        db.ForeignKey('user.id', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True
+    )
 )
 client_audit = db.Table(
     'client_audit',
-    db.Column('audited_client_id', db.Integer, db.ForeignKey('client.id'), primary_key=True),
-    db.Column('auditor_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    db.Column(
+        'audited_client_id',
+        db.Integer,
+        db.ForeignKey('client.id', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True
+    ),
+    db.Column(
+        'auditor_id',
+        db.Integer,
+        db.ForeignKey('user.id', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True
+    )
 )
 
 
@@ -25,7 +41,7 @@ class Client(Base, db.Model):
     assessments = db.relationship('Assessment', back_populates='client', cascade='all')
     templates = db.relationship('Template', backref='client', cascade='all')
 
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
     creator = db.relationship("User", back_populates="created_clients", uselist=False)
 
     managers = db.relationship('User', secondary=client_management, back_populates='managed_clients')
@@ -37,7 +53,7 @@ class Client(Base, db.Model):
 
 class Template(Base, db.Model):
     name = db.Column(db.String(32), primary_key=True)
-    client_id = db.Column(db.Integer, db.ForeignKey('client.id'), primary_key=True)
+    client_id = db.Column(db.Integer, db.ForeignKey('client.id', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 
     description = db.Column(db.String(128))
     file = db.Column(db.String(128), nullable=False)

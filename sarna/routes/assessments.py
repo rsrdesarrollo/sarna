@@ -12,6 +12,7 @@ from sarna.core.auth import login_required, current_user
 from sarna.core.security import limiter
 from sarna.forms.assessment import AssessmentForm, FindingEditForm, ActiveCreateNewForm, EvidenceCreateNewForm
 from sarna.model import *
+from sarna.model import AffectedResource, Active
 from sarna.model.enums import FindingStatus
 from sarna.report_generator.engine import generate_reports_bundle
 
@@ -135,16 +136,17 @@ def edit_finding(assessment_id, finding_id):
     finding_dict['affected_resources'] = "\r\n".join(r.uri for r in finding.affected_resources)
     form_data = request.form.to_dict() or finding_dict
     form = FindingEditForm(**form_data)
+    solutions = finding.template.solutions if finding.template else []
     context = dict(
         route=ROUTE_NAME,
         endpoint='findings',
         assessment=assessment,
         form=form,
         finding=finding,
-        solutions=finding.template.solutions,
+        solutions=solutions,
         solutions_dict={
             a.name: a.text
-            for a in finding.template.solutions
+            for a in solutions
         }
     )
     if form.validate_on_submit():

@@ -19,7 +19,7 @@ class FindingTemplate(Base, db.Model):
     dissemination = db.Column(Enum(Score), nullable=False)
     solution_complexity = db.Column(Enum(Score), nullable=False)
 
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
     creator = db.relationship('User', back_populates='created_findings', uselist=False)
 
     solutions = db.relationship('Solution', back_populates='finding_template', cascade='all')
@@ -32,7 +32,11 @@ class FindingTemplate(Base, db.Model):
 
 class FindingTemplateTranslation(Base, db.Model):
     lang = db.Column(Enum(Language), primary_key=True)
-    finding_template_id = db.Column(db.Integer, db.ForeignKey('finding_template.id'), primary_key=True)
+    finding_template_id = db.Column(
+        db.Integer,
+        db.ForeignKey('finding_template.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    )
     finding_template = db.relationship(FindingTemplate, back_populates='translations', uselist=False)
 
     title = db.Column(db.String(128), nullable=False)
@@ -43,7 +47,11 @@ class FindingTemplateTranslation(Base, db.Model):
 
 class Solution(Base, db.Model):
     name = db.Column(db.String(32), primary_key=True)
-    finding_template_id = db.Column(db.Integer, db.ForeignKey('finding_template.id'), primary_key=True)
+    finding_template_id = db.Column(
+        db.Integer,
+        db.ForeignKey('finding_template.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    )
     finding_template = db.relationship(FindingTemplate, back_populates='solutions', uselist=False)
 
     lang = db.Column(Enum(Language), nullable=False)

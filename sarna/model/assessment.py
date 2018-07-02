@@ -13,14 +13,39 @@ __all__ = ['Assessment', 'Image', 'auditor_approval', 'assessment_audit']
 
 auditor_approval = db.Table(
     'auditor_approval',
-    db.Column('approving_user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('approved_assessment_id', db.Integer, db.ForeignKey('assessment.id'), primary_key=True),
-    db.Column('approved_at', db.DateTime, default=lambda: datetime.now(), nullable=False)
+    db.Column(
+        'approving_user_id',
+        db.Integer,
+        db.ForeignKey('user.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    ),
+    db.Column(
+        'approved_assessment_id',
+        db.Integer,
+        db.ForeignKey('assessment.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    ),
+    db.Column(
+        'approved_at',
+        db.DateTime,
+        default=lambda: datetime.now(),
+        nullable=False
+    )
 )
 assessment_audit = db.Table(
     'assessment_audit',
-    db.Column('audited_assessment_id', db.Integer, db.ForeignKey('assessment.id'), primary_key=True),
-    db.Column('auditor_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    db.Column(
+        'audited_assessment_id',
+        db.Integer,
+        db.ForeignKey('assessment.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    ),
+    db.Column(
+        'auditor_id',
+        db.Integer,
+        db.ForeignKey('user.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    )
 )
 
 
@@ -33,7 +58,11 @@ class Assessment(Base, db.Model):
     type = db.Column(Enum(AssessmentType), nullable=False)
     status = db.Column(Enum(AssessmentStatus), nullable=False)
 
-    client_id = db.Column(db.Integer, db.ForeignKey('client.id'), nullable=False)
+    client_id = db.Column(
+        db.Integer,
+        db.ForeignKey('client.id', onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=False
+    )
     client = db.relationship(Client, back_populates="assessments", uselist=False)
 
     findings = db.relationship('Finding', back_populates='assessment')
@@ -48,7 +77,7 @@ class Assessment(Base, db.Model):
 
     approvals = db.relationship('User', secondary=auditor_approval, back_populates='approvals')
 
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
     creator = db.relationship("User", back_populates="created_assessments", uselist=False)
 
     auditors = db.relationship('User', secondary=assessment_audit, back_populates='audited_assessments')
@@ -96,7 +125,11 @@ class Assessment(Base, db.Model):
 
 class Image(Base, db.Model):
     name = db.Column(db.String(128), primary_key=True)
-    assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'), primary_key=True)
+    assessment_id = db.Column(
+        db.Integer,
+        db.ForeignKey('assessment.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    )
     assessment = db.relationship(Assessment, back_populates='images', uselist=False)
 
     label = db.Column(db.String())

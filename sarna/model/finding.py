@@ -13,20 +13,30 @@ __all__ = ['Finding', 'finding_affected_resource']
 
 finding_affected_resource = db.Table(
     'finding_affected_resource',
-    db.Column('affected_resource_id', db.Integer, db.ForeignKey('affected_resource.id'), primary_key=True),
-    db.Column('finding_id', db.Integer, db.ForeignKey('finding.id'), primary_key=True)
+    db.Column(
+        'affected_resource_id',
+        db.Integer,
+        db.ForeignKey('affected_resource.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    ),
+    db.Column(
+        'finding_id',
+        db.Integer,
+        db.ForeignKey('finding.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    )
 )
 
 
 class Finding(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
-    type = db.Column(Enum(FindingType), nullable=False)  # FindingType)
+    type = db.Column(Enum(FindingType), nullable=False)
 
-    assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'))
+    assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id', onupdate='CASCADE', ondelete='CASCADE'))
     assessment = db.relationship(Assessment, back_populates='findings', uselist=False)
 
-    template_id = db.Column(db.Integer, db.ForeignKey('finding_template.id'))
+    template_id = db.Column(db.Integer, db.ForeignKey('finding_template.id', onupdate='CASCADE', ondelete='SET NULL'))
     template = db.relationship(FindingTemplate, uselist=False)
 
     title = db.Column(db.String(128), nullable=False)
@@ -164,7 +174,11 @@ class Active(Base, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'))
+    assessment_id = db.Column(
+        db.Integer,
+        db.ForeignKey('assessment.id', onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=False
+    )
     assessment = db.relationship(Assessment, uselist=False)
 
     name = db.Column(db.String(128))
@@ -182,7 +196,11 @@ class AffectedResource(Base, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    active_id = db.Column(db.Integer, db.ForeignKey('active.id'))
+    active_id = db.Column(
+        db.Integer,
+        db.ForeignKey('active.id', onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=False
+    )
     active = db.relationship(Active, uselist=False, back_populates='active_resources')
 
     route = db.Column(db.String(256), default='/')

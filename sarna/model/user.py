@@ -15,7 +15,6 @@ __all__ = ['User']
 
 
 class User(Base, db.Model):
-    __table_args__ = (db.CheckConstraint('NOT (is_manager AND is_admin)'),)
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), unique=True)

@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: e313aa147450
+Revision ID: 49bab253b4ee
 Revises: 
-Create Date: 2018-06-28 23:03:33.698016
+Create Date: 2018-07-02 07:47:30.609868
 
 """
 from alembic import op
@@ -11,7 +11,7 @@ import sarna
 
 
 # revision identifiers, used by Alembic.
-revision = 'e313aa147450'
+revision = '49bab253b4ee'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,7 +22,8 @@ def upgrade():
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=128), nullable=True),
-    sa.Column('is_admin', sa.Boolean(), nullable=False),
+    sa.Column('user_type', sarna.model.sql_types.enum.Enum(sarna.model.enums.account.AccountType), nullable=False),
+    sa.Column('source', sarna.model.sql_types.enum.Enum(sarna.model.enums.account.AuthSource), nullable=False),
     sa.Column('passwd', sa.String(length=128), nullable=True),
     sa.Column('creation_date', sa.DateTime(), nullable=False),
     sa.Column('last_access', sa.DateTime(), nullable=True),
@@ -37,20 +38,22 @@ def upgrade():
     sa.Column('short_name', sa.String(length=64), nullable=False),
     sa.Column('long_name', sa.String(length=128), nullable=False),
     sa.Column('creator_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['creator_id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['creator_id'], ['user.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('finding_template',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=64), nullable=False),
-    sa.Column('type', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.FindingType), nullable=False),
-    sa.Column('owasp_category', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.OWASPCategory), nullable=True),
-    sa.Column('owisam_category', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.OWISAMCategory), nullable=True),
-    sa.Column('tech_risk', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.Score), nullable=False),
-    sa.Column('dissemination', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.Score), nullable=False),
-    sa.Column('solution_complexity', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.Score), nullable=False),
-    sa.Column('creator_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['creator_id'], ['user.id'], ),
+    sa.Column('type', sarna.model.sql_types.enum.Enum(sarna.model.enums.finding.FindingType), nullable=False),
+    sa.Column('owasp_category', sarna.model.sql_types.enum.Enum(sarna.model.enums.category.OWASPCategory), nullable=True),
+    sa.Column('owisam_category', sarna.model.sql_types.enum.Enum(sarna.model.enums.category.OWISAMCategory), nullable=True),
+    sa.Column('tech_risk', sarna.model.sql_types.enum.Enum(sarna.model.enums.score.Score), nullable=False),
+    sa.Column('business_risk', sarna.model.sql_types.enum.Enum(sarna.model.enums.score.Score), nullable=False),
+    sa.Column('exploitability', sarna.model.sql_types.enum.Enum(sarna.model.enums.score.Score), nullable=False),
+    sa.Column('dissemination', sarna.model.sql_types.enum.Enum(sarna.model.enums.score.Score), nullable=False),
+    sa.Column('solution_complexity', sarna.model.sql_types.enum.Enum(sarna.model.enums.score.Score), nullable=False),
+    sa.Column('creator_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['creator_id'], ['user.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('assessment',
@@ -58,9 +61,9 @@ def upgrade():
     sa.Column('uuid', sarna.model.sql_types.guid.GUID(), nullable=False),
     sa.Column('name', sa.String(length=64), nullable=False),
     sa.Column('platform', sa.String(length=64), nullable=False),
-    sa.Column('lang', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.Language), nullable=False),
-    sa.Column('type', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.AssessmentType), nullable=False),
-    sa.Column('status', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.AssessmentStatus), nullable=False),
+    sa.Column('lang', sarna.model.sql_types.enum.Enum(sarna.model.enums.language.Language), nullable=False),
+    sa.Column('type', sarna.model.sql_types.enum.Enum(sarna.model.enums.assessment.AssessmentType), nullable=False),
+    sa.Column('status', sarna.model.sql_types.enum.Enum(sarna.model.enums.assessment.AssessmentStatus), nullable=False),
     sa.Column('client_id', sa.Integer(), nullable=False),
     sa.Column('creation_date', sa.DateTime(), nullable=False),
     sa.Column('start_date', sa.Date(), nullable=True),
@@ -68,41 +71,41 @@ def upgrade():
     sa.Column('estimated_hours', sa.Integer(), nullable=True),
     sa.Column('effective_hours', sa.Integer(), nullable=True),
     sa.Column('creator_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['client_id'], ['client.id'], ),
-    sa.ForeignKeyConstraint(['creator_id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['client_id'], ['client.id'], onupdate='CASCADE', ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['creator_id'], ['user.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('uuid')
     )
     op.create_table('client_audit',
     sa.Column('audited_client_id', sa.Integer(), nullable=False),
     sa.Column('auditor_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['audited_client_id'], ['client.id'], ),
-    sa.ForeignKeyConstraint(['auditor_id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['audited_client_id'], ['client.id'], onupdate='CASCADE', ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['auditor_id'], ['user.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('audited_client_id', 'auditor_id')
     )
     op.create_table('client_management',
     sa.Column('managed_client_id', sa.Integer(), nullable=False),
     sa.Column('manager_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['managed_client_id'], ['client.id'], ),
-    sa.ForeignKeyConstraint(['manager_id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['managed_client_id'], ['client.id'], onupdate='CASCADE', ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['manager_id'], ['user.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('managed_client_id', 'manager_id')
     )
     op.create_table('finding_template_translation',
-    sa.Column('lang', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.Language), nullable=False),
+    sa.Column('lang', sarna.model.sql_types.enum.Enum(sarna.model.enums.language.Language), nullable=False),
     sa.Column('finding_template_id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=128), nullable=False),
     sa.Column('definition', sa.String(), nullable=False),
     sa.Column('references', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['finding_template_id'], ['finding_template.id'], ),
+    sa.ForeignKeyConstraint(['finding_template_id'], ['finding_template.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('lang', 'finding_template_id')
     )
     op.create_table('solution',
     sa.Column('name', sa.String(length=32), nullable=False),
     sa.Column('finding_template_id', sa.Integer(), nullable=False),
-    sa.Column('lang', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.Language), nullable=False),
+    sa.Column('lang', sarna.model.sql_types.enum.Enum(sarna.model.enums.language.Language), nullable=False),
     sa.Column('text', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['finding_template_id'], ['finding_template.id'], ),
+    sa.ForeignKeyConstraint(['finding_template_id'], ['finding_template.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('name', 'finding_template_id')
     )
     op.create_table('template',
@@ -110,76 +113,76 @@ def upgrade():
     sa.Column('client_id', sa.Integer(), nullable=False),
     sa.Column('description', sa.String(length=128), nullable=True),
     sa.Column('file', sa.String(length=128), nullable=False),
-    sa.ForeignKeyConstraint(['client_id'], ['client.id'], ),
+    sa.ForeignKeyConstraint(['client_id'], ['client.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('name', 'client_id')
     )
     op.create_table('active',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('assessment_id', sa.Integer(), nullable=True),
+    sa.Column('assessment_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=128), nullable=True),
-    sa.ForeignKeyConstraint(['assessment_id'], ['assessment.id'], ),
+    sa.ForeignKeyConstraint(['assessment_id'], ['assessment.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('assessment_id', 'name')
     )
     op.create_table('assessment_audit',
     sa.Column('audited_assessment_id', sa.Integer(), nullable=False),
     sa.Column('auditor_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['audited_assessment_id'], ['assessment.id'], ),
-    sa.ForeignKeyConstraint(['auditor_id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['audited_assessment_id'], ['assessment.id'], onupdate='CASCADE', ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['auditor_id'], ['user.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('audited_assessment_id', 'auditor_id')
     )
     op.create_table('auditor_approval',
     sa.Column('approving_user_id', sa.Integer(), nullable=False),
     sa.Column('approved_assessment_id', sa.Integer(), nullable=False),
     sa.Column('approved_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['approved_assessment_id'], ['assessment.id'], ),
-    sa.ForeignKeyConstraint(['approving_user_id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['approved_assessment_id'], ['assessment.id'], onupdate='CASCADE', ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['approving_user_id'], ['user.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('approving_user_id', 'approved_assessment_id')
     )
     op.create_table('finding',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=64), nullable=False),
-    sa.Column('type', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.FindingType), nullable=False),
+    sa.Column('type', sarna.model.sql_types.enum.Enum(sarna.model.enums.finding.FindingType), nullable=False),
     sa.Column('assessment_id', sa.Integer(), nullable=True),
     sa.Column('template_id', sa.Integer(), nullable=True),
     sa.Column('title', sa.String(length=128), nullable=False),
-    sa.Column('status', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.FindingStatus), nullable=False),
-    sa.Column('owasp_category', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.OWASPCategory), nullable=True),
-    sa.Column('owisam_category', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.OWISAMCategory), nullable=True),
+    sa.Column('status', sarna.model.sql_types.enum.Enum(sarna.model.enums.finding.FindingStatus), nullable=False),
+    sa.Column('owasp_category', sarna.model.sql_types.enum.Enum(sarna.model.enums.category.OWASPCategory), nullable=True),
+    sa.Column('owisam_category', sarna.model.sql_types.enum.Enum(sarna.model.enums.category.OWISAMCategory), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('solution', sa.String(), nullable=True),
-    sa.Column('tech_risk', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.Score), nullable=False),
-    sa.Column('business_risk', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.Score), nullable=True),
-    sa.Column('exploitability', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.Score), nullable=True),
-    sa.Column('dissemination', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.Score), nullable=False),
-    sa.Column('solution_complexity', sarna.model.sql_types.enum.Enum(sarna.model.enumerations.Score), nullable=False),
+    sa.Column('tech_risk', sarna.model.sql_types.enum.Enum(sarna.model.enums.score.Score), nullable=False),
+    sa.Column('business_risk', sarna.model.sql_types.enum.Enum(sarna.model.enums.score.Score), nullable=False),
+    sa.Column('exploitability', sarna.model.sql_types.enum.Enum(sarna.model.enums.score.Score), nullable=False),
+    sa.Column('dissemination', sarna.model.sql_types.enum.Enum(sarna.model.enums.score.Score), nullable=False),
+    sa.Column('solution_complexity', sarna.model.sql_types.enum.Enum(sarna.model.enums.score.Score), nullable=False),
     sa.Column('definition', sa.String(), nullable=False),
     sa.Column('references', sa.String(), nullable=False),
     sa.Column('cvss_v3_vector', sa.String(length=128), nullable=True),
-    sa.ForeignKeyConstraint(['assessment_id'], ['assessment.id'], ),
-    sa.ForeignKeyConstraint(['template_id'], ['finding_template.id'], ),
+    sa.ForeignKeyConstraint(['assessment_id'], ['assessment.id'], onupdate='CASCADE', ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['template_id'], ['finding_template.id'], onupdate='CASCADE', ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('image',
     sa.Column('name', sa.String(length=128), nullable=False),
     sa.Column('assessment_id', sa.Integer(), nullable=False),
     sa.Column('label', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['assessment_id'], ['assessment.id'], ),
+    sa.ForeignKeyConstraint(['assessment_id'], ['assessment.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('name', 'assessment_id')
     )
     op.create_table('affected_resource',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('active_id', sa.Integer(), nullable=True),
+    sa.Column('active_id', sa.Integer(), nullable=False),
     sa.Column('route', sa.String(length=256), nullable=True),
-    sa.ForeignKeyConstraint(['active_id'], ['active.id'], ),
+    sa.ForeignKeyConstraint(['active_id'], ['active.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('active_id', 'route')
     )
     op.create_table('finding_affected_resource',
     sa.Column('affected_resource_id', sa.Integer(), nullable=False),
     sa.Column('finding_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['affected_resource_id'], ['affected_resource.id'], ),
-    sa.ForeignKeyConstraint(['finding_id'], ['finding.id'], ),
+    sa.ForeignKeyConstraint(['affected_resource_id'], ['affected_resource.id'], onupdate='CASCADE', ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['finding_id'], ['finding.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('affected_resource_id', 'finding_id')
     )
     # ### end Alembic commands ###
