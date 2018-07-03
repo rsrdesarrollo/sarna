@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 
 from sarna.auxiliary import redirect_back, redirect_endpoint
-from sarna.core.auth import current_user, auditor_or_manager_required
+from sarna.core.auth import current_user, auditor_required
 from sarna.core.security import limiter
 from sarna.forms.assessment import AssessmentForm, FindingEditForm, ActiveCreateNewForm, EvidenceCreateNewForm
 from sarna.model import Assessment, User, AffectedResource, Finding, FindingTemplate, db, Active, Image, Template
@@ -19,7 +19,7 @@ blueprint = Blueprint('assessments', __name__)
 
 
 @blueprint.route('/')
-@auditor_or_manager_required
+@auditor_required
 def index():
     assessments = current_user.get_user_assessments()
 
@@ -30,7 +30,7 @@ def index():
 
 
 @blueprint.route('/<assessment_id>', methods=('GET', 'POST'))
-@auditor_or_manager_required
+@auditor_required
 def edit(assessment_id):
     assessment: Assessment = Assessment.query.filter_by(id=assessment_id).one()
     if not current_user.owns(assessment) and not current_user.manages(assessment.client):
@@ -63,7 +63,7 @@ def edit(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/delete', methods=('POST',))
-@auditor_or_manager_required
+@auditor_required
 def delete(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
     if not current_user.owns(assessment) and not current_user.manages(assessment.client):
@@ -74,7 +74,7 @@ def delete(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/summary')
-@auditor_or_manager_required
+@auditor_required
 def summary(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
     if not current_user.audits(assessment):
@@ -88,7 +88,7 @@ def summary(assessment_id):
 
 @blueprint.route('/<assessment_id>/findings/resource/<affected_resource_id>')
 @blueprint.route('/<assessment_id>/findings')
-@auditor_or_manager_required
+@auditor_required
 def findings(assessment_id, affected_resource_id=None):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
     if not current_user.audits(assessment):
@@ -112,7 +112,7 @@ def findings(assessment_id, affected_resource_id=None):
 
 
 @blueprint.route('/<assessment_id>/findings/<finding_id>', methods=('GET', 'POST'))
-@auditor_or_manager_required
+@auditor_required
 def edit_finding(assessment_id, finding_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
     if not current_user.audits(assessment):
@@ -150,7 +150,7 @@ def edit_finding(assessment_id, finding_id):
 
 
 @blueprint.route('/<assessment_id>/findings/<finding_id>/delete', methods=('POST',))
-@auditor_or_manager_required
+@auditor_required
 def delete_findings(assessment_id, finding_id):
     finding = Finding.query.filter_by(id=finding_id).one()
     if not current_user.audits(finding.assessment):
@@ -163,7 +163,7 @@ def delete_findings(assessment_id, finding_id):
 
 
 @blueprint.route('/<assessment_id>/add')
-@auditor_or_manager_required
+@auditor_required
 def add_findings(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
     if not current_user.audits(assessment):
@@ -177,7 +177,7 @@ def add_findings(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/add/<finding_id>', methods=('POST',))
-@auditor_or_manager_required
+@auditor_required
 def add_finding(assessment_id, finding_id):
     action = request.form.get('action', None)
     if not action or action not in {'add', 'edit_add'}:
@@ -201,7 +201,7 @@ def add_finding(assessment_id, finding_id):
 
 
 @blueprint.route('/<assessment_id>/bulk_action', methods=("POST",))
-@auditor_or_manager_required
+@auditor_required
 def bulk_action_finding(assessment_id):
     data = request.form.to_dict()
     action = data.pop('action', None)
@@ -242,7 +242,7 @@ def bulk_action_finding(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/actives', methods=("POST", "GET"))
-@auditor_or_manager_required
+@auditor_required
 def actives(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
     if not current_user.audits(assessment):
@@ -273,7 +273,7 @@ def actives(assessment_id):
 
 @blueprint.route('/<assessment_id>/evidences', methods=("POST", "GET"))
 @limiter.exempt
-@auditor_or_manager_required
+@auditor_required
 def evidences(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
     if not current_user.audits(assessment):
@@ -312,7 +312,7 @@ def evidences(assessment_id):
 
 @blueprint.route('/<assessment_id>/evidences/<evidence_name>')
 @limiter.exempt
-@auditor_or_manager_required
+@auditor_required
 def get_evidence(assessment_id, evidence_name):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
     if not current_user.audits(assessment):
@@ -331,7 +331,7 @@ def get_evidence(assessment_id, evidence_name):
 
 
 @blueprint.route('/<assessment_id>/reports')
-@auditor_or_manager_required
+@auditor_required
 def reports(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
     if not current_user.audits(assessment):
@@ -344,7 +344,7 @@ def reports(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/reports/download', methods=('POST',))
-@auditor_or_manager_required
+@auditor_required
 def download_reports(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
     if not current_user.audits(assessment):
@@ -371,7 +371,7 @@ def download_reports(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/reports/download/<template_name>', methods=('GET',))
-@auditor_or_manager_required
+@auditor_required
 def download_report(assessment_id, template_name):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
     if not current_user.audits(assessment):

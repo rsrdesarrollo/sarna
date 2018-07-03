@@ -8,5 +8,6 @@ class AuthSource(BaseChoice):
 
 class AccountType(BaseChoice):
     auditor = 1
-    manager = 2
-    admin = 3
+    trusted_auditor = 2
+    manager = 3
+    admin = 4

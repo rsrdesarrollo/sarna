@@ -18,7 +18,7 @@ class User(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), unique=True)
 
-    user_type = db.Column(Enum(AccountType), default=AccountType.auditor, nullable=False)
+    user_type = db.Column(Enum(AccountType), default=AccountType.trusted_auditor, nullable=False)
 
     source = db.Column(Enum(AuthSource), default=AuthSource.database, nullable=False)
     passwd = db.Column(db.String(128))
@@ -54,10 +54,6 @@ class User(Base, db.Model):
     @property
     def is_manager(self):
         return self.user_type == AccountType.manager
-
-    @property
-    def is_auditor(self):
-        return self.user_type == AccountType.auditor
 
     @property
     def name(self):

@@ -3,7 +3,7 @@
 {% endmacro %}
 
 {% macro render_user_type_pill(type) %}
-    {% set class = ['', 'primary', 'warning', 'danger'][type.value] %}
+    {% set class = ['', 'secondary', 'primary', 'warning', 'danger'][type.value] %}
     {{ render_pill(type, class) }}
 {% endmacro %}
 

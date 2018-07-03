@@ -9,7 +9,7 @@ from sarna.model.user import User
 
 __all__ = [
     'login_manager', 'logout_user', 'login_required', 'current_user', 'admin_required', 'manager_required',
-    'auditor_or_manager_required'
+    'auditor_required', 'trusted_required'
 ]
 
 login_manager = LoginManager()
@@ -37,7 +37,7 @@ def admin_required(func):
 
 
 def manager_required(func):
-    needs_accounts = {AccountType.auditor, AccountType.manager}
+    needs_accounts = {AccountType.manager}
     setattr(func, 'needs_accounts', {AccountType.manager})
 
     @wraps(func)
@@ -51,8 +51,23 @@ def manager_required(func):
     return decorated_view
 
 
-def auditor_or_manager_required(func):
-    needs_accounts = {AccountType.auditor, AccountType.manager}
+def trusted_required(func):
+    needs_accounts = {AccountType.trusted_auditor, AccountType.manager}
+    setattr(func, 'needs_accounts', needs_accounts)
+
+    @wraps(func)
+    @login_required
+    def decorated_view(*args, **kwargs):
+        if current_user.user_type not in needs_accounts:
+            abort(403)
+        else:
+            return func(*args, **kwargs)
+
+    return decorated_view
+
+
+def auditor_required(func):
+    needs_accounts = {AccountType.trusted_auditor, AccountType.auditor, AccountType.manager}
     setattr(func, 'needs_accounts', needs_accounts)
 
     @wraps(func)
