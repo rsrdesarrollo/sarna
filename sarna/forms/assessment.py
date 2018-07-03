@@ -1,8 +1,10 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
 from wtforms import SelectMultipleField, TextAreaField
+from wtforms.validators import Optional
 
 from sarna.auxiliary.upload_helpers import is_valid_evidence
+from sarna.auxiliary.user_helpers import user_is_auditor
 from sarna.forms.base_entity_form import BaseEntityForm
 from sarna.model import Assessment, Active, AffectedResource
 from sarna.model.finding import Finding
@@ -11,7 +13,8 @@ from sarna.model.user import User
 
 class AssessmentForm(BaseEntityForm(Assessment)):
     auditors = SelectMultipleField(
-        coerce=User.coerce
+        coerce=User.coerce,
+        validators=[Optional(), user_is_auditor]
     )
 
 

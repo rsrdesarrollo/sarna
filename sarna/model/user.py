@@ -4,6 +4,7 @@ import pyotp
 from flask_login import login_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from sarna.core.roles import valid_auditors, valid_managers, valid_admins
 from sarna.model.assessment import auditor_approval, assessment_audit, Assessment
 from sarna.model.base import Base, db
 from sarna.model.client import client_management, client_audit, Client
@@ -18,7 +19,7 @@ class User(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), unique=True)
 
-    user_type = db.Column(Enum(AccountType), default=AccountType.trusted_auditor, nullable=False)
+    user_type = db.Column(Enum(AccountType), default=AccountType.auditor, nullable=False)
 
     source = db.Column(Enum(AuthSource), default=AuthSource.database, nullable=False)
     passwd = db.Column(db.String(128))
@@ -49,11 +50,16 @@ class User(Base, db.Model):
 
     @property
     def is_admin(self):
-        return self.user_type == AccountType.admin
+        return self.user_type in valid_admins
 
     @property
     def is_manager(self):
-        return self.user_type == AccountType.manager
+        return self.user_type in valid_managers
+
+    @property
+    def is_auditor(self):
+        return self.user_type in valid_auditors
+
 
     @property
     def name(self):
@@ -177,8 +183,8 @@ class User(Base, db.Model):
     """
 
     @classmethod
-    def get_choices(cls, **kwargs):
-        return list((u, u.name) for u in User.query.filter_by(**kwargs).order_by(User.username))
+    def get_choices(cls, *args):
+        return list((u, u.name) for u in User.query.filter(*args).order_by(User.username))
 
     @classmethod
     def coerce(cls, item):

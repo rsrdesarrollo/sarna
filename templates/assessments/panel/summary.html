@@ -76,10 +76,10 @@
                     labels: ["Pending", "Reviewed", "Confirmed", "False Positive", "Other"],
                     datasets: [{
                         backgroundColor: [
-                            '#d9534f',
                             '#f0ad4e',
-                            '#5cb85c',
                             '#5bc0de',
+                            '#5cb85c',
+                            '#d9534f',
                             '#222'
                         ],
                         data: {{ assessment.aggregate_finding_status() | tojson }}

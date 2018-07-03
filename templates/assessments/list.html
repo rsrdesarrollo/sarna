@@ -19,14 +19,9 @@
                     {% for assessment in assessments %}
                         <tr>
                             <td>
-
-                                {% if current_user.manages(assessment) %}
-                                    <a href="{{ url_for('.summary', assessment_id=assessment.id, next=request.path) }}">
-                                        {{ assessment.name }}
-                                    </a>
-                                {% else %}
+                                <a href="{{ url_for('.summary', assessment_id=assessment.id, next=request.path) }}">
                                     {{ assessment.name }}
-                                {% endif %}
+                                </a>
                             </td>
                             <td>{{ assessment.client.short_name }}</td>
                             <td>{{ assessment.platform }}</td>

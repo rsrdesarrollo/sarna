@@ -5,12 +5,12 @@ from flask import Blueprint, render_template, request, send_from_directory, abor
 from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back
-from sarna.core.auth import current_user, manager_required
+from sarna.core.auth import current_user
+from sarna.core.roles import valid_auditors, valid_managers, manager_required
 from sarna.forms.assessment import AssessmentForm
 from sarna.forms.client import ClientForm, TemplateCreateNewForm
 from sarna.model import Assessment, db
 from sarna.model.client import Client, Template
-from sarna.model.enums import AccountType
 from sarna.model.user import User
 
 blueprint = Blueprint('clients', __name__)
@@ -36,8 +36,8 @@ def index():
 def new():
     form = ClientForm(request.form)
 
-    form.managers.get_choices = User.get_choices(user_type=AccountType.manager)
-    form.auditors.get_choices = User.get_choices()
+    form.managers.choices = User.get_choices(User.user_type.in_(valid_managers))
+    form.auditors.choices = User.get_choices(User.user_type.in_(valid_auditors))
 
     context = dict(
         form=form
@@ -81,8 +81,8 @@ def edit(client_id: int):
     else:
         form = ClientForm(**client.to_dict(), managers=client.managers, auditors=client.auditors)
 
-    form.managers.get_choices = User.get_choices(user_type=AccountType.manager)
-    form.auditors.get_choices = User.get_choices()
+    form.managers.choices = User.get_choices(User.user_type.in_(valid_managers))
+    form.auditors.choices = User.get_choices(User.user_type.in_(valid_auditors))
 
     context = dict(
         form=form,
@@ -115,7 +115,7 @@ def add_assessment(client_id: int):
         abort(403)
 
     form = AssessmentForm(request.form)
-    form.auditors.get_choices = User.get_choices()
+    form.auditors.choices = User.get_choices(User.user_type.in_(valid_auditors))
     context = dict(
         form=form,
         client=client

@@ -2,8 +2,10 @@ from flask import Blueprint, render_template, request, flash
 from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back
-from sarna.core.auth import login_required, current_user, admin_required
+from sarna.core.auth import login_required, current_user
+from sarna.core.roles import admin_required
 from sarna.forms.auth import OtpConfirmForm, ChangePasswordForm, AddUserForm
+from sarna.forms.user_administration import EditUserForm
 from sarna.model import db
 from sarna.model.user import User
 
@@ -97,7 +99,7 @@ def add_user():
     return redirect_back('users.index')
 
 
-@blueprint.route('/del_user/<username>', methods=('POST',))
+@blueprint.route('/<username>/delete', methods=('POST',))
 @admin_required
 def del_user(username):
     user = User.query.filter_by(username=username).one()
@@ -107,3 +109,25 @@ def del_user(username):
         user.delete()
 
     return redirect_back('users.index')
+
+
+@blueprint.route('/<username>', methods=('POST',))
+@admin_required
+def edit_user(username):
+    user = User.query.filter_by(username=username).one()
+
+    form_data = request.form.to_dict() or user.to_dict()
+    form = EditUserForm(**form_data)
+
+    context = dict(
+        form=form
+    )
+
+    if user != current_user:
+        pass
+
+    else:
+        flash('You can not edit yourself', 'danger')
+        return redirect_back('users.index')
+
+    return render_template()

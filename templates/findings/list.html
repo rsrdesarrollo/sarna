@@ -18,7 +18,12 @@
                     <tbody>
                     {% for finding in findings %}
                         <tr>
-                            <td>{{ finding.name }}</td>
+                            <td>
+                                <a title="Edit Finding"
+                                   href="{{ url_for('.edit', finding_id=finding.id, next=request.path) }}">
+                                    {{ finding.name }}
+                                </a>
+                            </td>
                             <td>{{ finding.type }}</td>
                             <td>{% for lang in finding.langs %}{{ render_pill(lang, 'secondary') }}{% endfor %}</td>
                             <td>{{ render_score_pill(finding.tech_risk) }}</td>

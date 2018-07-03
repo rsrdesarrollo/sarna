@@ -44,3 +44,15 @@ class ProductionConfig(DevelopmentConfig):
     WTF_CSRF_SECRET_KEY = token_urlsafe(64)
     SECRET_KEY = token_urlsafe(64)
     TEMPLATES_AUTO_RELOAD = False
+
+
+_conf_file = path.join(BaseConfig.PROJECT_PATH, 'config', 'config.yaml')
+if path.isfile(_conf_file):
+    import yaml
+
+    with open(_conf_file, 'r') as fh:
+        data = yaml.safe_load(fh)
+
+    for k, v in data.items():
+        setattr(ProductionConfig, k, v)
+        setattr(DevelopmentConfig, k, v)

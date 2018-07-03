@@ -8,7 +8,8 @@ from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 
 from sarna.auxiliary import redirect_back, redirect_endpoint
-from sarna.core.auth import current_user, auditor_required
+from sarna.core.auth import current_user
+from sarna.core.roles import auditor_required, valid_auditors
 from sarna.core.security import limiter
 from sarna.forms.assessment import AssessmentForm, FindingEditForm, ActiveCreateNewForm, EvidenceCreateNewForm
 from sarna.model import Assessment, User, AffectedResource, Finding, FindingTemplate, db, Active, Image, Template
@@ -41,7 +42,7 @@ def edit(assessment_id):
     else:
         form = AssessmentForm(**assessment.to_dict(), auditors=assessment.auditors)
 
-    form.auditors.get_choices = User.get_choices()
+    form.auditors.choices = User.get_choices(User.user_type.in_(valid_auditors))
 
     context = dict(
         assessment=assessment,
@@ -355,6 +356,9 @@ def download_reports(assessment_id):
     data.pop('csrf_token', None)
 
     templates = set(request.form.getlist('template_name'))
+    templates = Template.query.filter(
+        and_(Template.name.in_(templates), Template.client_id == assessment.client_id)
+    ).all()
 
     if not templates:
         flash('No report selected', 'danger')

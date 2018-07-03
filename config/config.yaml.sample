@@ -1,0 +1,11 @@
+MAX_CONTENT_LENGTH: 10000000
+EVIDENCES_PATH: '/some/path/to/volumen/evidences'
+TEMPLATES_PATH: '/some/path/to/volumen/evidences'
+
+## DATABASE
+# Connection string to database
+SQLALCHEMY_DATABASE_URI: 'postgres://user:password@localhost/sarna'
+
+# Secret sources. If commented, random string is generated each time the service boots.
+# WTF_CSRF_SECRET_KEY:
+# SECRET_KEY:

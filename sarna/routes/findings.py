@@ -2,7 +2,8 @@ from flask import Blueprint, render_template, request, flash, abort
 from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back
-from sarna.core.auth import current_user, trusted_required
+from sarna.core.auth import current_user
+from sarna.core.roles import trusted_required
 from sarna.forms.finding_template import *
 from sarna.model import FindingTemplate, FindingTemplateTranslation, db
 from sarna.model.enums import Language

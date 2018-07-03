@@ -59,9 +59,13 @@
             {% else %}
                 <h4 class="text-center">No report templates for this client</h4>
                 <h5 class="text-center">
-                    <a href="{{ url_for('clients.add_template', client_id=assessment.client.id) }}">
-                        You can add some templates here!
-                    </a>
+                    {% if current_user.manages(assessment.client) %}
+                        <a href="{{ url_for('clients.add_template', client_id=assessment.client.id, next=request.path) }}">
+                            You can add some templates here!
+                        </a>
+                    {% else %}
+                        Ask your manager to add some templates to this client.
+                    {% endif %}
                 </h5>
             {% endif %}
         </div>
