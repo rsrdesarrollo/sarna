@@ -23,7 +23,8 @@ def index():
         (Client.creator == current_user) |
         (Client.managers.any(User.id == current_user.id)) |
         (Client.auditors.any(User.id == current_user.id))
-    )
+    ).all()
+
     context = dict(
         route=ROUTE_NAME,
         clients=clients

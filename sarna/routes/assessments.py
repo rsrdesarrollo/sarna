@@ -28,7 +28,7 @@ def index():
         (Assessment.client_id.in_(map(lambda x: x.id, current_user.managed_clients))) |
         (Assessment.client_id.in_(map(lambda x: x.id, current_user.audited_clients))) |
         (Assessment.auditors.any(User.id == current_user.id))
-    )
+    ).all()
     context = dict(
         route=ROUTE_NAME,
         assessments=assessments
