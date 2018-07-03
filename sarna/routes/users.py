@@ -1,5 +1,3 @@
-import os
-
 from flask import Blueprint, render_template, request, flash
 from sqlalchemy.exc import IntegrityError
 
@@ -9,7 +7,6 @@ from sarna.forms.auth import OtpConfirmForm, ChangePasswordForm, AddUserForm
 from sarna.model import db
 from sarna.model.user import User
 
-ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('users', __name__)
 
 
@@ -22,7 +19,6 @@ def index():
         users = []
 
     context = dict(
-        route=ROUTE_NAME,
         otp_form=OtpConfirmForm(),
         change_passwd_form=ChangePasswordForm(),
         add_user_form=AddUserForm(request.form),

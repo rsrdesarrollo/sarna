@@ -49,7 +49,7 @@
                     <thead class="thead-dark">
                     <th>
                         <label class="custom_checkbox">
-                            <input type="checkbox" id="all_checked" name="finding:all">
+                            <input type="checkbox" id="all_checked">
                             <span class="checkmark"></span>
                         </label>
                     </th>
@@ -65,7 +65,7 @@
                         <tr>
                             <td>
                                 <label class="custom_checkbox">
-                                    <input name="finding:{{ finding.id }}" type="checkbox">
+                                    <input name="finding_id" value="{{ finding.id }}" type="checkbox">
                                     <span class="checkmark"></span>
                                 </label>
                             </td>

@@ -55,23 +55,31 @@
             <div class="collapse navbar-collapse" id="navbar">
                 <ul class="mr-auto navbar-nav">
                     {% block navitems %}
-                        <li class="{{ 'active' if route == 'index' }}">
+                        {% if can_view('index.index') %}
+                        <li class="{{ 'active' if is_endpoint('index') }}">
                             <a class="nav-link" href={{ url_for('index.index') }}>Home</a>
                         </li>
-                        {% if current_user.is_manager %}
-                        <li class="{{ 'active' if route == 'clients' }}">
+                        {% endif %}
+                        {% if can_view('clients.index') %}
+                        <li class="{{ 'active' if is_endpoint('clients') }}">
                             <a class="nav-link" href="{{ url_for('clients.index') }}">Clients</a>
                         </li>
                         {% endif %}
-                        <li class="{{ 'active' if route == 'assessments' }}">
+                        {% if can_view('assessments.index') %}
+                        <li class="{{ 'active' if is_endpoint('assessments') }}">
                             <a class="nav-link" href="{{ url_for('assessments.index') }}">Assessments</a>
                         </li>
-                        <li class="{{ 'active' if route == 'findings' }}">
+                        {% endif %}
+                        {% if can_view('findings.index') %}
+                        <li class="{{ 'active' if is_endpoint('findings') }}">
                             <a class="nav-link" href="{{ url_for('findings.index') }}">Findings Database</a>
                         </li>
-                        <li class="{{ 'active' if route == 'users' }}">
+                        {% endif %}
+                        {% if can_view('users.index') %}
+                        <li class="{{ 'active' if is_endpoint('users') }}">
                             <a class="nav-link" href="{{ url_for('users.index') }}">Users</a>
                         </li>
+                        {% endif %}
                     {% endblock %}
                 </ul>
                 {% if current_user.is_authenticated %}

@@ -13,7 +13,6 @@ from sarna.model.client import Client, Template
 from sarna.model.enums import AccountType
 from sarna.model.user import User
 
-ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('clients', __name__)
 
 
@@ -27,7 +26,6 @@ def index():
     ).all()
 
     context = dict(
-        route=ROUTE_NAME,
         clients=clients
     )
     return render_template('clients/list.html', **context)
@@ -38,11 +36,10 @@ def index():
 def new():
     form = ClientForm(request.form)
 
-    form.managers.choices = User.choices(user_type=AccountType.manager)
-    form.auditors.choices = User.choices()
+    form.managers.get_choices = User.get_choices(user_type=AccountType.manager)
+    form.auditors.get_choices = User.get_choices()
 
     context = dict(
-        route=ROUTE_NAME,
         form=form
     )
     if form.validate_on_submit():
@@ -84,11 +81,10 @@ def edit(client_id: int):
     else:
         form = ClientForm(**client.to_dict(), managers=client.managers, auditors=client.auditors)
 
-    form.managers.choices = User.choices(user_type=AccountType.manager)
-    form.auditors.choices = User.choices()
+    form.managers.get_choices = User.get_choices(user_type=AccountType.manager)
+    form.auditors.get_choices = User.get_choices()
 
     context = dict(
-        route=ROUTE_NAME,
         form=form,
         client=client
     )
@@ -119,9 +115,8 @@ def add_assessment(client_id: int):
         abort(403)
 
     form = AssessmentForm(request.form)
-    form.auditors.choices = User.choices()
+    form.auditors.get_choices = User.get_choices()
     context = dict(
-        route=ROUTE_NAME,
         form=form,
         client=client
     )
@@ -145,7 +140,6 @@ def add_template(client_id: int):
 
     form = TemplateCreateNewForm()
     context = dict(
-        route=ROUTE_NAME,
         form=form,
         client=client
     )

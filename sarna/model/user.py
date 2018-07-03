@@ -43,15 +43,9 @@ class User(Base, db.Model):
     def __str__(self):
         return self.username
 
-    @classmethod
-    def choices(cls, **kwargs):
-        return list((u, u.name) for u in User.query.filter_by(**kwargs).order_by(User.username))
-
-    @classmethod
-    def coerce(cls, item):
-        if isinstance(item, User):
-            return item
-        return cls.query.filter_by(username=item).one()
+    """
+    Properties
+    """
 
     @property
     def is_admin(self):
@@ -62,8 +56,28 @@ class User(Base, db.Model):
         return self.user_type == AccountType.manager
 
     @property
+    def is_auditor(self):
+        return self.user_type == AccountType.auditor
+
+    @property
     def name(self):
         return self.username
+
+    """
+    Assessment access methods
+    """
+
+    def get_user_assessments(self):
+        return Assessment.query.filter(
+            (Assessment.creator == self) |
+            (Assessment.client_id.in_(map(lambda x: x.id, self.managed_clients))) |
+            (Assessment.client_id.in_(map(lambda x: x.id, self.audited_clients))) |
+            (Assessment.auditors.any(User.id == self.id))
+        ).all()
+
+    """
+    Check permissions methods
+    """
 
     def owns(self, obj):
         if isinstance(obj, Client):
@@ -96,6 +110,10 @@ class User(Base, db.Model):
             return self.audits(obj.client) or obj in self.audited_assessments
 
         return False
+
+    """
+    Authentication
+    """
 
     def login(self):
         self.last_access = datetime.now()
@@ -157,3 +175,17 @@ class User(Base, db.Model):
     def check_otp(self, otp):
         totp = pyotp.TOTP(self.otp_seed)
         return totp.verify(otp)
+
+    """
+    Multi-Select Field helper methods
+    """
+
+    @classmethod
+    def get_choices(cls, **kwargs):
+        return list((u, u.name) for u in User.query.filter_by(**kwargs).order_by(User.username))
+
+    @classmethod
+    def coerce(cls, item):
+        if isinstance(item, User):
+            return item
+        return cls.query.filter_by(username=item).one()

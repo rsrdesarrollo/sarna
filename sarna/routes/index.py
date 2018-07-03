@@ -1,5 +1,3 @@
-import os
-
 from flask import Blueprint, render_template, request, flash
 
 from sarna.auxiliary import redirect_back
@@ -8,7 +6,6 @@ from sarna.core.security import limiter
 from sarna.forms.auth import LoginForm
 from sarna.model.user import User
 
-ROUTE_NAME = os.path.basename(__file__).split('.')[0]
 blueprint = Blueprint('index', __name__)
 
 
@@ -17,7 +14,6 @@ blueprint = Blueprint('index', __name__)
 def index():
     form = LoginForm(request.form)
     context = dict(
-        route=ROUTE_NAME,
         form=form,
         need_otp=False
     )
