@@ -9,7 +9,7 @@ from sarna.model.enums import Score, OWASPCategory, OWISAMCategory, FindingType,
 from sarna.model.finding_template import FindingTemplate, FindingTemplateTranslation
 from sarna.model.sql_types import Enum
 
-__all__ = ['Finding', 'finding_affected_resource']
+__all__ = ['Finding', 'Active', 'AffectedResource', 'finding_affected_resource']
 
 finding_affected_resource = db.Table(
     'finding_affected_resource',

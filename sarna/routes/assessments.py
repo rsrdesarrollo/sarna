@@ -11,8 +11,7 @@ from sarna.auxiliary import redirect_back, redirect_endpoint
 from sarna.core.auth import login_required, current_user
 from sarna.core.security import limiter
 from sarna.forms.assessment import AssessmentForm, FindingEditForm, ActiveCreateNewForm, EvidenceCreateNewForm
-from sarna.model import *
-from sarna.model import AffectedResource, Active
+from sarna.model import Assessment, User, AffectedResource, Finding, FindingTemplate, db, Active, Image, Template
 from sarna.model.enums import FindingStatus
 from sarna.report_generator.engine import generate_reports_bundle
 
