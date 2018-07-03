@@ -58,9 +58,11 @@
                         <li class="{{ 'active' if route == 'index' }}">
                             <a class="nav-link" href={{ url_for('index.index') }}>Home</a>
                         </li>
+                        {% if current_user.is_manager %}
                         <li class="{{ 'active' if route == 'clients' }}">
                             <a class="nav-link" href="{{ url_for('clients.index') }}">Clients</a>
                         </li>
+                        {% endif %}
                         <li class="{{ 'active' if route == 'assessments' }}">
                             <a class="nav-link" href="{{ url_for('assessments.index') }}">Assessments</a>
                         </li>

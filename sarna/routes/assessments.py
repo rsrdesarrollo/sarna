@@ -39,7 +39,7 @@ def index():
 @login_required
 def edit(assessment_id):
     assessment: Assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.owns(assessment):
+    if not current_user.owns(assessment) and not current_user.manages(assessment.client):
         abort(403)
 
     if request.form:
@@ -73,7 +73,7 @@ def edit(assessment_id):
 @login_required
 def delete(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.owns(assessment):
+    if not current_user.owns(assessment) and not current_user.manages(assessment.client):
         abort(403)
 
     assessment.delete()

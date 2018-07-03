@@ -5,11 +5,12 @@ from flask import Blueprint, render_template, request, send_from_directory, abor
 from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back
-from sarna.core.auth import login_required, current_user
+from sarna.core.auth import current_user, manager_required
 from sarna.forms.assessment import AssessmentForm
 from sarna.forms.client import ClientForm, TemplateCreateNewForm
 from sarna.model import Assessment, db
 from sarna.model.client import Client, Template
+from sarna.model.enums import AccountType
 from sarna.model.user import User
 
 ROUTE_NAME = os.path.basename(__file__).split('.')[0]
@@ -17,7 +18,7 @@ blueprint = Blueprint('clients', __name__)
 
 
 @blueprint.route('/')
-@login_required
+@manager_required
 def index():
     clients = Client.query.filter(
         (Client.creator == current_user) |
@@ -33,10 +34,12 @@ def index():
 
 
 @blueprint.route('/new', methods=('POST', 'GET'))
-@login_required
+@manager_required
 def new():
     form = ClientForm(request.form)
-    form.managers.choices = form.auditors.choices = User.choices()
+
+    form.managers.choices = User.choices(user_type=AccountType.manager)
+    form.auditors.choices = User.choices()
 
     context = dict(
         route=ROUTE_NAME,
@@ -56,7 +59,7 @@ def new():
 
 
 @blueprint.route('/delete/<client_id>', methods=('POST',))
-@login_required
+@manager_required
 def delete(client_id: int):
     client = Client.query.filter_by(id=client_id).one()
 
@@ -69,7 +72,7 @@ def delete(client_id: int):
 
 
 @blueprint.route('/<client_id>', methods=('POST', 'GET'))
-@login_required
+@manager_required
 def edit(client_id: int):
     client: Client = Client.query.filter_by(id=client_id).one()
 
@@ -81,7 +84,8 @@ def edit(client_id: int):
     else:
         form = ClientForm(**client.to_dict(), managers=client.managers, auditors=client.auditors)
 
-    form.managers.choices = form.auditors.choices = User.choices()
+    form.managers.choices = User.choices(user_type=AccountType.manager)
+    form.auditors.choices = User.choices()
 
     context = dict(
         route=ROUTE_NAME,
@@ -107,7 +111,7 @@ def edit(client_id: int):
 
 
 @blueprint.route('/<client_id>/add_assessment', methods=('POST', 'GET'))
-@login_required
+@manager_required
 def add_assessment(client_id: int):
     client = Client.query.filter_by(id=client_id).one()
 
@@ -132,7 +136,7 @@ def add_assessment(client_id: int):
 
 
 @blueprint.route('/<client_id>/add_template', methods=('POST', 'GET'))
-@login_required
+@manager_required
 def add_template(client_id: int):
     client = Client.query.filter_by(id=client_id).one()
 
@@ -172,7 +176,7 @@ def add_template(client_id: int):
 
 
 @blueprint.route('/<client_id>/template/<template_name>/delete', methods=('POST',))
-@login_required
+@manager_required
 def delete_template(client_id: int, template_name):
     client = Client.query.filter_by(id=client_id).one()
     if not current_user.manages(client):
@@ -185,7 +189,7 @@ def delete_template(client_id: int, template_name):
 
 
 @blueprint.route('/<client_id>/template/<template_name>/download')
-@login_required
+@manager_required
 def download_template(client_id: int, template_name):
     client = Client.query.filter_by(id=client_id).one()
     if not current_user.manages(client):

@@ -15,7 +15,6 @@ __all__ = ['User']
 
 
 class User(Base, db.Model):
-
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), unique=True)
 
@@ -45,8 +44,8 @@ class User(Base, db.Model):
         return self.username
 
     @classmethod
-    def choices(cls):
-        return list((u, u.name) for u in User.query.order_by(User.username).all())
+    def choices(cls, **kwargs):
+        return list((u, u.name) for u in User.query.filter_by(**kwargs).order_by(User.username))
 
     @classmethod
     def coerce(cls, item):
@@ -57,6 +56,10 @@ class User(Base, db.Model):
     @property
     def is_admin(self):
         return self.user_type == AccountType.admin
+
+    @property
+    def is_manager(self):
+        return self.user_type == AccountType.manager
 
     @property
     def name(self):
@@ -78,6 +81,8 @@ class User(Base, db.Model):
 
         if isinstance(obj, Client):
             return obj in self.managed_clients
+        elif isinstance(obj, Assessment):
+            return self.manages(obj.client)
 
         return False
 
@@ -88,7 +93,7 @@ class User(Base, db.Model):
         if isinstance(obj, Client):
             return obj in self.audited_clients
         elif isinstance(obj, Assessment):
-            return obj in self.audited_assessments
+            return self.audits(obj.client) or obj in self.audited_assessments
 
         return False
 
