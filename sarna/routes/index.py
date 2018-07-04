@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, request, flash
 
+from sarna.auth_engine.auth_controller import AuthController
+from sarna.auth_engine.exceptions import AuthException
 from sarna.auxiliary import redirect_back
 from sarna.core.auth import login_required, logout_user
 from sarna.core.security import limiter
 from sarna.forms.auth import LoginForm
-from sarna.model.user import User
 
 blueprint = Blueprint('index', __name__)
 
@@ -19,21 +20,24 @@ def index():
     )
 
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        controller = AuthController()
 
-        if user and user.check_password(form.password.data):
-            if not user.otp_enabled or user.otp_enabled and user.confirm_otp(form.otp.data):
-                user.login()
+        try:
+            controller.authenticate(
+                form.username.data,
+                form.password.data,
+                form.otp.data
+            )
+            flash('Logged in successfully.', 'success')
+            return redirect_back('index.index')
 
-                flash('Logged in successfully.', 'success')
-                return redirect_back('index.index')
+        except AuthException:
+            context['need_otp'] = True
 
         if form.otp.data:
             flash('Invalid credentials', 'danger')
         else:
             form.otp.errors.append('Google Authenticator OTP required.')
-
-        context['need_otp'] = True
 
     return render_template('index.html', **context)
 

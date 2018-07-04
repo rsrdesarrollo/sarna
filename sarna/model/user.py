@@ -26,6 +26,7 @@ class User(Base, db.Model):
 
     creation_date = db.Column(db.DateTime, default=lambda: datetime.now(), nullable=False)
     last_access = db.Column(db.DateTime)
+    login_try = db.Column(db.SmallInteger, default=0, nullable=False)
 
     is_locked = db.Column(db.Boolean(), default=False, nullable=False)
     otp_enabled = db.Column(db.Boolean(), default=False, nullable=False)
