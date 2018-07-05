@@ -6,6 +6,7 @@ from sarna.commands import user_cli
 from sarna.core import app
 from sarna.core import asset
 from sarna.core.auth import login_manager
+from sarna.core.auth_engine import auth_controller
 from sarna.core.security import csrf, limiter
 from sarna.routes import clients, index, findings, users, assessments
 
@@ -30,7 +31,9 @@ def error_handler(err):
 csrf.init_app(app)
 limiter.init_app(app)
 asset.init_app(app)
+
 login_manager.init_app(app)
+auth_controller.init_app(app)
 
 user_cli.init_app(app)
 

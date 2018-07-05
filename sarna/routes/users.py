@@ -3,6 +3,7 @@ from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back
 from sarna.core.auth import login_required, current_user
+from sarna.core.auth_engine.exceptions import AuthException
 from sarna.core.roles import admin_required
 from sarna.forms.auth import OtpConfirmForm, ChangePasswordForm, AddUserForm
 from sarna.forms.user_administration import EditUserForm
@@ -34,13 +35,14 @@ def index():
 def enable_otp():
     form = OtpConfirmForm(request.form)
 
-    try:
-        if current_user.enable_otp(form.otp.data):
-            flash('OTP enabled successfully', 'success')
-        else:
-            raise ValueError('invalid otp')
-    except ValueError:
-        flash('Invalid OTP, please try to enroll again.', 'danger')
+    if form.validate_on_submit():
+        try:
+            if current_user.enable_otp(form.otp.data, form.password.data):
+                flash('OTP enabled successfully', 'success')
+            else:
+                raise ValueError('invalid otp or password')
+        except ValueError:
+            flash('Invalid credentials, please try to enroll again.', 'danger')
 
     return redirect_back('users.index')
 
@@ -50,13 +52,14 @@ def enable_otp():
 def disable_otp():
     form = OtpConfirmForm(request.form)
 
-    try:
-        if current_user.disable_otp(form.otp.data):
-            flash('OTP disabled successfully', 'success')
-        else:
-            raise ValueError('invalid otp')
-    except ValueError:
-        flash('Invalid OTP, please try again.', 'danger')
+    if form.validate_on_submit():
+        try:
+            if current_user.disable_otp(form.otp.data, form.password.data):
+                flash('OTP disabled successfully', 'success')
+            else:
+                raise ValueError('invalid otp or password')
+        except ValueError:
+            flash('Invalid credentials, please try again.', 'danger')
 
     return redirect_back('users.index')
 
@@ -65,16 +68,20 @@ def disable_otp():
 @login_required
 def change_passwd():
     form = ChangePasswordForm()
+    if form.validate_on_submit():
+        try:
+            if form.newpassword.data == form.newpasswordrep.data:
+                current_user.change_password(
+                    form.oldpassword.data,
+                    form.newpassword.data,
+                    form.otp.data
+                )
+                flash('Password changed successfully', 'success')
+            else:
+                flash('Password repeat invalid', 'danger')
 
-    if (not current_user.otp_enabled or current_user.check_otp(form.otp.data)) and current_user.check_password(
-            form.oldpassword.data):
-        if form.newpassword.data == form.newpasswordrep.data:
-            current_user.set_passwd(form.newpassword.data)
-            flash('Password changed successfully', 'success')
-        else:
-            flash('Password repeat invalid', 'danger')
-    else:
-        flash('Invalid credentials', 'danger')
+        except AuthException:
+            flash('Invalid credentials', 'danger')
 
     return redirect_back('users.index')
 
@@ -89,7 +96,7 @@ def add_user():
         if form.password.data == form.passwordrep.data:
             try:
                 user = User(username=username)
-                user.set_passwd(form.password.data)
+                user.set_database_passwd(form.password.data)
             except IntegrityError:
                 flash('User {} already exist'.format(username), 'danger')
                 db.session.rollback()

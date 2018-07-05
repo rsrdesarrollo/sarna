@@ -1,3 +1,4 @@
+from sarna.config import BaseConfig
 from sarna.core import app
 
 
@@ -6,6 +7,6 @@ class ConfigWrapper:
         return app.config[item]
 
 
-config = ConfigWrapper()
+config: BaseConfig = ConfigWrapper()
 
 __all__ = ['config']

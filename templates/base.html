@@ -5,8 +5,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>SARNA</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='logo-red.png') }}?v=5">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css"
-          integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+
     {% assets "css_all" %}
         <link href="{{ ASSET_URL }}" rel="stylesheet">
     {% endassets %}

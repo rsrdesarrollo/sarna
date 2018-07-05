@@ -2,13 +2,14 @@ from datetime import datetime
 
 import pyotp
 from flask_login import login_user
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 
+from sarna.core.auth_engine.exceptions import AuthException
 from sarna.core.roles import valid_auditors, valid_managers, valid_admins
 from sarna.model.assessment import auditor_approval, assessment_audit, Assessment
 from sarna.model.base import Base, db
 from sarna.model.client import client_management, client_audit, Client
-from sarna.model.enums import AccountType, AuthSource
+from sarna.model.enums import UserType, AuthSource
 from sarna.model.finding_template import FindingTemplate
 from sarna.model.sql_types import Enum
 
@@ -19,7 +20,7 @@ class User(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), unique=True)
 
-    user_type = db.Column(Enum(AccountType), default=AccountType.auditor, nullable=False)
+    user_type = db.Column(Enum(UserType), default=UserType.auditor, nullable=False)
 
     source = db.Column(Enum(AuthSource), default=AuthSource.database, nullable=False)
     passwd = db.Column(db.String(128))
@@ -60,7 +61,6 @@ class User(Base, db.Model):
     @property
     def is_auditor(self):
         return self.user_type in valid_auditors
-
 
     @property
     def name(self):
@@ -120,6 +120,7 @@ class User(Base, db.Model):
 
     def login(self):
         self.last_access = datetime.now()
+        self.login_try = 0
         db.session.commit()
         login_user(self)
 
@@ -138,12 +139,23 @@ class User(Base, db.Model):
     def is_active(self):
         return not self.is_locked
 
-    def set_passwd(self, passwd):
+    def set_database_passwd(self, passwd):
         self.passwd = generate_password_hash(passwd)
         db.session.commit()
 
+    def change_password(self, password, new_password, otp=None):
+        try:
+            self.source.engine.change_password(self, password, new_password, otp)
+        except AuthException:
+            return False
+        return True
+
     def check_password(self, password):
-        return check_password_hash(self.passwd, password)
+        try:
+            self.source.engine.verify_passwd(self, password)
+        except AuthException:
+            return False
+        return True
 
     def generate_otp(self):
         if self.otp_enabled:
@@ -153,20 +165,28 @@ class User(Base, db.Model):
         db.session.commit()
         return pyotp.totp.TOTP(self.otp_seed).provisioning_uri(self.username, issuer_name="SARNA")
 
-    def enable_otp(self, otp):
+    def enable_otp(self, otp, password):
         if self.otp_enabled:
             raise ValueError('otp already set')
 
-        self.otp_enabled = self.check_otp(otp)
-        db.session.commit()
+        otp_ok = self.check_otp(otp)
+
+        if otp_ok and self.check_password(password):
+            self.otp_enabled = True
+            db.session.commit()
+
         return self.otp_enabled
 
-    def disable_otp(self, otp):
+    def disable_otp(self, otp, password):
         if not self.otp_enabled:
             raise ValueError('otp already disabled')
 
-        self.otp_enabled = self.check_otp(otp)
-        db.session.commit()
+        otp_ok = self.check_otp(otp)
+
+        if otp_ok and self.check_password(password):
+            self.otp_enabled = False
+            db.session.commit()
+
         return not self.otp_enabled
 
     def confirm_otp(self, otp):

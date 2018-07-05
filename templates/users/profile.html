@@ -60,7 +60,7 @@
                         {% else %}
 
                             <h3 class="mt-5">Disable OTP</h3>
-                            <h5>Insert your current OTP and password to disable it.</h5>
+                            <h5>Use your current OTP and password to disable it.</h5>
                             <form action="{{ url_for('users.disable_otp') }}" method="POST" class="mt-3">
                                 {{ otp_form.csrf_token }}
                                 <div class="form-row">
