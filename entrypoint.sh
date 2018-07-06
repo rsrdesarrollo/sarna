@@ -7,7 +7,7 @@ fi
 
 chown sarna:sarna /sarna/uploaded_data /sarna/static
 
-DATABASE_HOST=$(echo $SQLALCHEMY_DATABASE_URI | sed -r 's#\w+://[^:]+:[^@]+@([^/]+)/.*#\1#')
+DATABASE_HOST=`echo $SQLALCHEMY_DATABASE_URI | sed -r 's#\w+://[^:]+:[^@]+@([^/]+)/.*#\1#'`
 until nc -z -v -w30 $DATABASE_HOST 5432
 do
   echo "Waiting for database connection..."
