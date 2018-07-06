@@ -125,6 +125,10 @@ class ActiveDirectoryEngine(BaseEngine):
                 user_type = UserType.manager
             elif config.AD_TRUSTED_AUDITOR_GROUP and config.AD_TRUSTED_AUDITOR_GROUP in groups:
                 user_type = UserType.trusted_auditor
+            elif config.AD_AUDITOR_GROUP and config.AD_AUDITOR_GROUP in groups:
+                user_type = UserType.auditor
+            else:
+                raise UnauthorizedAccountException('No mapping found for user')
 
         return user_type
 
