@@ -20,11 +20,19 @@ def error_handler(err):
     elif isinstance(err, NoResultFound):
         err = exceptions.NotFound()
 
-    context = dict(
-        code=err.code,
-        error=err.name,
-        description=err.description,
-    )
+    try:
+        context = dict(
+            code=err.code,
+            error=err.name,
+            description=err.description,
+        )
+    except AttributeError:
+        context = dict(
+            code=500,
+            error='Internal Server Error',
+            description=str(err),
+        )
+
     return render_template('error.html', **context), context['code']
 
 

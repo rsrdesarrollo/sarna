@@ -15,7 +15,6 @@ js_all:
     - node_modules/bootstrap-notify/bootstrap-notify.js
     - node_modules/chart.js/dist/Chart.js
     - js/main.js
-    - js/cvss.js
 css_all:
   filters: cssmin
   output: dist/main.css

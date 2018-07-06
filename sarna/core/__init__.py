@@ -1,8 +1,8 @@
+import itertools
 from os import path
 
 from flask import Flask, request
 from werkzeug.contrib.fixers import ProxyFix
-import itertools
 
 from sarna.config import DevelopmentConfig, ProductionConfig, BaseConfig
 
@@ -29,6 +29,9 @@ app.wsgi_app = ProxyFix(app.wsgi_app)
 @app.context_processor
 def processor_endpoint():
     def is_endpoint(endpoint: str):
+        if not request.endpoint:
+            return False
+
         for a, b in itertools.zip_longest(request.endpoint.split('.'), endpoint.split('.')):
             if not a or (b and b != a):
                 return False

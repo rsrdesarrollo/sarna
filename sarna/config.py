@@ -1,6 +1,5 @@
 import os
 from os import path
-from secrets import token_urlsafe
 
 
 class BaseConfig:
@@ -30,7 +29,7 @@ class BaseConfig:
     TEMPLATES_ALLOW_EXTENSIONS = {'docx'}
     TEMPLATES_ALLOW_MIME = 'application/.*'
 
-    SQLALCHEMY_DATABASE_URI = os.getenv('SARNA_DATABASE_URI', _default_database_uri)
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', _default_database_uri)
 
     AD_FALLBACK = False
     AD_AUTO_ROLE_MAPPING = False
@@ -54,7 +53,6 @@ class BaseConfig:
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     ASSETS_DEBUG = True
-    WTF_CSRF_SECRET_KEY = "SECRET RANDOM STR CHANGE ME"
     SECRET_KEY = "SECRET RANDOM STR CHANGE ME"
     TEMPLATES_AUTO_RELOAD = True
 
@@ -62,8 +60,7 @@ class DevelopmentConfig(BaseConfig):
 class ProductionConfig(DevelopmentConfig):
     DEBUG = False
     ASSETS_DEBUG = False
-    WTF_CSRF_SECRET_KEY = token_urlsafe(64)
-    SECRET_KEY = token_urlsafe(64)
+    SECRET_KEY = ''
     TEMPLATES_AUTO_RELOAD = False
 
 
