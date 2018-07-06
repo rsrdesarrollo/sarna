@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from terminaltables import AsciiTable
 
 from sarna.model import db
-from sarna.model.enums import UserType
+from sarna.model.enums import UserType, AuthSource
 from sarna.model.user import User
 
 user_cli = AppGroup('user', help='User management')
@@ -75,7 +75,7 @@ def mod_user(username, role, change_passwd):
     if role:
         user.user_type = UserType[role]
 
-    if change_passwd:
+    if change_passwd and user.source == AuthSource.database:
         pswd = getpass.getpass('Password: ')
         pswd2 = getpass.getpass('Repeat password: ')
 
