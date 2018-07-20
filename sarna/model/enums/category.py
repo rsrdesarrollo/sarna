@@ -2,6 +2,50 @@ from sarna.model.enums.base_choice import BaseChoice
 from sarna.model.enums.language import Language
 
 
+class OWASPMobileTop10Category(BaseChoice):
+    _init_ = "value code desc translation"
+    M1 = 1, 'M1', 'Improper Platform Usage', {
+        Language.English: 'Improper Platform Usage',
+        Language.Spanish: 'Uso inapropiado de la plataforma'
+    }
+    M2 = 2, 'M2', 'Insecure Data Storage', {
+        Language.English: 'Insecure Data Storage',
+        Language.Spanish: 'Almacenamiento inseguro de datos'
+    }
+    M3 = 3, 'M3', 'Insecure Communication', {
+        Language.English: 'Insecure Communication',
+        Language.Spanish: 'Comunicaciones inseguras'
+    }
+    M4 = 4, 'M4', 'Insecure Authentication', {
+        Language.English: 'Insecure Authentication',
+        Language.Spanish: 'Autenticación insegura'
+    }
+    M5 = 5, 'M5', 'Insufficient Cryptography', {
+        Language.English: 'Insufficient Cryptography',
+        Language.Spanish: 'Criptografía insuficiente'
+    }
+    M6 = 6, 'M6', 'Insecure Authorization', {
+        Language.English: 'Insecure Authorization',
+        Language.Spanish: 'Autorización insegura'
+    }
+    M7 = 7, 'M7', 'Poor Code Quality', {
+        Language.English: 'Poor Code Quality',
+        Language.Spanish: 'Calidad del código cliente'
+    }
+    M8 = 8, 'M8', 'Code Tampering', {
+        Language.English: 'Code Tampering',
+        Language.Spanish: 'Alteraciones de código'
+    }
+    M9 = 9, 'M9', 'Reverse Engineering', {
+        Language.English: 'Reverse Engineering',
+        Language.Spanish: 'Ingeniería inversa'
+    }
+    M10 = 10, 'M10', 'Extraneous Functionality', {
+        Language.English: 'Extraneous Functionality',
+        Language.Spanish: 'Funcionalidad oculta'
+    }
+
+
 class OWISAMCategory(BaseChoice):
     _init_ = "value code desc translation"
     DI_001 = 1, 'DI-001', 'Discovering of access points', {
