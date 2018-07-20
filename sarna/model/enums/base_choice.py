@@ -38,5 +38,8 @@ class BaseChoice(OrderedEnum):
         else:
             return OrderedEnum.__eq__(self, other)
 
+    def __ne__(self, other):
+        return not self == other
+
     def __hash__(self):
         return self.value
