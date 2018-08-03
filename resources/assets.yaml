@@ -15,7 +15,6 @@ js_all:
     - node_modules/bootstrap-notify/bootstrap-notify.js
     - node_modules/chart.js/dist/Chart.js
     - js/main.js
-    - js/cvss.js
 css_all:
   filters: cssmin
   output: dist/main.css
@@ -27,3 +26,5 @@ css_all:
     - node_modules/horsey/dist/horsey.css
     - node_modules/jquery-ui-dist/jquery-ui.css
     - node_modules/font-awesome/css/font-awesome.css
+fonts_all:
+  output:

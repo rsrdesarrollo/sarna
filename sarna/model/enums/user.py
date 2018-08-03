@@ -2,11 +2,13 @@ from sarna.model.enums.base_choice import BaseChoice
 
 
 class AuthSource(BaseChoice):
-    database = 1
-    ldap = 2
+    _init_ = "value engine"
+    database = 1, None
+    ldap = 2, None
+    ad = 3, None
 
 
-class AccountType(BaseChoice):
+class UserType(BaseChoice):
     auditor = 1
     trusted_auditor = 2
     manager = 3

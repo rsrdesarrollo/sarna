@@ -1,0 +1,23 @@
+version: '3'
+services:
+  sarna:
+    build: .
+    volumes:
+      - ./volumes/uploaded_data:/sarna/uploaded_data
+      - ./volumes/config:/sarna/config
+    environment:
+      FLASK_ENV: 'production'
+      SQLALCHEMY_DATABASE_URI: 'postgres://sarna:change_me_loko@psql/sarna'
+    depends_on:
+      - psql
+    ports:
+      - "5000:5000"
+  psql:
+    image: postgres
+    environment:
+      POSTGRES_USER: 'sarna'
+      POSTGRES_PASSWORD: 'change_me_loko'
+      POSTGRES_DB: 'sarna'
+    volumes:
+      - ./volumes/database:/var/lib/postgresql/data
+

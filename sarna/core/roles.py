@@ -3,12 +3,12 @@ from functools import wraps
 from flask_login import login_required
 from werkzeug.exceptions import abort
 
-from sarna.model.enums import AccountType
+from sarna.model.enums import UserType
 
-valid_auditors = {AccountType.manager, AccountType.trusted_auditor, AccountType.auditor}
-valid_trusted = {AccountType.manager, AccountType.trusted_auditor}
-valid_managers = {AccountType.manager}
-valid_admins = {AccountType.admin}
+valid_auditors = {UserType.manager, UserType.trusted_auditor, UserType.auditor}
+valid_trusted = {UserType.manager, UserType.trusted_auditor}
+valid_managers = {UserType.manager}
+valid_admins = {UserType.admin}
 
 
 def admin_required(func):

@@ -29,3 +29,17 @@ class BaseChoice(OrderedEnum):
 
     def __str__(self):
         return self.name.replace("_", " ")
+
+    def __eq__(self, other):
+        if type(other) == str:
+            return self.name == other
+        elif type(other) == int:
+            return self.value == other
+        else:
+            return OrderedEnum.__eq__(self, other)
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __hash__(self):
+        return self.value

@@ -5,8 +5,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>SARNA</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='logo-red.png') }}?v=5">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css"
-          integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
     {% assets "css_all" %}
         <link href="{{ ASSET_URL }}" rel="stylesheet">
     {% endassets %}
@@ -14,6 +12,8 @@
         <script type="text/javascript" src="{{ ASSET_URL }}"></script>
     {% endassets %}
 
+    <link href="{{ url_for('static', filename='css/cvss.css') }}" rel="stylesheet">
+    <script type="text/javascript" src="{{ url_for('static', filename='js/cvss.js') }}"></script>
 
     {% block scripts %}
         <script type="text/javascript">
@@ -56,29 +56,29 @@
                 <ul class="mr-auto navbar-nav">
                     {% block navitems %}
                         {% if can_view('index.index') %}
-                        <li class="{{ 'active' if is_endpoint('index') }}">
-                            <a class="nav-link" href={{ url_for('index.index') }}>Home</a>
-                        </li>
+                            <li class="{{ 'active' if is_endpoint('index') }}">
+                                <a class="nav-link" href={{ url_for('index.index') }}>Home</a>
+                            </li>
                         {% endif %}
                         {% if can_view('clients.index') %}
-                        <li class="{{ 'active' if is_endpoint('clients') }}">
-                            <a class="nav-link" href="{{ url_for('clients.index') }}">Clients</a>
-                        </li>
+                            <li class="{{ 'active' if is_endpoint('clients') }}">
+                                <a class="nav-link" href="{{ url_for('clients.index') }}">Clients</a>
+                            </li>
                         {% endif %}
                         {% if can_view('assessments.index') %}
-                        <li class="{{ 'active' if is_endpoint('assessments') }}">
-                            <a class="nav-link" href="{{ url_for('assessments.index') }}">Assessments</a>
-                        </li>
+                            <li class="{{ 'active' if is_endpoint('assessments') }}">
+                                <a class="nav-link" href="{{ url_for('assessments.index') }}">Assessments</a>
+                            </li>
                         {% endif %}
                         {% if can_view('findings.index') %}
-                        <li class="{{ 'active' if is_endpoint('findings') }}">
-                            <a class="nav-link" href="{{ url_for('findings.index') }}">Findings Database</a>
-                        </li>
+                            <li class="{{ 'active' if is_endpoint('findings') }}">
+                                <a class="nav-link" href="{{ url_for('findings.index') }}">Findings Database</a>
+                            </li>
                         {% endif %}
                         {% if can_view('users.index') %}
-                        <li class="{{ 'active' if is_endpoint('users') }}">
-                            <a class="nav-link" href="{{ url_for('users.index') }}">Users</a>
-                        </li>
+                            <li class="{{ 'active' if is_endpoint('users') }}">
+                                <a class="nav-link" href="{{ url_for('users.index') }}">Users</a>
+                            </li>
                         {% endif %}
                     {% endblock %}
                 </ul>

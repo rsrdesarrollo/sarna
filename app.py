@@ -6,6 +6,7 @@ from sarna.commands import user_cli
 from sarna.core import app
 from sarna.core import asset
 from sarna.core.auth import login_manager
+from sarna.core.auth_engine import auth_controller
 from sarna.core.security import csrf, limiter
 from sarna.routes import clients, index, findings, users, assessments
 
@@ -19,18 +20,28 @@ def error_handler(err):
     elif isinstance(err, NoResultFound):
         err = exceptions.NotFound()
 
-    context = dict(
-        code=err.code,
-        error=err.name,
-        description=err.description,
-    )
+    try:
+        context = dict(
+            code=err.code,
+            error=err.name,
+            description=err.description,
+        )
+    except AttributeError:
+        context = dict(
+            code=500,
+            error='Internal Server Error',
+            description=str(err),
+        )
+
     return render_template('error.html', **context), context['code']
 
 
 csrf.init_app(app)
 limiter.init_app(app)
 asset.init_app(app)
+
 login_manager.init_app(app)
+auth_controller.init_app(app)
 
 user_cli.init_app(app)
 

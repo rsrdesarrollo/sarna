@@ -1,8 +1,20 @@
+class ConfigException(Exception):
+    pass
+
+
 class AuthException(Exception):
     pass
 
 
-class LockedUserException(AuthException):
+class AuthEngineFailedException(AuthException):
+    pass
+
+
+class UnauthorizedAccountException(AuthException):
+    pass
+
+
+class LockedUserException(UnauthorizedAccountException):
     pass
 
 

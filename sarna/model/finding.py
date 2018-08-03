@@ -6,6 +6,7 @@ from rfc3986 import URIReference
 from sarna.model.assessment import Assessment
 from sarna.model.base import Base, db
 from sarna.model.enums import Score, OWASPCategory, OWISAMCategory, FindingType, FindingStatus
+from sarna.model.enums.category import OWASPMobileTop10Category
 from sarna.model.finding_template import FindingTemplate, FindingTemplateTranslation
 from sarna.model.sql_types import Enum
 
@@ -43,6 +44,7 @@ class Finding(Base, db.Model):
     status = db.Column(Enum(FindingStatus), nullable=False, default=FindingStatus.Pending)
 
     owasp_category = db.Column(Enum(OWASPCategory))
+    owasp_mobile_category = db.Column(Enum(OWASPMobileTop10Category))
     owisam_category = db.Column(Enum(OWISAMCategory))
 
     description = db.Column(db.String())
@@ -158,6 +160,7 @@ class Finding(Base, db.Model):
             solution_complexity=template.solution_complexity,
 
             owasp_category=template.owasp_category,
+            owasp_mobile_category=template.owasp_mobile_category,
             owisam_category=template.owisam_category,
 
             template=template,
