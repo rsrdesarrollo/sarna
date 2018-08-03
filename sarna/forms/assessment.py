@@ -18,7 +18,7 @@ class AssessmentForm(BaseEntityForm(Assessment)):
     )
 
 
-class FindingEditForm(BaseEntityForm(Finding, skip_attrs={'name', 'type'})):
+class FindingEditForm(BaseEntityForm(Finding, skip_attrs={'name'})):
     affected_resources = TextAreaField(description='List of affected resources. One per line.',
                                        render_kw=dict(class_='noMD', rows=5))
 
