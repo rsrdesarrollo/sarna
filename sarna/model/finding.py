@@ -68,8 +68,10 @@ class Finding(Base, db.Model):
             if not resource:
                 continue  # Skip empty lines
             resource_uri = URIReference.from_string(resource)
-            if resource_uri.is_valid(require_scheme=True, require_path=True):
-                if resource_uri.authority is not None or resource_uri.scheme == 'urn':
+            if resource_uri.is_valid(require_scheme=True):
+                _resource_ok = resource_uri.scheme.lower() in {'http', 'https'} and resource_uri.authority is not None
+                _resource_ok = _resource_ok or (resource_uri.scheme == 'urn' and resource_uri.path is not None)
+                if _resource_ok:
                     resource_uris.append(resource_uri)
                     continue
 
@@ -87,13 +89,13 @@ class Finding(Base, db.Model):
                     resource_rute += "#" + resource.fragment
             elif resource.scheme == 'urn':
                 # URN
-                active_name = "{}:{}".format(resource.scheme, resource.path)
-                resource_rute = None
+                resource_name, *path = resource.path.split('/', 1)
+                active_name = "{}:{}".format(resource.scheme, resource_name)
+                resource_rute = "/{}".format(path[0]) if path else None
             else:
                 # TODO: this should never happen. Make some warning.
                 continue
 
-            resource_rute = resource_rute or '/'
             active = Active.query.filter_by(
                 assessment=self.assessment,
                 name=active_name
@@ -203,7 +205,7 @@ class AffectedResource(Base, db.Model):
     )
     active = db.relationship(Active, uselist=False, back_populates='active_resources')
 
-    route = db.Column(db.String(256), default='/')
+    route = db.Column(db.String(256))
 
     findings = db.relationship('Finding', secondary=finding_affected_resource)
 
