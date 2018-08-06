@@ -211,4 +211,4 @@ class User(Base, db.Model):
     def coerce(cls, item):
         if isinstance(item, User):
             return item
-        return cls.query.filter_by(username=item).one()
+        return cls.query.filter_by(username=item).first()

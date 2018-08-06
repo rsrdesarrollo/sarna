@@ -1,6 +1,6 @@
 {% extends "clients/base.html" %}
 
-{% from "macros.html" import render_form %}
+{% from "macros.html" import render_form, render_field %}
 {% block body %}
 
     <div class="row mt-3 pl-3">
@@ -114,5 +114,18 @@
             <h2>Edit client</h2>
             {{ render_form(form) }}
         </div>
+        {% if current_user.owns(client) %}
+            <div class="col-lg pl-lg-5 pr-lg-5 mr-2 border-danger border rounded">
+                <h2 class="text-danger">Danger Zone</h2>
+
+                <form method="post" action="{{ url_for('.change_owner', client_id=client.id, next=request.path) }}">
+                    <div class="form-group">
+                        {{ render_field(change_owner_form.csrf_token) }}
+                        {{ render_field(change_owner_form.owner) }}
+                    </div>
+                    <button type="submit" class="btn btn-danger btn-block">Change Owner</button>
+                </form>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

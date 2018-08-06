@@ -1,5 +1,6 @@
+from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
-from wtforms import SelectMultipleField
+from wtforms import SelectMultipleField, SelectField
 from wtforms.validators import Optional
 
 from sarna.auxiliary.upload_helpers import is_valid_template
@@ -17,6 +18,13 @@ class ClientForm(BaseEntityForm(Client)):
     auditors = SelectMultipleField(
         coerce=User.coerce,
         validators=[Optional(), user_is_auditor]
+    )
+
+
+class ClientChangeOwnerForm(FlaskForm):
+    owner = SelectField(
+        coerce=User.coerce,
+        validators=[Optional(), users_are_managers]
     )
 
 
