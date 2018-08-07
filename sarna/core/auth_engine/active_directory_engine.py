@@ -102,14 +102,17 @@ class ActiveDirectoryEngine(BaseEngine):
 
     @staticmethod
     def get_entry_user_type(entry):
-        groups = getattr(entry, config.AD_GROUP_ATTR, None)
+        groups = getattr(entry, config.AD_GROUP_ATTR, None).value
 
         if not groups and config.AD_GROUP_REQUIRED:
             raise UnauthorizedAccountException(
                 'No groups on user referenced by attribute {}'.format(config.AD_GROUP_ATTR)
             )
 
-        groups = set(groups.value)
+        if type(groups) != list:
+            groups = [groups]
+
+        groups = set(groups)
 
         if config.AD_GROUP_REQUIRED and config.AD_GROUP_REQUIRED not in groups:
             raise UnauthorizedAccountException(
