@@ -37,7 +37,7 @@
 
     <div class="row mx-2" id="previews">
         {% for image in assessment.images %}
-            <div class="col-xl-3 col-lg-4 col-md-6 py-3 border-secondary border">
+            <div class="col-xl-3 col-lg-4 col-md-6 py-3 border-secondary border image-card">
                 <strong>{{ image.name }}</strong>
                 <a target="_blank"
                    href="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=image.name) }}">
@@ -47,7 +47,7 @@
             </div>
         {% endfor %}
 
-        <div class="col-xl-3 col-lg-4 col-md-6 py-3 border-secondary border" id="template">
+        <div class="col-xl-3 col-lg-4 col-md-6 py-3 border-secondary border image-card" id="template">
             <strong data-dz-name></strong>
             <span class="card-text" data-dz-size></span>
             <strong class="error text-danger" data-dz-errormessage></strong>

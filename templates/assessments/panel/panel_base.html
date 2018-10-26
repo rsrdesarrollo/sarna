@@ -59,7 +59,7 @@
                         {% if assessment.images %}
                             <div class="row">
                                 {% for image in assessment.images %}
-                                    <div class="col-xl-3 col-lg-4 col-md-6 py-3">
+                                    <div class="col-xl-3 col-lg-4 col-md-6 py-3 image-card">
                                         <a target="_blank"
                                            href="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=image.name) }}">
                                             <strong>{{ image.name }}</strong>

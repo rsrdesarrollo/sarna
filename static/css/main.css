@@ -35,6 +35,10 @@
     z-index: 199999 !important;
 }
 
+.image-card {
+    word-wrap: break-word;
+}
+
 /*Custom custom_checkbox*/
 /* The container */
 .custom_checkbox {
