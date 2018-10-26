@@ -17,7 +17,7 @@ RUN cd /sarna/static && yarn install
 WORKDIR /sarna
 COPY ./ /sarna/
 
-ENV FLASK_ENV=development
+ENV FLASK_ENV=production
 
 EXPOSE 5000
 ENTRYPOINT ["/sarna/entrypoint.sh"]

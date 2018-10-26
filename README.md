@@ -20,3 +20,24 @@ Sarna is the Spanish name for Scabies. In Spain we have a saying "sarna con gust
 like "Scabies with pleasure does not itch". It is a little bit disgusting, but at the end, it means that if you have
 something bad (like having to make a report), but you get something good with it in exchange (like doing it 
 fast with this tool), it is not that bad at the end. 
+
+### Run test environment
+
+To run a simple test environment in order to check what is SARNA yo can use the docker-compose recipe
+
+**PLEASE DO NOT USE DOCKER-COMPOSE RECIPE FOR PRODUCTION WITHOUT CHANGING PASSWORDS AND SECRETS**
+
+```bash
+docker-compose up
+```
+This will take a while for the first time. At the end of the process your SARNA Server should 
+be running at <http://localhost:5000>
+
+You only need to create a new user
+
+```bash
+docker-compose exec sarna /bin/sh
+flask user add -r manager <user_name>
+```
+
+Please referer to `flask user add --help` for more info.

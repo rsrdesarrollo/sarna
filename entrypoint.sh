@@ -16,4 +16,9 @@ do
 done
 
 su -c 'flask db upgrade' sarna
-su -c 'gunicorn -w 4 -b 0.0.0.0:5000 --access-logfile - --error-logfile - app:app' sarna
+
+if [ "$FLASK_ENV" == "development" ]; then
+    flask run --debugger --host 0.0.0.0
+else
+    su -c 'gunicorn -w 4 -b 0.0.0.0:5000 --access-logfile - --error-logfile - app:app' sarna
+fi;

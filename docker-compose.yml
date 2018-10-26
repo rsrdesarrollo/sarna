@@ -6,8 +6,9 @@ services:
       - ./volumes/uploaded_data:/sarna/uploaded_data
       - ./volumes/config:/sarna/config
     environment:
-      FLASK_ENV: 'production'
-      SQLALCHEMY_DATABASE_URI: 'postgres://sarna:change_me_loko@psql/sarna'
+      FLASK_ENV: 'development'
+      SQLALCHEMY_DATABASE_URI: 'postgres://sarna:InsecurePasswordChangeMe@psql/sarna'
+      SECRET_KEY: 'Insecure Secret Change Me!!'
     depends_on:
       - psql
     ports:
@@ -16,7 +17,7 @@ services:
     image: postgres
     environment:
       POSTGRES_USER: 'sarna'
-      POSTGRES_PASSWORD: 'change_me_loko'
+      POSTGRES_PASSWORD: 'InsecurePasswordChangeMe'
       POSTGRES_DB: 'sarna'
     volumes:
       - ./volumes/database:/var/lib/postgresql/data
