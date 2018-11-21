@@ -1,0 +1,13 @@
+version: '3'
+services:
+  psql:
+    image: postgres
+    environment:
+      POSTGRES_USER: 'sarna'
+      POSTGRES_PASSWORD: 'InsecurePasswordChangeMe'
+      POSTGRES_DB: 'sarna'
+    volumes:
+      - ./volumes/database:/var/lib/postgresql/data
+    ports:
+      - 127.0.0.1:5432:5432
+

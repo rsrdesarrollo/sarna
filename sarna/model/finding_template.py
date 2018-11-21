@@ -24,8 +24,8 @@ class FindingTemplate(Base, db.Model):
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
     creator = db.relationship('User', back_populates='created_findings', uselist=False)
 
-    solutions = db.relationship('Solution', back_populates='finding_template', cascade='all')
-    translations = db.relationship('FindingTemplateTranslation', back_populates='finding_template', cascade='all')
+    solutions = db.relationship('Solution', back_populates='finding_template')
+    translations = db.relationship('FindingTemplateTranslation', back_populates='finding_template')
 
     @property
     def langs(self):

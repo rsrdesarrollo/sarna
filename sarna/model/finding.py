@@ -201,6 +201,7 @@ class AffectedResource(Base, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
+
     active_id = db.Column(
         db.Integer,
         db.ForeignKey('active.id', onupdate='CASCADE', ondelete='CASCADE'),

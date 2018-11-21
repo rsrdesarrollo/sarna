@@ -33,7 +33,7 @@ class User(Base, db.Model):
     otp_enabled = db.Column(db.Boolean(), default=False, nullable=False)
     otp_seed = db.Column(db.String(16))
 
-    created_clients = db.relationship(Client, back_populates="creator", cascade='all,delete')
+    created_clients = db.relationship(Client, back_populates="creator")
     created_assessments = db.relationship(Assessment, back_populates="creator")
 
     managed_clients = db.relationship(Client, secondary=client_management, back_populates='managers')

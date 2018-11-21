@@ -38,8 +38,8 @@ class Client(Base, db.Model):
     short_name = db.Column(db.String(64), nullable=False)
     long_name = db.Column(db.String(128), nullable=False)
 
-    assessments = db.relationship('Assessment', back_populates='client', cascade='all')
-    templates = db.relationship('Template', backref='client', cascade='all')
+    assessments = db.relationship('Assessment', back_populates='client')
+    templates = db.relationship('Template', backref='client')
 
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
     creator = db.relationship("User", back_populates="created_clients", uselist=False)

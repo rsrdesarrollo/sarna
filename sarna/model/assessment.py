@@ -66,8 +66,8 @@ class Assessment(Base, db.Model):
     client = db.relationship(Client, back_populates="assessments", uselist=False)
 
     findings = db.relationship('Finding', back_populates='assessment')
-    actives = db.relationship('Active', back_populates='assessment', cascade='all')
-    images = db.relationship('Image', back_populates='assessment', cascade='all')
+    actives = db.relationship('Active', back_populates='assessment')
+    images = db.relationship('Image', back_populates='assessment')
 
     creation_date = db.Column(db.DateTime, default=lambda: datetime.now(), nullable=False)
     start_date = db.Column(db.Date)

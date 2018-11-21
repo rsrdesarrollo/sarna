@@ -40,6 +40,6 @@ class Base(object):
         return d
 
     def delete(self, commit=True):
-        db.session.delete(self)
+        db.session.delete(self, synchronize_session=False)
         if commit:
             db.session.commit()

@@ -66,11 +66,12 @@ def edit(assessment_id):
 @blueprint.route('/<assessment_id>/delete', methods=('POST',))
 @auditor_required
 def delete(assessment_id):
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
+    assessment_query = Assessment.query.filter_by(id=assessment_id)
+    assessment = assessment_query.one()
     if not current_user.owns(assessment) and not current_user.manages(assessment.client):
         abort(403)
 
-    assessment.delete()
+    assessment_query.delete(synchronize_session=False)
     return redirect_back('.index')
 
 
@@ -218,7 +219,7 @@ def bulk_action_finding(assessment_id):
         and_(Finding.id.in_(set_findings), Finding.assessment == assessment)
     )
     if action == "delete":
-        target.delete()
+        target.delete(synchronize_session=False)
         flash("{} items deleted successfully.".format(len(set_findings)), "success")
     elif action.startswith('status_'):
         status = None
