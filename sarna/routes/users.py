@@ -86,7 +86,7 @@ def change_passwd():
     return redirect_back('users.index')
 
 
-#@blueprint.route('/add_user', methods=('POST',))
+# @blueprint.route('/add_user', methods=('POST',))
 @admin_required
 def add_user():
     form = AddUserForm(request.form)
@@ -106,7 +106,7 @@ def add_user():
     return redirect_back('users.index')
 
 
-#@blueprint.route('/<username>/delete', methods=('POST',))
+# @blueprint.route('/<username>/delete', methods=('POST',))
 @admin_required
 def del_user(username):
     user = User.query.filter_by(username=username).one()
@@ -118,7 +118,7 @@ def del_user(username):
     return redirect_back('users.index')
 
 
-#@blueprint.route('/<username>', methods=('POST',))
+# @blueprint.route('/<username>', methods=('POST',))
 @admin_required
 def edit_user(username):
     user = User.query.filter_by(username=username).one()

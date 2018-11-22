@@ -39,7 +39,5 @@ class Base(object):
 
         return d
 
-    def delete(self, commit=True):
-        db.session.delete(self, synchronize_session=False)
-        if commit:
-            db.session.commit()
+    def delete(self, synchronize_session=False):
+        self.query.delete(synchronize_session=synchronize_session)

@@ -115,8 +115,7 @@ def delete_translation(finding_id: int, language: str):
         lang=Language[language]
     ).one()
 
-    db.session.delete(tranlsation)
-    db.session.commit()
+    tranlsation.delete()
     return redirect_back('.edit', finding_id=finding_id)
 
 
@@ -195,8 +194,7 @@ def delete_solution(finding_id: int, solution_name: str):
         finding_template_id=finding_id,
         name=solution_name
     ).one()
-    db.session.delete(solution)
-    db.session.commit()
+    solution.delete()
     return redirect_back('.edit', finding_id=finding_id)
 
 

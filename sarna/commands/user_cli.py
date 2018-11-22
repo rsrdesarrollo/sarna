@@ -58,7 +58,7 @@ def add_user(username, role):
 @user_cli.command('del', help='delete a existing user')
 @click.argument('username')
 def del_user(username):
-    user = User.query.filter_by(username=username)
+    user = User.query.filter_by(username=username).one()
     user.delete()
     db.session.commit()
 

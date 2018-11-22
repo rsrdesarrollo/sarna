@@ -58,13 +58,12 @@ def new():
 @blueprint.route('/delete/<client_id>', methods=('POST',))
 @manager_required
 def delete(client_id: int):
-    client_query = Client.query.filter_by(id=client_id)
-    client = client_query.one()
+    client = Client.query.filter_by(id=client_id).one()
 
     if not current_user.owns(client):
         abort(403)
 
-    client_query.delete(synchronize_session=False)
+    client.delete()
 
     return redirect_back('.index')
 
