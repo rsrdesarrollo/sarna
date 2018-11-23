@@ -40,4 +40,8 @@ class Base(object):
         return d
 
     def delete(self, synchronize_session=False):
-        self.query.delete(synchronize_session=synchronize_session)
+        pk = {
+            k.name: getattr(self, k.name)
+            for k in self.__mapper__.primary_key
+        }
+        self.query.filter_by(**pk).delete(synchronize_session=synchronize_session)
