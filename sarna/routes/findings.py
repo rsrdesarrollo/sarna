@@ -65,9 +65,6 @@ def edit(finding_id: int):
 @trusted_required
 def delete(finding_id: int):
     finding_template = FindingTemplate.query.filter_by(id=finding_id).one()
-    if not current_user.owns(finding_template):
-        abort(403)
-
     finding_template.delete()
     return redirect_back('.index')
 
