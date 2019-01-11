@@ -378,7 +378,11 @@ class OWASPCategory(BaseChoice):
     }
     OTG_CONFIG_008 = 18, 'OTG-CONFIG-008', 'Test RIA cross domain policy', {
         Language.English: 'Test RIA cross domain policy',
-        Language.Spanish: 'Pruebas de políticas cross domain RIA (Rich Internet Applications )'
+        Language.Spanish: 'Pruebas de políticas cross domain RIA (Rich Internet Applications)'
+    }
+    OTG_CONFIG_009 = 90, 'OTG-CONFIG-009', 'Test file permissions', {
+        Language.English: 'Test file permissions',
+        Language.Spanish: 'Pruebas de permisos de ficheros'
     }
     OTG_IDENT_001 = 19, 'OTG-IDENT-001', 'Test Role Definitions', {
         Language.English: 'Test Role Definitions',
@@ -560,6 +564,10 @@ class OWASPCategory(BaseChoice):
         Language.English: 'Testing for HTTP Splitting/Smuggling',
         Language.Spanish: 'Pruebas de HTTP Splitting/Smuggling'
     }
+    OTG_INPVAL_017 = 91, 'OTG-INPVAL-017', 'Testing for HTTP Incomming Requests', {
+        Language.English: 'Testing for HTTP Incomming Requests',
+        Language.Spanish: 'Pruebas de peticiones HTTP entrantes'
+    }
     OTG_ERR_001 = 64, 'OTG-ERR-001', 'Analysis of Error Codes', {
         Language.English: 'Analysis of Error Codes',
         Language.Spanish: 'Análisis de códigos de error'
@@ -579,6 +587,10 @@ class OWASPCategory(BaseChoice):
     OTG_CRYPST_003 = 68, 'OTG-CRYPST-003', 'Testing for Sensitive information sent via unencrypted channels', {
         Language.English: 'Testing for Sensitive information sent via unencrypted channels',
         Language.Spanish: 'Pruebas de transmisión de información sensible a través de canales sin cifrar'
+    }
+    OTG_CRYPST_004 = 92, 'OTG-CRYPST-004', 'Testing for Weak Encryption', {
+        Language.English: 'Testing for Weak Encryption',
+        Language.Spanish: 'Pruebas de cifrado débil'
     }
     OTG_BUSLOGIC_001 = 69, 'OTG-BUSLOGIC-001', 'Test Business Logic Data Validation', {
         Language.English: 'Test Business Logic Data Validation',
