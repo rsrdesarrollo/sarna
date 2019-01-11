@@ -6,7 +6,7 @@ services:
       - ./volumes/uploaded_data:/sarna/uploaded_data
       - ./volumes/config:/sarna/config
     environment:
-      FLASK_ENV: 'development'
+      FLASK_ENV: 'production'
       SQLALCHEMY_DATABASE_URI: 'postgres://sarna:InsecurePasswordChangeMe@psql/sarna'
       SECRET_KEY: 'Insecure Secret Change Me!!'
     depends_on:

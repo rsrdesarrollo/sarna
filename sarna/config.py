@@ -31,6 +31,9 @@ class BaseConfig:
 
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', _default_database_uri)
 
+
+    SECRET_KEY = os.getenv('SECRET_KEY', "")
+
     AD_FALLBACK = False
     AD_AUTO_ROLE_MAPPING = False
     AD_GROUP_REQUIRED = ''
@@ -53,14 +56,12 @@ class BaseConfig:
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     ASSETS_DEBUG = True
-    SECRET_KEY = "SECRET RANDOM STR CHANGE ME"
     TEMPLATES_AUTO_RELOAD = True
 
 
 class ProductionConfig(DevelopmentConfig):
     DEBUG = False
     ASSETS_DEBUG = False
-    SECRET_KEY = ''
     TEMPLATES_AUTO_RELOAD = False
 
 

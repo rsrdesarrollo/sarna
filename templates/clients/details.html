@@ -6,10 +6,10 @@
     <div class="row mt-3 pl-3">
         <div class="col-lg">
             <div class="row">
-                <div class="col-10">
+                <div class="col-9">
                     <h2>Assessments</h2>
                 </div>
-                <div class="col-2">
+                <div class="col-3">
                     <a href="{{ url_for('.add_assessment', client_id=client.id, next=request.path) }}"
                        class="btn btn-primary btn-success float-right">
                         <span class="fa fa-plus"></span> Add
@@ -60,10 +60,10 @@
             </div>
 
             <div class="row mt-5">
-                <div class="col-10">
+                <div class="col-9">
                     <h2>Templates</h2>
                 </div>
-                <div class="col-2">
+                <div class="col-3">
                     <a href="{{ url_for('.add_template', client_id=client.id, next=request.path) }}"
                        class="btn btn-primary btn-success float-right">
                         <span class="fa fa-plus"></span> Add

@@ -6,11 +6,11 @@
     <div class="row mt-3 pl-3">
         <div class="col-lg-6">
             <div class="row">
-                <div class="col-10">
+                <div class="col-9">
                     <h2>Translations</h2>
                 </div>
 
-                <div class="col-2">
+                <div class="col-3">
                     <a href="{{ url_for('.add_translation', finding_id=finding.id, next=request.path) }}"
                        class="btn btn-primary btn-success float-right">
                         <span class="fa fa-plus"></span> Add
@@ -55,10 +55,10 @@
             </div>
 
             <div class="row mt-3">
-                <div class="col-10">
+                <div class="col-9">
                     <h2>Solutions</h2>
                 </div>
-                <div class="col-2">
+                <div class="col-3">
                     <a href="{{ url_for('.add_solution', finding_id=finding.id, next=request.path) }}"
                        class="btn btn-primary btn-success float-right">
                         <span class="fa fa-plus"></span> Add

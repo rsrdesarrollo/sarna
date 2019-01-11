@@ -122,25 +122,25 @@
     border-radius: 0px;
 }
 
-.btn-purple {
+.btn.btn-purple {
     color: #fff;
     background-color: #673AB7;
     border-color: #6036ab;
 }
 
-.btn-purple:hover {
+.btn.btn-purple:hover {
     color: #fff;
     background-color: #482882;
     border-color: #452879;
 }
 
-.btn-cyan {
+.btn.btn-cyan {
     color: #fff;
     background-color: #67b7b7;
     border-color: #16a2ab;
 }
 
-.btn-cyan:hover {
+.btn.btn-cyan:hover {
     color: #fff;
     background-color: #319795;
     border-color: #138e97;
