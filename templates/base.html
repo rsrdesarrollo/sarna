@@ -5,8 +5,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>SARNA</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='logo-red.png') }}?v=5">
+    {% assets "css_custom" %}
+        <link href="{{ ASSET_URL }}" rel="stylesheet">
+    {% endassets %}
     {% assets "css_all" %}
         <link href="{{ ASSET_URL }}" rel="stylesheet">
+    {% endassets %}
+    {% assets "js_mins" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
     {% endassets %}
     {% assets "js_all" %}
         <script type="text/javascript" src="{{ ASSET_URL }}"></script>

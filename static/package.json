@@ -18,7 +18,7 @@
     "jquery": "^3.3.1",
     "jquery-ui-dist": "^1.12.1",
     "jquery.qrcode": "^1.0.3",
-    "markdown": "^0.5.0",
+    "marked": "^0.6.1",
     "popper.js": "^1.14.3"
   }
 }
