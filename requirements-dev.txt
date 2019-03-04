@@ -37,3 +37,5 @@ WTForms==2.2.1
 flask-migrate==2.2.1
 psycopg2-binary==2.7.5
 inflection==0.3.1
+pytest==4.3.0
+coverage==4.5.2

@@ -1,6 +1,9 @@
 import re
 
-__all__ = ['docx_escape', 'escape_url', 'list_level_style', 'make_run', 'make_paragraph', 'make_sequence']
+__all__ = [
+    'docx_escape', 'escape_url', 'list_level_style', 'make_run', 'make_paragraph', 'make_sequence', 'make_table',
+    'make_table_row', 'make_table_cell'
+]
 
 
 def docx_escape(s, quote=False):
@@ -54,7 +57,7 @@ def make_sequence():
 
 def list_level_style(pPr, level):
     return re.sub(
-        '<\s*w:ilvl\s+w:val\s*=\s*"\d+"\s*/>',
+        r'<\s*w:ilvl\s+w:val\s*=\s*"\d+"\s*/>',
         '<w:ilvl w:val="{}"/>'.format(level),
         pPr
     )
@@ -65,3 +68,15 @@ def make_paragraph(pPr, content, close_prev=False):
         return "</w:p><w:p>{}{}".format(pPr, content)
     else:
         return "<w:p>{}{}</w:p>".format(pPr, content)
+
+
+def make_table(tblpr, header, content):
+    return "<w:tbl><w:tblGrid><w:gridCol w:w=\"9016\"/></w:tblGrid>{}{}{}</w:tbl>".format(tblpr, header, content)
+
+
+def make_table_row(content):
+    return "<w:tr>{}</w:tr>".format(content)
+
+
+def make_table_cell(pPr, content):
+    return "<w:tc>{}</w:tc>".format(make_paragraph(pPr, content))

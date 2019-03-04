@@ -2,10 +2,10 @@ from typing import *
 
 import mistletoe
 from PIL import Image
+from docx.section import Section
 from docxtpl import DocxTemplate
 from mistletoe.base_renderer import BaseRenderer
 
-from docx.section import Section
 from sarna.report_generator import *
 from sarna.report_generator.style import RenderStyle
 
@@ -164,14 +164,17 @@ class DOCXRenderer(BaseRenderer):
         return ''
 
     def render_table(self, token):
-        self.warnings.add('Markdown Table is not implemented. It will be ignored')
-        return ''
+        header = self.render(token.header)
+        content = self.render_inner(token)
+        return make_table(self.style.table, header, content)
 
     def render_table_row(self, token, is_header=False):
-        return ''
+        content = self.render_inner(token)
+        return make_table_row(content)
 
     def render_table_cell(self, token, in_header=False):
-        return ''
+        content = self.render_inner(token)
+        return make_table_cell(self.style.paragraph, content)
 
     @staticmethod
     def render_separator(token):
