@@ -69,7 +69,7 @@
                         } else {
                             solution_preview.hide();
                         }
-                        solution_preview.html(markdown.toHTML(selected_text));
+                        solution_preview.html(marked(selected_text));
                     });
                     $('.btn#solution_apply').click(function (ev) {
                         $('#solution').val(selected_text)
