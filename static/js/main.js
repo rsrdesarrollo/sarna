@@ -19,6 +19,8 @@ function ask_confirmation() {
 }
 
 $(function () {
+    marked.setOptions({sanitize: true});
+
     $('a.need-confirm').click(function (e) {
         var elem = $(this);
         var href = elem.attr('href');
