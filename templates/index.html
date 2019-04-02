@@ -35,7 +35,7 @@
                     {% if need_otp %}
                         <div class="input-group mt-3 px-5">
                             <div class="input-group-append">
-                                <i class="fa fa-clock input-group-text" style="min-width: 41px;"></i>
+                                <i class="fa fa-clock-o input-group-text" style="min-width: 41px;"></i>
                             </div>
 
                             {{ render_field(form.otp, with_label=False, maxlength="6", pattern="[0-9]{6}") }}
