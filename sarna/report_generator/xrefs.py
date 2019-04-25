@@ -1,3 +1,5 @@
+from markupsafe import Markup
+
 from sarna.report_generator import make_run
 
 _xrefs_runs = """
@@ -40,12 +42,12 @@ def xref(elem, xref_type='number'):
     elif xref_type == 'title':
         ref_ops = "\\h"
 
-    return _xrefs_runs.format(ref=ref_name, ops=ref_ops)
+    return Markup(_xrefs_runs.format(ref=ref_name, ops=ref_ops))
 
 
 def bookmark(elem, attr):
     run = make_run('', getattr(elem, attr))
-    return _bookmark.format(ref=_ref_name(elem), run=run)
+    return Markup(_bookmark.format(ref=_ref_name(elem), run=run))
 
 
 __all__ = ['xref', 'bookmark']
