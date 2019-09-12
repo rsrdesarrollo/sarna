@@ -84,16 +84,21 @@ class Finding(Base, db.Model):
             if resource.authority is not None:
                 # URL
                 active_name = "{}://{}".format(resource.scheme, resource.authority)
-                resource_rute = resource.path
+                resource_route = resource.path
+
+                if not resource_route:
+                    resource_route = "/"
+
                 if resource.query:
-                    resource_rute += "?" + resource.query
+                    resource_route += "?" + resource.query
+
                 if resource.fragment:
-                    resource_rute += "#" + resource.fragment
+                    resource_route += "#" + resource.fragment
             elif resource.scheme == 'urn':
                 # URN
                 resource_name, *path = resource.path.split('/', 1)
                 active_name = "{}:{}".format(resource.scheme, resource_name)
-                resource_rute = "/{}".format(path[0]) if path else None
+                resource_route = "/{}".format(path[0]) if path else None
             else:
                 # TODO: this should never happen. Make some warning.
                 continue
@@ -105,15 +110,15 @@ class Finding(Base, db.Model):
 
             if not active:
                 active = Active(assessment=self.assessment, name=active_name)
-                affected_resource = AffectedResource(active=active, route=resource_rute)
+                affected_resource = AffectedResource(active=active, route=resource_route)
                 active.active_resources.append(affected_resource)
             else:
                 affected_resource = AffectedResource.query.filter_by(
-                    active=active, route=resource_rute
+                    active=active, route=resource_route
                 ).first()
 
                 if not affected_resource:
-                    affected_resource = AffectedResource(active=active, route=resource_rute)
+                    affected_resource = AffectedResource(active=active, route=resource_route)
                     active.active_resources.append(affected_resource)
 
             self.affected_resources.append(affected_resource)
