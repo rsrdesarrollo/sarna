@@ -38,7 +38,13 @@
     <div class="row mx-2" id="previews">
         {% for image in assessment.images %}
             <div class="col-xl-3 col-lg-4 col-md-6 py-3 border-secondary border image-card">
-                <strong>{{ image.name }}</strong>
+                <div class="d-flex mb-2">
+                    <strong class="align-self-center">{{ image.name }}</strong>
+                    <a class="btn btn-danger need-confirm ml-auto"
+                       href="{{ url_for('.delete_evidence', assessment_id=assessment.id, evidence_name=image.name) }}">
+                        <span class="fa fa-trash"></span>
+                    </a>
+                </div>
                 <a target="_blank"
                    href="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=image.name) }}">
                     <img style="width: 100%"

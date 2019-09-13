@@ -158,7 +158,7 @@ def delete_findings(assessment_id, finding_id):
         abort(403)
 
     finding.delete()
-    flash("Findign deleted", "success")
+    flash("Finding deleted", "success")
     return redirect_back('.findings', assessment_id=assessment_id)
 
 
@@ -328,6 +328,28 @@ def get_evidence(assessment_id, evidence_name):
         image.name,
         mimetype='image/jpeg'
     )
+
+
+@blueprint.route('/<assessment_id>/evidences/<evidence_name>/delete', methods=("POST",))
+@auditor_required
+def delete_evidence(assessment_id, evidence_name):
+    assessment = Assessment.query.filter_by(id=assessment_id).one()
+
+    if not current_user.audits(assessment):
+        abort(403)
+
+    image = Image.query.filter_by(
+        assessment=assessment,
+        name=evidence_name
+    ).one()
+    image_name = image.name
+    image.delete()
+
+    os.remove(os.path.join(assessment.evidence_path(), image_name))
+
+    flash("Evidence deleted", "success")
+
+    return redirect_back(".evidences", assessment_id=assessment_id)
 
 
 @blueprint.route('/<assessment_id>/reports')
