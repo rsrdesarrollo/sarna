@@ -56,17 +56,17 @@
                 </div>
                 <div class="modal-body">
                     <div class="container-fluid">
-                        {% if assessment.images %}
+                        {% if evidences %}
                             <div class="row">
-                                {% for image in assessment.images %}
+                                {% for evidence in evidences %}
                                     <div class="col-xl-3 col-lg-4 col-md-6 py-3 image-card">
                                         <a target="_blank"
-                                           href="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=image.name) }}">
-                                            <strong>{{ image.name }}</strong>
+                                           href="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=evidence.name) }}">
+                                            <strong>{{ evidence.name }}</strong>
                                         </a>
 
                                         <img style="width: 100%"
-                                             src="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=image.name) }}"/>
+                                             src="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=evidence.name) }}"/>
                                     </div>
                                 {% endfor %}
                             </div>

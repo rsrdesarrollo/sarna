@@ -36,19 +36,19 @@
 
 
     <div class="row mx-2" id="previews">
-        {% for image in assessment.images %}
+        {% for evidence in evidences %}
             <div class="col-xl-3 col-lg-4 col-md-6 py-3 border-secondary border image-card">
                 <div class="d-flex mb-2">
-                    <strong class="align-self-center">{{ image.name }}</strong>
+                    <strong class="align-self-center">{{ evidence.name }}</strong>
                     <a class="btn btn-danger need-confirm ml-auto"
-                       href="{{ url_for('.delete_evidence', assessment_id=assessment.id, evidence_name=image.name) }}">
+                       href="{{ url_for('.delete_evidence', assessment_id=assessment.id, evidence_name=evidence.name) }}">
                         <span class="fa fa-trash"></span>
                     </a>
                 </div>
                 <a target="_blank"
-                   href="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=image.name) }}">
+                   href="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=evidence.name) }}">
                     <img style="width: 100%"
-                         src="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=image.name) }}"/>
+                         src="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=evidence.name) }}"/>
                 </a>
             </div>
         {% endfor %}

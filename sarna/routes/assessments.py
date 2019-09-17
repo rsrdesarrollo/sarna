@@ -134,7 +134,8 @@ def edit_finding(assessment_id, finding_id):
         solutions_dict={
             a.name: a.text
             for a in solutions
-        }
+        },
+        evidences=Image.query.filter_by(assessment_id=assessment_id).order_by(Image.name).all()
     )
     if form.validate_on_submit():
         data = dict(form.data)
@@ -281,7 +282,8 @@ def evidences(assessment_id):
 
     form = EvidenceCreateNewForm()
     context = dict(
-        assessment=assessment
+        assessment=assessment,
+        evidences=Image.query.filter_by(assessment_id=assessment_id).order_by(Image.name).all()
     )
     if form.is_submitted():
         if form.validate_on_submit():
