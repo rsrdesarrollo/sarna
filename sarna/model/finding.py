@@ -79,7 +79,9 @@ class Finding(Base, db.Model):
 
             raise ValueError('Invalid formatted URI: "{}"'.format(resource.strip()))
 
-        self.affected_resources.clear()
+        for affected_resource in self.affected_resources:
+            affected_resource.delete_update_active()
+
         for resource in resource_uris:
             if resource.authority is not None:
                 # URL
@@ -222,3 +224,9 @@ class AffectedResource(Base, db.Model):
     @property
     def uri(self):
         return "{}{}".format(self.active.name, self.route or '')
+
+    def delete_update_active(self):
+        if len(self.active.active_resources) == 1 and self.active.active_resources[0] is self:
+            self.active.delete()
+        else:
+            self.delete()
