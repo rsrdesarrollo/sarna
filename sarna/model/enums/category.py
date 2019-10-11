@@ -404,183 +404,183 @@ class OWASPCategory(BaseChoice):
         Language.English: 'Testing for Weak or unenforced username policy',
         Language.Spanish: 'Pruebas sobre identificadores de usuario débiles'
     }
-    OTG_AUTHN_001 = 24, 'OTG-AUTHN-001', 'Testing for Credentials Transported over an Encrypted Channel', {
+    OTG_AUTHN_001 = 26, 'OTG-AUTHN-001', 'Testing for Credentials Transported over an Encrypted Channel', {
         Language.English: 'Testing for Credentials Transported over an Encrypted Channel',
         Language.Spanish: 'Pruebas de transmisión de credenciales por un canal sin cifrado'
     }
-    OTG_AUTHN_002 = 25, 'OTG-AUTHN-002', 'Testing for default credentials', {
+    OTG_AUTHN_002 = 27, 'OTG-AUTHN-002', 'Testing for default credentials', {
         Language.English: 'Testing for default credentials',
         Language.Spanish: 'Pruebas de credenciales por defecto'
     }
-    OTG_AUTHN_003 = 26, 'OTG-AUTHN-003', 'Testing for Weak lock out mechanism', {
+    OTG_AUTHN_003 = 28, 'OTG-AUTHN-003', 'Testing for Weak lock out mechanism', {
         Language.English: 'Testing for Weak lock out mechanism',
         Language.Spanish: 'Pruebas sobre sistemas de bloqueo de cuentas débiles'
     }
-    OTG_AUTHN_004 = 27, 'OTG-AUTHN-004', 'Testing for bypassing authentication schema', {
+    OTG_AUTHN_004 = 29, 'OTG-AUTHN-004', 'Testing for bypassing authentication schema', {
         Language.English: 'Testing for bypassing authentication schema',
         Language.Spanish: 'Pruebas de evitar los mecanismos de autenticación'
     }
-    OTG_AUTHN_005 = 28, 'OTG-AUTHN-005', 'Test remember password functionality', {
+    OTG_AUTHN_005 = 30, 'OTG-AUTHN-005', 'Test remember password functionality', {
         Language.English: 'Test remember password functionality',
         Language.Spanish: 'Pruebas sobre los mecanismos de recordatorio de contraseña'
     }
-    OTG_AUTHN_006 = 29, 'OTG-AUTHN-006', 'Testing for Browser cache weakness', {
+    OTG_AUTHN_006 = 31, 'OTG-AUTHN-006', 'Testing for Browser cache weakness', {
         Language.English: 'Testing for Browser cache weakness',
         Language.Spanish: 'Pruebas de debilidades en la caché del navegador'
     }
-    OTG_AUTHN_007 = 30, 'OTG-AUTHN-007', 'Testing for Weak password policy', {
+    OTG_AUTHN_007 = 32, 'OTG-AUTHN-007', 'Testing for Weak password policy', {
         Language.English: 'Testing for Weak password policy',
         Language.Spanish: 'Pruebas sobre políticas de contraseñas débiles'
     }
-    OTG_AUTHN_008 = 31, 'OTG-AUTHN-008', 'Testing for Weak security question/answer', {
+    OTG_AUTHN_008 = 33, 'OTG-AUTHN-008', 'Testing for Weak security question/answer', {
         Language.English: 'Testing for Weak security question/answer',
         Language.Spanish: 'Pruebas sobre preguntas y respuestas de seguridad'
     }
-    OTG_AUTHN_009 = 32, 'OTG-AUTHN-009', 'Testing for weak password change or reset functionalities', {
+    OTG_AUTHN_009 = 34, 'OTG-AUTHN-009', 'Testing for weak password change or reset functionalities', {
         Language.English: 'Testing for weak password change or reset functionalities',
         Language.Spanish: 'Pruebas sobre mecanismos de cambio y recuperación de contraseña'
     }
-    OTG_AUTHN_010 = 33, 'OTG-AUTHN-010', 'Testing for Weaker authentication in alternative channel', {
+    OTG_AUTHN_010 = 35, 'OTG-AUTHN-010', 'Testing for Weaker authentication in alternative channel', {
         Language.English: 'Testing for Weaker authentication in alternative channel',
         Language.Spanish: 'Pruebas de autenticación débil en canales alternativos'
     }
-    OTG_AUTHZ_001 = 34, 'OTG-AUTHZ-001', 'Testing Directory traversal/file include', {
+    OTG_AUTHZ_001 = 36, 'OTG-AUTHZ-001', 'Testing Directory traversal/file include', {
         Language.English: 'Testing Directory traversal/file include',
         Language.Spanish: 'Pruebas de atravesamiento de directorio e inclusión de ficheros'
     }
-    OTG_AUTHZ_002 = 35, 'OTG-AUTHZ-002', 'Testing for bypassing authorization schema', {
+    OTG_AUTHZ_002 = 37, 'OTG-AUTHZ-002', 'Testing for bypassing authorization schema', {
         Language.English: 'Testing for bypassing authorization schema',
         Language.Spanish: 'Pruebas para evitar el esquema de autorización'
     }
-    OTG_AUTHZ_003 = 36, 'OTG-AUTHZ-003', 'Testing for Privilege Escalation', {
+    OTG_AUTHZ_003 = 38, 'OTG-AUTHZ-003', 'Testing for Privilege Escalation', {
         Language.English: 'Testing for Privilege Escalation',
         Language.Spanish: 'Pruebas de escalado de privilegios'
     }
-    OTG_AUTHZ_004 = 37, 'OTG-AUTHZ-004', 'Testing for Insecure Direct Object References', {
+    OTG_AUTHZ_004 = 39, 'OTG-AUTHZ-004', 'Testing for Insecure Direct Object References', {
         Language.English: 'Testing for Insecure Direct Object References',
         Language.Spanish: 'Pruebas de referencias directas inseguras a objetos (IDOR)'
     }
-    OTG_SESS_001 = 38, 'OTG-SESS-001', 'Testing for Bypassing Session Management Schema', {
+    OTG_SESS_001 = 40, 'OTG-SESS-001', 'Testing for Bypassing Session Management Schema', {
         Language.English: 'Testing for Bypassing Session Management Schema',
         Language.Spanish: 'Pruebas de evitar el mecanismo de gestión de sesiones'
     }
-    OTG_SESS_002 = 39, 'OTG-SESS-002', 'Testing for Cookies attributes', {
+    OTG_SESS_002 = 41, 'OTG-SESS-002', 'Testing for Cookies attributes', {
         Language.English: 'Testing for Cookies attributes',
         Language.Spanish: 'Pruebas de los atributos de cookies de sesión'
     }
-    OTG_SESS_003 = 40, 'OTG-SESS-003', 'Testing for Session Fixation', {
+    OTG_SESS_003 = 42, 'OTG-SESS-003', 'Testing for Session Fixation', {
         Language.English: 'Testing for Session Fixation',
         Language.Spanish: 'Pruebas de fijación de sesiones'
     }
-    OTG_SESS_004 = 41, 'OTG-SESS-004', 'Testing for Exposed Session Variables', {
+    OTG_SESS_004 = 43, 'OTG-SESS-004', 'Testing for Exposed Session Variables', {
         Language.English: 'Testing for Exposed Session Variables',
         Language.Spanish: 'Pruebas sobre la exposición de variables de sesión'
     }
-    OTG_SESS_005 = 42, 'OTG-SESS-005', 'Testing for Cross-Site Request Forgery', {
+    OTG_SESS_005 = 44, 'OTG-SESS-005', 'Testing for Cross-Site Request Forgery', {
         Language.English: 'Testing for Cross-Site Request Forgery',
         Language.Spanish: 'Pruebas de Cross-Site Request Forgery (CSRF)'
     }
-    OTG_SESS_006 = 43, 'OTG-SESS-006', 'Testing for logout functionality', {
+    OTG_SESS_006 = 45, 'OTG-SESS-006', 'Testing for logout functionality', {
         Language.English: 'Testing for logout functionality',
         Language.Spanish: 'Pruebas sobre la funcionalidad de cierre de sesión'
     }
-    OTG_SESS_007 = 44, 'OTG-SESS-007', 'Test Session Timeout', {
+    OTG_SESS_007 = 46, 'OTG-SESS-007', 'Test Session Timeout', {
         Language.English: 'Test Session Timeout',
         Language.Spanish: 'Pruebas sobre la caducidad de la sesión'
     }
-    OTG_SESS_008 = 45, 'OTG-SESS-008', 'Testing for Session puzzling', {
+    OTG_SESS_008 = 47, 'OTG-SESS-008', 'Testing for Session puzzling', {
         Language.English: 'Testing for Session puzzling',
         Language.Spanish: 'Pruebas de puzzling de sesión'
     }
-    OTG_INPVAL_001 = 46, 'OTG-INPVAL-001', 'Testing for Reflected Cross-Site Scripting', {
+    OTG_INPVAL_001 = 48, 'OTG-INPVAL-001', 'Testing for Reflected Cross-Site Scripting', {
         Language.English: 'Testing for Reflected Cross-Site Scripting',
         Language.Spanish: 'Pruebas de Cross-Site Scripting reflejado'
     }
-    OTG_INPVAL_002 = 47, 'OTG-INPVAL-002', 'Testing for Stored Cross-Site Scripting', {
+    OTG_INPVAL_002 = 49, 'OTG-INPVAL-002', 'Testing for Stored Cross-Site Scripting', {
         Language.English: 'Testing for Stored Cross-Site Scripting',
         Language.Spanish: 'Pruebas de Cross-Site Scripting almacenado'
     }
-    OTG_INPVAL_003 = 48, 'OTG-INPVAL-003', 'Testing for HTTP Verb Tampering', {
+    OTG_INPVAL_003 = 50, 'OTG-INPVAL-003', 'Testing for HTTP Verb Tampering', {
         Language.English: 'Testing for HTTP Verb Tampering',
         Language.Spanish: 'Pruebas de manipulación de verbos HTTP'
     }
-    OTG_INPVAL_004 = 49, 'OTG-INPVAL-004', 'Testing for HTTP Parameter pollution', {
+    OTG_INPVAL_004 = 51, 'OTG-INPVAL-004', 'Testing for HTTP Parameter pollution', {
         Language.English: 'Testing for HTTP Parameter pollution',
         Language.Spanish: 'Pruebas de polución de parámetros HTTP'
     }
-    OTG_INPVAL_005 = 50, 'OTG-INPVAL-005', 'Testing for SQL Injection', {
+    OTG_INPVAL_005 = 52, 'OTG-INPVAL-005', 'Testing for SQL Injection', {
         Language.English: 'Testing for SQL Injection',
         Language.Spanish: 'Pruebas de inyección SQL'
     }
-    OTG_INPVAL_006 = 51, 'OTG-INPVAL-006', 'Testing for LDAP Injection', {
+    OTG_INPVAL_006 = 53, 'OTG-INPVAL-006', 'Testing for LDAP Injection', {
         Language.English: 'Testing for LDAP Injection',
         Language.Spanish: 'Pruebas de inyección LDAP'
     }
-    OTG_INPVAL_007 = 52, 'OTG-INPVAL-007', 'Testing for ORM Injection', {
+    OTG_INPVAL_007 = 54, 'OTG-INPVAL-007', 'Testing for ORM Injection', {
         Language.English: 'Testing for ORM Injection',
         Language.Spanish: 'Pruebas de inyección ORM'
     }
-    OTG_INPVAL_008 = 53, 'OTG-INPVAL-008', 'Testing for XML Injection', {
+    OTG_INPVAL_008 = 55, 'OTG-INPVAL-008', 'Testing for XML Injection', {
         Language.English: 'Testing for XML Injection',
         Language.Spanish: 'Pruebas de inyección XML'
     }
-    OTG_INPVAL_009 = 54, 'OTG-INPVAL-009', 'Testing for SSI Injection', {
+    OTG_INPVAL_009 = 56, 'OTG-INPVAL-009', 'Testing for SSI Injection', {
         Language.English: 'Testing for SSI Injection',
         Language.Spanish: 'Pruebas de inyección SSI'
     }
-    OTG_INPVAL_010 = 55, 'OTG-INPVAL-010', 'Testing for XPath Injection', {
+    OTG_INPVAL_010 = 57, 'OTG-INPVAL-010', 'Testing for XPath Injection', {
         Language.English: 'Testing for XPath Injection',
         Language.Spanish: 'Pruebas de inyección XPath'
     }
-    OTG_INPVAL_011 = 56, 'OTG-INPVAL-011', 'IMAP/SMTP Injection', {
+    OTG_INPVAL_011 = 58, 'OTG-INPVAL-011', 'IMAP/SMTP Injection', {
         Language.English: 'IMAP/SMTP Injection',
         Language.Spanish: 'Pruebas de inyección IMAP/SMTP'
     }
-    OTG_INPVAL_012 = 57, 'OTG-INPVAL-012', 'Testing for Code Injection', {
+    OTG_INPVAL_012 = 59, 'OTG-INPVAL-012', 'Testing for Code Injection', {
         Language.English: 'Testing for Code Injection',
         Language.Spanish: 'Pruebas de inyección de código (LFI/RFI)'
     }
-    OTG_INPVAL_013 = 58, 'OTG-INPVAL-013', 'Testing for Command Injection', {
+    OTG_INPVAL_013 = 60, 'OTG-INPVAL-013', 'Testing for Command Injection', {
         Language.English: 'Testing for Command Injection',
         Language.Spanish: 'Pruebas de inyección de comandos'
     }
-    OTG_INPVAL_014 = 59, 'OTG-INPVAL-014', 'Testing for Buffer overflow', {
+    OTG_INPVAL_014 = 61, 'OTG-INPVAL-014', 'Testing for Buffer overflow', {
         Language.English: 'Testing for Buffer overflow',
         Language.Spanish: 'Pruebas de desbordamiento de búfer'
     }
-    OTG_INPVAL_015 = 60, 'OTG-INPVAL-015', 'Testing for incubated vulnerabilities', {
+    OTG_INPVAL_015 = 62, 'OTG-INPVAL-015', 'Testing for incubated vulnerabilities', {
         Language.English: 'Testing for incubated vulnerabilities',
         Language.Spanish: 'Pruebas de vulnerabilidad incubada'
     }
-    OTG_INPVAL_016 = 61, 'OTG-INPVAL-016', 'Testing for HTTP Splitting/Smuggling', {
+    OTG_INPVAL_016 = 63, 'OTG-INPVAL-016', 'Testing for HTTP Splitting/Smuggling', {
         Language.English: 'Testing for HTTP Splitting/Smuggling',
         Language.Spanish: 'Pruebas de HTTP Splitting/Smuggling'
     }
-    OTG_INPVAL_017 = 62, 'OTG-INPVAL-017', 'Testing for HTTP Incomming Requests', {
+    OTG_INPVAL_017 = 91, 'OTG-INPVAL-017', 'Testing for HTTP Incomming Requests', {
         Language.English: 'Testing for HTTP Incomming Requests',
         Language.Spanish: 'Pruebas de peticiones HTTP recibidas'
     }
-    OTG_ERR_001 = 63, 'OTG-ERR-001', 'Analysis of Error Codes', {
+    OTG_ERR_001 = 64, 'OTG-ERR-001', 'Analysis of Error Codes', {
         Language.English: 'Analysis of Error Codes',
         Language.Spanish: 'Análisis de códigos de error'
     }
-    OTG_ERR_002 = 64, 'OTG-ERR-002', 'Analysis of Stack Traces', {
+    OTG_ERR_002 = 65, 'OTG-ERR-002', 'Analysis of Stack Traces', {
         Language.English: 'Analysis of Stack Traces',
         Language.Spanish: 'Análisis de las trazas de depuración'
     }
-    OTG_CRYPST_001 = 65, 'OTG-CRYPST-001', 'Testing for Weak SSL/TLS Ciphers, Insufficient Transport Layer Protection', {
+    OTG_CRYPST_001 = 66, 'OTG-CRYPST-001', 'Testing for Weak SSL/TLS Ciphers, Insufficient Transport Layer Protection', {
         Language.English: 'Testing for Weak SSL/TLS Ciphers, Insufficient Transport Layer Protection',
         Language.Spanish: 'Pruebas de uso de esquemas cifrado débiles o protección insuficiente de la capa de transporte'
     }
-    OTG_CRYPST_002 = 66, 'OTG-CRYPST-002', 'Testing for Padding Oracle', {
+    OTG_CRYPST_002 = 67, 'OTG-CRYPST-002', 'Testing for Padding Oracle', {
         Language.English: 'Testing for Padding Oracle',
         Language.Spanish: 'Pruebas de padding oracle'
     }
-    OTG_CRYPST_003 = 67, 'OTG-CRYPST-003', 'Testing for Sensitive information sent via unencrypted channels', {
+    OTG_CRYPST_003 = 68, 'OTG-CRYPST-003', 'Testing for Sensitive information sent via unencrypted channels', {
         Language.English: 'Testing for Sensitive information sent via unencrypted channels',
         Language.Spanish: 'Pruebas de transmisión de información sensible a través de canales sin cifrar'
     }
-    OTG_CRYPST_004 = 68, 'OTG-CRYPST-004', 'Testing for Weak Encryption', {
+    OTG_CRYPST_004 = 92, 'OTG-CRYPST-004', 'Testing for Weak Encryption', {
         Language.English: 'Testing for Weak Encryption',
         Language.Spanish: 'Pruebas de cifrados débiles'
     }
@@ -668,3 +668,4 @@ class OWASPCategory(BaseChoice):
         Language.English: 'Test Local Storage',
         Language.Spanish: 'Pruebas de almacenamiento local'
     }
+
