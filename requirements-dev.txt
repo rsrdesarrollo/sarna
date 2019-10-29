@@ -19,7 +19,7 @@ lxml==4.2.2
 Mako==1.0.7
 MarkupSafe==1.0
 mistletoe==0.7
-Pillow==5.1.0
+Pillow==6.2.0
 pyotp==2.2.6
 python-dateutil==2.7.3
 python-docx==0.8.6
