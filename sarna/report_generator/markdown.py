@@ -32,7 +32,7 @@ class DOCXRenderer(BaseRenderer):
         self.warnings = set()
         return self
 
-    def __init__(self, docx: DocxTemplate, img_path_trans: Callable):
+    def __init__(self, docx: DocxTemplate, img_path_trans: Callable, seq_name: str = "Image"):
         self.warnings = set()
         self.style = None
         self._tpl = docx
@@ -42,6 +42,8 @@ class DOCXRenderer(BaseRenderer):
         self._list_style_stack = []
         self._mod_pstyle_stack = []
         self._list_level = -1
+        self.seq_name = seq_name
+
         super().__init__()
 
     def set_style(self, style: RenderStyle):
@@ -60,7 +62,7 @@ class DOCXRenderer(BaseRenderer):
         return str(render)
 
     def render_inline_code(self, token):
-        self.warnings.add('Marckdown inline code is not implemented. It will be ignored')
+        self.warnings.add('Markdown inline code is not implemented. It will be ignored')
         return ''
 
     def render_strikethrough(self, token):
@@ -84,7 +86,7 @@ class DOCXRenderer(BaseRenderer):
         self._mod_pstyle_stack.append(self.style.image_caption)
         return '<w:r><w:drawing>{pic}</w:drawing></w:r><w:br/>{seq}{run}'.format(
             pic=pic,
-            seq=make_sequence(),
+            seq=make_sequence(self.seq_name),
             run=inner
         )
 

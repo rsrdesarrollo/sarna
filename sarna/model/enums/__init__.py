@@ -4,8 +4,9 @@ from .category import OWISAMCategory, OWASPCategory
 from .finding import FindingStatus, FindingType
 from .language import Language
 from .score import Score
+from .report import SequenceName
 
 __all__ = [
     'UserType', 'AuthSource', 'AssessmentStatus', 'AssessmentType', 'OWISAMCategory', 'OWASPCategory',
-    'FindingStatus', 'FindingType', 'Language', 'Score'
+    'FindingStatus', 'FindingType', 'Language', 'Score', 'SequenceName'
 ]
