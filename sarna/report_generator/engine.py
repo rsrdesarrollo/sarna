@@ -14,7 +14,7 @@ from werkzeug.utils import secure_filename
 from sarna.core.config import config
 from sarna.model import Assessment
 from sarna.model.client import Template
-from sarna.model.enums import FindingStatus
+from sarna.model.enums import FindingStatus, SequenceName
 from sarna.report_generator.locale_choice import locale_choice
 from sarna.report_generator.markdown import markdown_to_docx, DOCXRenderer
 from sarna.report_generator.scores import score_to_docx
@@ -84,7 +84,7 @@ def generate_reports_bundle(assessment: Assessment, templates: Collection[Templa
         template_render = DocxTemplate(template_path)
         render_styles = get_document_render_styles(template_path)
 
-        render = DOCXRenderer(template_render, image_path_converter)
+        render = DOCXRenderer(template_render, image_path_converter, locale_choice(SequenceName.Image, assessment.lang))
 
         def markdown(text, style='default'):
             render.set_style(render_styles.get_style(style))

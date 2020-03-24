@@ -1,6 +1,6 @@
 {% extends "assessments/panel/panel_base.html" %}
 
-{% from "macros.html" import render_form, render_score_pill, render_finding_status_pill %}
+{% from "macros.html" import render_form, render_score_pill, render_finding_status_pill, render_cvss_pill %}
 
 {% block body %}
     <form action="{{ url_for('.bulk_action_finding', assessment_id=assessment.id) }}" method="post">
@@ -55,7 +55,7 @@
                     </th>
                     <th>Title</th>
                     <th>Type</th>
-                    <th>Technical Risk</th>
+                    <th>CVSS Score</th>
                     <th>Business Risk</th>
                     <th>Status</th>
                     <th class="text-right">Actions</th>
@@ -71,7 +71,7 @@
                             </td>
                             <td>{{ finding.title }}</td>
                             <td>{{ finding.type }}</td>
-                            <td>{{ render_score_pill(finding.tech_risk) }}</td>
+                            <td>{{ render_cvss_pill(finding.cvss_v3_severity, finding.cvss_v3_score) }}</td>
                             <td>{{ render_score_pill(finding.business_risk) }}</td>
                             <td>{{ render_finding_status_pill(finding.status) }}</td>
                             <td>

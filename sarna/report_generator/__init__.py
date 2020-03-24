@@ -38,9 +38,9 @@ def make_run(rPr, text):
 
 _sequence_format = """
 <w:r>
-    <w:t xml:space="preserve">{sec_name} </w:t> 
+    <w:t xml:space="preserve">{seq_name} </w:t> 
 </w:r>
-<w:fldSimple w:instr=" SEQ {sec_name} \* ARABIC ">
+<w:fldSimple w:instr=" SEQ {seq_name} \* ARABIC ">
     <w:r>
         <w:rPr><w:noProof/></w:rPr> 
         <w:t>1</w:t>
@@ -51,8 +51,8 @@ _sequence_format = """
 </w:r>"""
 
 
-def make_sequence():
-    return _sequence_format.format(sec_name="Imagen", separator=": ")
+def make_sequence(seq_name: str, separator: str = ": "):
+    return _sequence_format.format(seq_name=seq_name, separator=separator)
 
 
 def list_level_style(pPr, level):
