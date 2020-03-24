@@ -16,8 +16,13 @@
 {% endmacro %}
 
 {% macro render_score_pill(score) %}
-    {% set class = ['', 'info', 'success', 'warning', 'danger', 'critical'][score.value] %}
+    {% set class = ['', 'info', 'success', 'warning', 'danger', 'critical', 'secondary'][score.value] %}
     {{ render_pill(score, class) }}
+{%- endmacro %}
+
+{% macro render_cvss_pill(severity,score) %}
+    {% set class = ['', 'info', 'success', 'warning', 'danger', 'critical', 'secondary'][severity.value] %}
+    {{ render_pill("{}: {}".format(severity,score), class) }}
 {%- endmacro %}
 
 {% macro render_finding_status_pill(score) %}

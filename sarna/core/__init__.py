@@ -6,6 +6,8 @@ from werkzeug.contrib.fixers import ProxyFix
 
 from sarna.config import DevelopmentConfig, ProductionConfig, BaseConfig
 
+APP_VERSION = "v1.0.4"
+
 app = Flask(
     __name__,
     template_folder=path.join(BaseConfig.PROJECT_PATH, 'templates'),
@@ -39,6 +41,10 @@ def processor_endpoint():
 
     return dict(is_endpoint=is_endpoint)
 
+
+@app.context_processor
+def inyect_app_version():
+    return dict(app_version=APP_VERSION)
 
 __all__ = [
     'app'
