@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, request, flash
 
-from sarna.core.auth_engine.auth_controller import AuthController
-from sarna.core.auth_engine.exceptions import AuthException
 from sarna.auxiliary import redirect_back
 from sarna.core.auth import login_required, logout_user
+from sarna.core.auth_engine.auth_controller import AuthController
+from sarna.core.auth_engine.exceptions import AuthException
 from sarna.core.security import limiter
 from sarna.forms.auth import LoginForm
 

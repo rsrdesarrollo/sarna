@@ -1,6 +1,5 @@
 from typing import Collection, AnyStr
 
-from cvsslib import calculate_vector, cvss3
 from rfc3986 import URIReference
 
 from sarna.model.assessment import Assessment
@@ -80,7 +79,6 @@ class Finding(Base, db.Model):
 
             raise ValueError('Invalid formatted URI: "{}"'.format(resource.strip()))
 
-#        self.affected_resources.clear()
         affected_resources_to_add = set()
 
         for resource in resource_uris:
@@ -212,7 +210,6 @@ class AffectedResource(Base, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-
     active_id = db.Column(
         db.Integer,
         db.ForeignKey('active.id', onupdate='CASCADE', ondelete='CASCADE'),
@@ -229,7 +226,7 @@ class AffectedResource(Base, db.Model):
         return "{}{}".format(self.active.name, self.route or '')
 
     def delete_last_reference(self):
-        if len(self.findings) == 1 :
+        if len(self.findings) == 1:
             if len(self.active.active_resources) == 1 and self.active.active_resources[0] is self:
                 self.active.delete()
             else:

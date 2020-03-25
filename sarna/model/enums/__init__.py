@@ -1,10 +1,10 @@
-from .user import UserType, AuthSource
 from .assessment import AssessmentStatus, AssessmentType
 from .category import OWISAMCategory, OWASPCategory
 from .finding import FindingStatus, FindingType
 from .language import Language
-from .score import Score
 from .report import SequenceName
+from .score import Score
+from .user import UserType, AuthSource
 
 __all__ = [
     'UserType', 'AuthSource', 'AssessmentStatus', 'AssessmentType', 'OWISAMCategory', 'OWASPCategory',
