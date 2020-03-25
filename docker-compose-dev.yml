@@ -3,8 +3,8 @@ services:
   psql:
     image: postgres
     environment:
-      POSTGRES_USER: 'sarna'
-      POSTGRES_PASSWORD: 'InsecurePasswordChangeMe'
+      POSTGRES_USER: 'user'
+      POSTGRES_PASSWORD: 'password'
       POSTGRES_DB: 'sarna'
     volumes:
       - ./volumes/database:/var/lib/postgresql/data
