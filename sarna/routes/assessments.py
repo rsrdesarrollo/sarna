@@ -87,10 +87,9 @@ def summary(assessment_id):
     return render_template('assessments/panel/summary.html', **context)
 
 
-@blueprint.route('/<assessment_id>/findings/resource/<affected_resource_id>')
 @blueprint.route('/<assessment_id>/findings')
 @auditor_required
-def findings(assessment_id, affected_resource_id=None):
+def findings(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
     if not current_user.audits(assessment):
         abort(403)
@@ -99,16 +98,9 @@ def findings(assessment_id, affected_resource_id=None):
         assessment=assessment
     )
 
-    if affected_resource_id is not None:
-        affected = AffectedResource.query.filter_by(id=affected_resource_id).one()
-        if affected.active.assessment != assessment:
-            return abort(401)
+    context['findings'] = Finding.query.filter(Finding.assessment == assessment) \
+        .order_by(Finding.cvss_v3_score.desc(), Finding.id)
 
-        list_findings = affected.findings
-    else:
-        list_findings = assessment.findings
-
-    context['findings'] = list_findings
     return render_template('assessments/panel/list_findings.html', **context)
 
 
