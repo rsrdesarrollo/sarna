@@ -79,8 +79,8 @@ class Finding(Base, db.Model):
 
             raise ValueError('Invalid formatted URI: "{}"'.format(resource.strip()))
 
-        for affected_resource in self.affected_resources:
-            affected_resource.delete_update_active()
+#        self.affected_resources.clear()
+        affected_resources_to_add = set()
 
         for resource in resource_uris:
             if resource.authority is not None:
@@ -123,9 +123,18 @@ class Finding(Base, db.Model):
                     affected_resource = AffectedResource(active=active, route=resource_route)
                     active.active_resources.append(affected_resource)
 
+            affected_resources_to_add.add(affected_resource)
+
+        db.session.commit()
+
+        for affected_resource in self.affected_resources:
+            if affected_resource not in affected_resources_to_add:
+                affected_resource.delete_last_reference()
+
+        for affected_resource in affected_resources_to_add:
             self.affected_resources.append(affected_resource)
 
-            db.session.commit()
+        db.session.commit()
 
     @property
     def cvss_v3_score(self):
@@ -225,8 +234,9 @@ class AffectedResource(Base, db.Model):
     def uri(self):
         return "{}{}".format(self.active.name, self.route or '')
 
-    def delete_update_active(self):
-        if len(self.active.active_resources) == 1 and self.active.active_resources[0] is self:
-            self.active.delete()
-        else:
-            self.delete()
+    def delete_last_reference(self):
+        if len(self.findings) == 1 :
+            if len(self.active.active_resources) == 1 and self.active.active_resources[0] is self:
+                self.active.delete()
+            else:
+                self.delete()
