@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, abort
+from flask import Blueprint, render_template, request, flash
 from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back

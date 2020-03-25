@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
-from wtforms import SelectMultipleField, TextAreaField, FloatField, StringField
+from wtforms import SelectMultipleField, TextAreaField
 from wtforms.validators import Optional
 
 from sarna.auxiliary.upload_helpers import is_valid_evidence
