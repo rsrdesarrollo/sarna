@@ -62,6 +62,7 @@ class Finding(Base, db.Model):
     affected_resources = db.relationship('AffectedResource', secondary=finding_affected_resource)
 
     cvss_v3_vector = db.Column(db.String(128))
+    cvss_v3_score = db.Column(db.Float, default=0.0, nullable=False)
 
     def update_affected_resources(self, resources: Collection[AnyStr]):
         resource_uris = []
@@ -135,13 +136,6 @@ class Finding(Base, db.Model):
             self.affected_resources.append(affected_resource)
 
         db.session.commit()
-
-    @property
-    def cvss_v3_score(self):
-        try:
-            return calculate_vector(self.cvss_v3_vector, cvss3)[0]
-        except:
-            return 0
 
     @property
     def cvss_v3_severity(self):

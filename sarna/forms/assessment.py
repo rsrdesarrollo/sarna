@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
-from wtforms import SelectMultipleField, TextAreaField
+from wtforms import SelectMultipleField, TextAreaField, FloatField, StringField
 from wtforms.validators import Optional
 
 from sarna.auxiliary.upload_helpers import is_valid_evidence
@@ -18,7 +18,7 @@ class AssessmentForm(BaseEntityForm(Assessment)):
     )
 
 
-class FindingEditForm(BaseEntityForm(Finding, skip_attrs={'name'})):
+class FindingEditForm(BaseEntityForm(Finding, skip_attrs={'name'}, hide_attrs={'cvss_v3_score', 'cvss_v3_vector'})):
     affected_resources = TextAreaField(description='List of affected resources. One per line.',
                                        render_kw=dict(class_='noMD', rows=5))
 
