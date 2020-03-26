@@ -50,9 +50,13 @@
                     var cvss = new CVSS("cvssboard", {
                         onchange: function () {
                             var vector = cvss.get()['vector'];
-                            var score = cvss.get()['score'];
+                            var score = parseFloat(cvss.get()['score']);
                             $('#cvss_v3_vector').val(vector);
-                            $('#cvss_v3_score').val(score);
+                            if (isNaN(score)){
+                                $('#cvss_v3_score').val(0);
+                            }else{
+                                $('#cvss_v3_score').val(score);
+                            }
                         }
                     });
                     var solutions = {{ solutions_dict|tojson }};

@@ -50,7 +50,7 @@
     {% if field.errors %}
         {% set class_ = class_ + ' is-invalid' %}
     {% endif %}
-    {% if with_label and field.type != 'CSRFTokenField' %}
+    {% if with_label and field.widget.input_type != 'hidden' %}
         <label for="{{ field.id }}"
                class="control-label{% if field.flags.required %} required{% endif %}">
             {{ field.label.text }}{% if field.flags.required %}*{% endif %}
