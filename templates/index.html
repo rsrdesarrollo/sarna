@@ -24,7 +24,7 @@
                         <div class="input-group-append">
                             <i class="fa fa-user input-group-text" style="min-width: 41px;"></i>
                         </div>
-                        {{ render_field(form.username, with_label=False) }}
+                        {{ render_field(form.username, with_label=False, autofocus=not need_otp) }}
                     </div>
                     <div class="input-group mt-3 px-5">
                         <div class="input-group-append">
@@ -38,7 +38,14 @@
                                 <i class="fa fa-clock-o input-group-text" style="min-width: 41px;"></i>
                             </div>
 
-                            {{ render_field(form.otp, with_label=False, maxlength="6", pattern="[0-9]{6}") }}
+                            {{ render_field(
+                                        form.otp,
+                                        with_label=False,
+                                        maxlength="6",
+                                        pattern="[0-9]{6}",
+                                        autocomplete="off",
+                                        autofocus="on"
+                                    ) }}
                         </div>
                     {% endif %}
                     <div class="input-group mt-4 px-5">
