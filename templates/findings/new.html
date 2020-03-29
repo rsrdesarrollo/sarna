@@ -9,5 +9,27 @@
             <h1>New finding</h1>
             {{ render_form(form) }}
         </div>
+        <div class="col-lg-5 mt-5">
+            <div id="cvssboard"></div>
+        </div>
     </div>
+
+    <script>
+        $(document).ready(function () {
+
+            var cvss = new CVSS("cvssboard", {
+                onchange: function () {
+                    var vector = cvss.get()['vector'];
+                    var score = parseFloat(cvss.get()['score']);
+                    $('#cvss_v3_vector').val(vector);
+                    if (isNaN(score)) {
+                        $('#cvss_v3_score').val(0);
+                    } else {
+                        $('#cvss_v3_score').val(score);
+                    }
+                }
+            });
+            cvss.set($('#cvss_v3_vector').val());
+        });
+    </script>
 {% endblock %}
