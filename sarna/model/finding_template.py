@@ -27,6 +27,9 @@ class FindingTemplate(Base, db.Model):
     solutions = db.relationship('Solution', back_populates='finding_template')
     translations = db.relationship('FindingTemplateTranslation', back_populates='finding_template')
 
+    cvss_v3_vector = db.Column(db.String(128))
+    cvss_v3_score = db.Column(db.Float, default=0.0, nullable=False)
+
     @property
     def langs(self):
         return {t.lang for t in self.translations}

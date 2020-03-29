@@ -5,13 +5,13 @@ from sarna.model.finding_template import FindingTemplate, FindingTemplateTransla
 
 
 class FindingTemplateCreateNewForm(
-    BaseEntityForm(FindingTemplate),
+    BaseEntityForm(FindingTemplate, hide_attrs={'cvss_v3_score', 'cvss_v3_vector'}),
     BaseEntityForm(FindingTemplateTranslation, skip_pk=False)
 ):
     pass
 
 
-class FindingTemplateEditForm(BaseEntityForm(FindingTemplate)):
+class FindingTemplateEditForm(BaseEntityForm(FindingTemplate, hide_attrs={'cvss_v3_score', 'cvss_v3_vector'})):
     pass
 
 
