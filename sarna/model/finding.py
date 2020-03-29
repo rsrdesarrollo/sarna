@@ -179,7 +179,10 @@ class Finding(Base, db.Model):
             references=translation.references,
             description=translation.description,
 
-            assessment=assessment
+            assessment=assessment,
+
+            cvss_v3_vector=template.cvss_v3_vector,
+            cvss_v3_score=template.cvss_v3_score,
         )
 
 

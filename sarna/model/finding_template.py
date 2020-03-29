@@ -34,6 +34,20 @@ class FindingTemplate(Base, db.Model):
     def langs(self):
         return {t.lang for t in self.translations}
 
+    @property
+    def cvss_v3_severity(self):
+        score = self.cvss_v3_score
+        if score == 0:
+            return Score.NA
+        elif 0 < score < 4:
+            return Score.Low
+        elif 4 <= score < 7:
+            return Score.Medium
+        elif 7 <= score < 9:
+            return Score.High
+        else:
+            return Score.Critical
+
 
 class FindingTemplateTranslation(Base, db.Model):
     lang = db.Column(Enum(Language), primary_key=True)
