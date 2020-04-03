@@ -1,7 +1,9 @@
 import os
 
+from sqlathanor import AttributeConfiguration
+
 from sarna.core.config import config
-from sarna.model.base import Base, db
+from sarna.model.base import Base, db, supported_serialization
 
 __all__ = ['Client', 'Template', 'client_management', 'client_audit']
 
@@ -34,6 +36,12 @@ client_audit = db.Table(
 
 
 class Client(Base, db.Model):
+    __serialization__ = [
+        AttributeConfiguration(name='id', csv_sequence=1, **supported_serialization),
+        AttributeConfiguration(name='short_name', **supported_serialization),
+        AttributeConfiguration(name='long_name', **supported_serialization),
+    ]
+
     id = db.Column(db.Integer, primary_key=True)
     short_name = db.Column(db.String(64), nullable=False)
     long_name = db.Column(db.String(128), nullable=False)

@@ -3,11 +3,13 @@ from typing import Collection, AnyStr
 from rfc3986 import URIReference
 
 from sarna.model.assessment import Assessment
-from sarna.model.base import Base, db
+from sarna.model.base import Base, db, supported_serialization
 from sarna.model.enums import Score, OWASPCategory, OWISAMCategory, FindingType, FindingStatus
 from sarna.model.enums.category import OWASPMobileTop10Category
 from sarna.model.finding_template import FindingTemplate, FindingTemplateTranslation
 from sarna.model.sql_types import Enum
+
+from sqlathanor import AttributeConfiguration
 
 __all__ = ['Finding', 'Active', 'AffectedResource', 'finding_affected_resource']
 
@@ -29,6 +31,30 @@ finding_affected_resource = db.Table(
 
 
 class Finding(Base, db.Model):
+    __serialization__ = [
+        AttributeConfiguration(name='id', csv_sequence=1, **supported_serialization),
+        AttributeConfiguration(name='name', **supported_serialization),
+        AttributeConfiguration(name='title', **supported_serialization),
+        AttributeConfiguration(name='type', **supported_serialization),
+        AttributeConfiguration(name='status', **supported_serialization),
+        AttributeConfiguration(name='owasp_category', **supported_serialization),
+        AttributeConfiguration(name='owasp_mobile_category', **supported_serialization),
+        AttributeConfiguration(name='owisam_category', **supported_serialization),
+        AttributeConfiguration(name='description', **supported_serialization),
+        AttributeConfiguration(name='solution', **supported_serialization),
+        AttributeConfiguration(name='tech_risk', **supported_serialization),
+        AttributeConfiguration(name='business_risk', **supported_serialization),
+        AttributeConfiguration(name='exploitability', **supported_serialization),
+        AttributeConfiguration(name='dissemination', **supported_serialization),
+        AttributeConfiguration(name='solution_complexity', **supported_serialization),
+        AttributeConfiguration(name='definition', **supported_serialization),
+        AttributeConfiguration(name='references', **supported_serialization),
+        AttributeConfiguration(name='affected_resources', **supported_serialization),
+        AttributeConfiguration(name='cvss_v3_vector', **supported_serialization),
+        AttributeConfiguration(name='cvss_v3_score', **supported_serialization),
+        AttributeConfiguration(name='cvss_v3_severity', **supported_serialization),
+    ]
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     type = db.Column(Enum(FindingType), nullable=False)
@@ -188,6 +214,10 @@ class Finding(Base, db.Model):
 
 class Active(Base, db.Model):
     __table_args__ = (db.UniqueConstraint('assessment_id', 'name'),)
+    __serialization__ = [
+        AttributeConfiguration(name='name', csv_sequence=1, **supported_serialization),
+        AttributeConfiguration(name='uris', **supported_serialization),
+    ]
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -210,6 +240,9 @@ class Active(Base, db.Model):
 
 class AffectedResource(Base, db.Model):
     __table_args__ = (db.UniqueConstraint('active_id', 'route'),)
+    __serialization__ = [
+        AttributeConfiguration(name='uri', csv_sequence=1, **supported_serialization),
+    ]
 
     id = db.Column(db.Integer, primary_key=True)
 
