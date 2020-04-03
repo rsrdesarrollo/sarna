@@ -49,6 +49,10 @@
                                        href="{{ url_for('.add_findings', assessment_id=assessment.id, next=request.path) }}">
                                         <span class="fa fa-plus"></span>
                                     </a>
+                                    <a class="btn btn-dark" title="Add findings to assessment"
+                                       href="{{ url_for('.export', assessment_id=assessment.id, next=request.path) }}">
+                                        <span class="fa fa-download"></span>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
