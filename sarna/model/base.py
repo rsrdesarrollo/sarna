@@ -1,15 +1,19 @@
+from enum import Enum
+
 import inflection
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Query
+from sqlathanor import FlaskBaseModel, initialize_flask_sqlathanor
 
 from sarna.core import app
 
-db = SQLAlchemy(app)
+db = SQLAlchemy(app, model_class=FlaskBaseModel)
+db = initialize_flask_sqlathanor(db)
 migrate = Migrate(app, db)
 
-__all__ = ['db', 'Base']
+__all__ = ['db', 'Base', 'supported_serialization']
 
 
 @app.after_request
@@ -45,3 +49,18 @@ class Base(object):
             for k in self.__mapper__.primary_key
         }
         self.query.filter_by(**pk).delete(synchronize_session=synchronize_session)
+
+
+def _serialize_enum(obj):
+    if isinstance(obj, Enum):
+        return str(obj)
+    else:
+        return obj
+
+supported_serialization = dict(
+    on_serialize = _serialize_enum,
+    supports_csv=False,
+    supports_json=True,
+    supports_yaml=True,
+    supports_dict=True
+)
