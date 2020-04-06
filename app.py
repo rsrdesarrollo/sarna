@@ -12,7 +12,7 @@ from sarna.routes import clients, index, findings, users, assessments
 
 
 def error_handler(err):
-    if request.is_xhr:
+    if request.is_json:
         return str(err), err.code
 
     if isinstance(err, ValueError):

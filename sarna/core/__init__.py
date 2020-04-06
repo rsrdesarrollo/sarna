@@ -2,11 +2,11 @@ import itertools
 from os import path
 
 from flask import Flask, request
-from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from sarna.config import DevelopmentConfig, ProductionConfig, BaseConfig
 
-APP_VERSION = "v1.0.6"
+APP_VERSION = "v1.1.0"
 
 app = Flask(
     __name__,
@@ -26,7 +26,6 @@ else:
     app.config.from_object(ProductionConfig)
 
 app.wsgi_app = ProxyFix(app.wsgi_app)
-
 
 @app.context_processor
 def processor_endpoint():

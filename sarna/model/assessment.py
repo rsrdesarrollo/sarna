@@ -3,8 +3,10 @@ from collections import Counter
 from datetime import datetime
 from uuid import uuid4
 
+from sqlathanor import AttributeConfiguration
+
 from sarna.core.config import config
-from sarna.model.base import Base, db
+from sarna.model.base import Base, db, supported_serialization
 from sarna.model.client import Client
 from sarna.model.enums import Language, AssessmentType, AssessmentStatus, Score, FindingStatus
 from sarna.model.sql_types import Enum, GUID
@@ -50,6 +52,17 @@ assessment_audit = db.Table(
 
 
 class Assessment(Base, db.Model):
+    __serialization__ = [
+        AttributeConfiguration(name='id', csv_sequence=1, **supported_serialization),
+        AttributeConfiguration(name='name', **supported_serialization),
+        AttributeConfiguration(name='platform', **supported_serialization),
+        AttributeConfiguration(name='lang', **supported_serialization),
+        AttributeConfiguration(name='type', **supported_serialization),
+        AttributeConfiguration(name='status', **supported_serialization),
+        AttributeConfiguration(name='client', **supported_serialization),
+        AttributeConfiguration(name='findings', **supported_serialization),
+    ]
+
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(GUID, default=uuid4, unique=True, nullable=False)
     name = db.Column(db.String(64), nullable=False)

@@ -105,12 +105,39 @@
                     {% endif %}
                 </div>
             </div>
+            <div class="row mt-5">
+                <div class="col-9">
+                    <h2>CVSS Score</h2>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col">
+                    <div id="cvssboard"></div>
+                </div>
+            </div>
         </div>
         <div class="col-lg-6 pl-lg-5 pr-lg-5">
             <h2>Edit Finding</h2>
             {{ render_form(form) }}
         </div>
     </div>
+    <script>
+        $(document).ready(function () {
 
+            var cvss = new CVSS("cvssboard", {
+                onchange: function () {
+                    var vector = cvss.get()['vector'];
+                    var score = parseFloat(cvss.get()['score']);
+                    $('#cvss_v3_vector').val(vector);
+                    if (isNaN(score)) {
+                        $('#cvss_v3_score').val(0);
+                    } else {
+                        $('#cvss_v3_score').val(score);
+                    }
+                }
+            });
+            cvss.set($('#cvss_v3_vector').val());
+        });
+    </script>
 
 {% endblock %}
