@@ -3,7 +3,7 @@ alembic==1.4.2
 click==7.1.1
 cssmin==0.2.0
 docx==0.2.4
-docxtpl==0.6.3
+docxtpl==0.4.13
 Flask==1.1.1
 Flask-Assets==2.0
 Flask-Limiter==1.2.1
@@ -14,7 +14,7 @@ itsdangerous==1.1.0
 Jinja2==2.11.1
 jsmin==2.2.2
 limits==1.5.1
-lxml==4.5.0
+lxml==4.2.2
 Mako==1.1.2
 MarkupSafe==1.1.1
 mistletoe==0.7.2
