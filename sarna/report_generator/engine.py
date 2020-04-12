@@ -95,7 +95,7 @@ def generate_reports_bundle(assessment: Assessment, templates: Collection[Templa
 
         def locale(choice):
             return locale_choice(choice, assessment.lang)
-        
+
         finding_status_valid = {FindingStatus.Confirmed, FindingStatus.Reviewed}
         assessment_data = assessment.to_dict()
         assessment_data['findings'] = list(

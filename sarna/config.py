@@ -31,7 +31,6 @@ class BaseConfig:
 
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', _default_database_uri)
 
-
     SECRET_KEY = os.getenv('SECRET_KEY', "")
 
     AD_FALLBACK = False

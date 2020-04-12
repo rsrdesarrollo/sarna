@@ -1,6 +1,7 @@
 from typing import Collection, AnyStr
 
 from rfc3986 import URIReference
+from sqlathanor import AttributeConfiguration
 
 from sarna.model.assessment import Assessment
 from sarna.model.base import Base, db, supported_serialization
@@ -8,8 +9,6 @@ from sarna.model.enums import Score, OWASPCategory, OWISAMCategory, FindingType,
 from sarna.model.enums.category import OWASPMobileTop10Category
 from sarna.model.finding_template import FindingTemplate, FindingTemplateTranslation
 from sarna.model.sql_types import Enum
-
-from sqlathanor import AttributeConfiguration
 
 __all__ = ['Finding', 'Active', 'AffectedResource', 'finding_affected_resource']
 

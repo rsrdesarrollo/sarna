@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 
 from sqlathanor import AttributeConfiguration
@@ -86,3 +85,20 @@ class Template(Base, db.Model):
     @staticmethod
     def template_path():
         return config.TEMPLATES_PATH
+
+    """
+    Multi-Select Field helper methods
+    """
+
+    @classmethod
+    def get_choices(cls, *args):
+        return list((u, u.name) for u in Template.query.filter(*args).order_by(Template.name))
+
+    @classmethod
+    def coerce(cls, item):
+        if isinstance(item, Template):
+            return item
+        return cls.query.filter_by(name=item).first()
+
+    def __str__(self):
+        return self.name

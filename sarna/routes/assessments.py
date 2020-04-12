@@ -1,7 +1,7 @@
 import os
 
 from PIL import Image as PillowImage
-from flask import Blueprint, render_template, request, flash, send_from_directory, json, Response
+from flask import Blueprint, render_template, request, flash, send_from_directory, Response
 from flask import abort
 from sqlalchemy import and_
 from sqlalchemy.exc import IntegrityError

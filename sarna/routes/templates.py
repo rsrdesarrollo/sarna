@@ -1,9 +1,8 @@
 import os
 from datetime import datetime
-
-from flask import Blueprint, render_template, send_from_directory, request
 from uuid import uuid4
 
+from flask import Blueprint, render_template, send_from_directory, request
 from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back

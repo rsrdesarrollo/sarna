@@ -91,10 +91,16 @@ def edit(client_id: int):
     if request.form:
         form = ClientForm(request.form)
     else:
-        form = ClientForm(**client.to_dict(), managers=client.managers, auditors=client.auditors)
+        form = ClientForm(
+            **client.to_dict(),
+            managers=client.managers,
+            auditors=client.auditors,
+            templates=client.templates
+        )
 
     form.managers.choices = User.get_choices(User.user_type.in_(valid_managers))
     form.auditors.choices = User.get_choices(User.user_type.in_(valid_auditors))
+    form.templates.choices = Template.get_choices()
 
     change_owner_form = ClientChangeOwnerForm(owner=client.creator)
     change_owner_form.owner.choices = User.get_choices(User.user_type.in_(valid_managers))
@@ -109,6 +115,7 @@ def edit(client_id: int):
         data.pop('csrf_token', None)
         managers = data.pop('managers', [])
         auditors = data.pop('auditors', [])
+        templates = data.pop('templates', [])
 
         client.set(**data)
 
@@ -117,6 +124,9 @@ def edit(client_id: int):
 
         client.auditors.clear()
         client.auditors.extend(auditors)
+
+        client.templates.clear()
+        client.templates.extend(templates)
 
         return redirect_back('.index')
     return render_template('clients/details.html', **context)
