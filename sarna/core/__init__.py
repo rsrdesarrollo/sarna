@@ -6,7 +6,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 from sarna.config import DevelopmentConfig, ProductionConfig, BaseConfig
 
-APP_VERSION = "v1.1.0"
+APP_VERSION = "v1.2.0"
 
 app = Flask(
     __name__,
