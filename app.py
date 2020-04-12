@@ -8,7 +8,7 @@ from sarna.core import asset
 from sarna.core.auth import login_manager
 from sarna.core.auth_engine import auth_controller
 from sarna.core.security import csrf, limiter
-from sarna.routes import clients, index, findings, users, assessments
+from sarna.routes import clients, index, findings, users, assessments, templates
 
 
 def error_handler(err):
@@ -50,6 +50,7 @@ app.register_blueprint(clients.blueprint, url_prefix='/clients')
 app.register_blueprint(assessments.blueprint, url_prefix='/assessments')
 app.register_blueprint(findings.blueprint, url_prefix='/findings')
 app.register_blueprint(users.blueprint, url_prefix='/users')
+app.register_blueprint(templates.blueprint, url_prefix='/templates')
 
 app.register_error_handler(400, error_handler)
 app.register_error_handler(401, error_handler)

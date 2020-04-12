@@ -1,4 +1,4 @@
-import os
+from datetime import datetime
 
 from sqlathanor import AttributeConfiguration
 
@@ -34,6 +34,22 @@ client_audit = db.Table(
     )
 )
 
+client_template = db.Table(
+    'client_template',
+    db.Column(
+        'client_id',
+        db.Integer,
+        db.ForeignKey('client.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    ),
+    db.Column(
+        'template_id',
+        db.Integer,
+        db.ForeignKey('template.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    )
+)
+
 
 class Client(Base, db.Model):
     __serialization__ = [
@@ -47,7 +63,7 @@ class Client(Base, db.Model):
     long_name = db.Column(db.String(128), nullable=False)
 
     assessments = db.relationship('Assessment', back_populates='client')
-    templates = db.relationship('Template', backref='client')
+    templates = db.relationship('Template', secondary=client_template, back_populates='clients')
 
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
     creator = db.relationship("User", back_populates="created_clients", uselist=False)
@@ -55,13 +71,34 @@ class Client(Base, db.Model):
     managers = db.relationship('User', secondary=client_management, back_populates='managed_clients')
     auditors = db.relationship('User', secondary=client_audit, back_populates='audited_clients')
 
-    def template_path(self):
-        return os.path.join(config.TEMPLATES_PATH, str(self.id))
-
 
 class Template(Base, db.Model):
-    name = db.Column(db.String(32), primary_key=True)
-    client_id = db.Column(db.Integer, db.ForeignKey('client.id', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
-    description = db.Column(db.String(128))
+    name = db.Column(db.String(32), unique=True, nullable=False)
+    description = db.Column(db.String(128), nullable=False)
+    last_modified = db.Column(db.DateTime, default=lambda: datetime.now(), nullable=False)
     file = db.Column(db.String(128), nullable=False)
+
+    clients = db.relationship('Client', secondary=client_template, back_populates='templates')
+
+    @staticmethod
+    def template_path():
+        return config.TEMPLATES_PATH
+
+    """
+    Multi-Select Field helper methods
+    """
+
+    @classmethod
+    def get_choices(cls, *args):
+        return list((u, u.name) for u in Template.query.filter(*args).order_by(Template.name))
+
+    @classmethod
+    def coerce(cls, item):
+        if isinstance(item, Template):
+            return item
+        return cls.query.filter_by(name=item).first()
+
+    def __str__(self):
+        return self.name

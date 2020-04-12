@@ -97,36 +97,36 @@
                 </div>
             </div>
         </div>
-    {% if current_user.is_admin %}
-        <div class="col-lg-8 mt-3 px-3">
-            <h3>List of users</h3>
-            <table id="table_data" class="table table-striped">
-                <thead class="thead-dark">
-                <th>Username</th>
-                <th>Role</th>
-                <th>OTP</th>
-                <th>Creation</th>
-                <th>Last Login</th>
-                <th class="text-right">Actions</th>
-                </thead>
-                <tbody>
-                {% for user in users %}
-                    <tr>
-                        <td>{{ user.username }}</td>
-                        <td>{{ render_user_type_pill(user.user_type) }}</td>
-                        <td>{{ boolean_pill(user.otp_enabled) }}</td>
-                        <td>{{ user.creation_date }}</td>
-                        <td>{{ user.last_access }}</td>
-                        <td>
-                            <div class="btn-group float-right">
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% endif %}
+        {% if current_user.is_admin %}
+            <div class="col-lg-8 mt-3 px-3">
+                <h3>List of users</h3>
+                <table id="table_data" class="table table-striped">
+                    <thead class="thead-dark">
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>OTP</th>
+                    <th>Creation</th>
+                    <th>Last Login</th>
+                    <th class="text-right">Actions</th>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ render_user_type_pill(user.user_type) }}</td>
+                            <td>{{ boolean_pill(user.otp_enabled) }}</td>
+                            <td>{{ user.creation_date }}</td>
+                            <td>{{ user.last_access }}</td>
+                            <td>
+                                <div class="btn-group float-right">
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
     </div>
 
 {% endblock %}
