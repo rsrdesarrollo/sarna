@@ -1,0 +1,13 @@
+{% extends "templates/base.html" %}
+
+{% from "macros.html" import render_form %}
+{% block body %}
+
+    <div class="row mt-3 pl-3">
+
+        <div class="col-lg-5">
+            <h2>Edit template: {{ template.name }}</h2>
+            {{ render_form(form, multipart=True) }}
+        </div>
+    </div>
+{% endblock %}

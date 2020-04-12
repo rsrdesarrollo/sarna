@@ -23,6 +23,9 @@ def is_valid_evidence(_, field):
 
 
 def is_valid_template(_, field):
+    if field.data is None:
+        return
+    
     mime, ext = _get_mime_ext(field.data)
     if not re.match(config.TEMPLATES_ALLOW_MIME, mime) or ext not in config.TEMPLATES_ALLOW_EXTENSIONS:
         raise ValidationError('Invalid file')

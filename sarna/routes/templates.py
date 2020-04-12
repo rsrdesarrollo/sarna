@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from flask import Blueprint, render_template, send_from_directory, request
 from uuid import uuid4
@@ -7,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back
 from sarna.core.roles import manager_required
-from sarna.forms.templates import TemplateCreateNewForm
+from sarna.forms.templates import TemplateCreateNewForm, TemplateEditForm
 from sarna.model import Template, db
 
 blueprint = Blueprint('templates', __name__)
@@ -69,10 +70,37 @@ def delete(template_id: int):
 @blueprint.route('/edit/<template_id>', methods=('POST', 'GET'))
 @manager_required
 def edit(template_id: int):
+    template = Template.query.filter_by(id=template_id).one()
+    form = TemplateEditForm()
+
+    if not request.form:
+        form = TemplateEditForm(**template.to_dict())
+
     context = dict(
-        templates=[]
+        template=template,
+        form=form
     )
-    return render_template('templates/list.html', **context)
+
+    if form.validate_on_submit():
+        data = dict(form.data)
+        data.pop('csrf_token', None)
+
+        file = data.pop('file')
+
+        try:
+            template.set(**data)
+            template.last_modified = datetime.now()
+            db.session.commit()
+
+            if file is not None:
+                file.save(os.path.join(template.template_path(), template.file))
+
+            return redirect_back('.index')
+        except IntegrityError:
+            form.name.errors.append('Name already used')
+            db.session.rollback()
+
+    return render_template('templates/edit.html', **context)
 
 
 @blueprint.route('/download/<template_id>')
@@ -83,5 +111,5 @@ def download(template_id: int):
         template.template_path(),
         template.file,
         as_attachment=True,
-        attachment_filename="{}.{}".format(template.name, template.file.split('.')[-1])
+        attachment_filename="{}.template.{}".format(template.name, template.file.split('.')[-1])
     )

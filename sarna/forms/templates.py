@@ -7,3 +7,11 @@ from sarna.model import Template
 
 class TemplateCreateNewForm(BaseEntityForm(Template)):
     file = FileField(validators=[FileRequired(), is_valid_template], description="Allowed templates: .docx")
+
+
+class TemplateEditForm(BaseEntityForm(Template)):
+    file = FileField(
+        validators=[is_valid_template],
+        description="Allowed templates: .docx",
+        label='Update file:'
+    )
