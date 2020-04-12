@@ -27,6 +27,7 @@ else:
 
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
+
 @app.context_processor
 def processor_endpoint():
     def is_endpoint(endpoint: str):
@@ -44,6 +45,7 @@ def processor_endpoint():
 @app.context_processor
 def inyect_app_version():
     return dict(app_version=APP_VERSION)
+
 
 __all__ = [
     'app'

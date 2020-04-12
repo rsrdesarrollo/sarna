@@ -1,12 +1,13 @@
 from sarna.report_generator.markdown import *
 
 SAMPLE_TABLE_01 = \
-"""|    Col1   |   Col2  |            Col3            |
-|:------------:|:-------:|:--------------------------:|
-| Cell1.1      | Cell1.2 | Cell1.3                    |
-| dsadas       | adssad  | dsaasdasd __italic__       |
-| asddsaasd    | sa d    |  adsasd das asd **strong** |
-"""
+    """|    Col1   |   Col2  |            Col3            |
+    |:------------:|:-------:|:--------------------------:|
+    | Cell1.1      | Cell1.2 | Cell1.3                    |
+    | dsadas       | adssad  | dsaasdasd __italic__       |
+    | asddsaasd    | sa d    |  adsasd das asd **strong** |
+    """
+
 
 def test_table_generation():
     from xml.etree import ElementTree

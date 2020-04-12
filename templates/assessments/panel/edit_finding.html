@@ -52,9 +52,9 @@
                             var vector = cvss.get()['vector'];
                             var score = parseFloat(cvss.get()['score']);
                             $('#cvss_v3_vector').val(vector);
-                            if (isNaN(score)){
+                            if (isNaN(score)) {
                                 $('#cvss_v3_score').val(0);
-                            }else{
+                            } else {
                                 $('#cvss_v3_score').val(score);
                             }
                         }

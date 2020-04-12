@@ -57,8 +57,9 @@ def _serialize_enum(obj):
     else:
         return obj
 
+
 supported_serialization = dict(
-    on_serialize = _serialize_enum,
+    on_serialize=_serialize_enum,
     supports_csv=False,
     supports_json=True,
     supports_yaml=True,
