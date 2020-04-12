@@ -89,6 +89,11 @@
                                 <a class="nav-link" href="{{ url_for('users.index') }}">Users</a>
                             </li>
                         {% endif %}
+                        {% if can_view('templates.index') %}
+                            <li class="{{ 'active' if is_endpoint('templates') }}">
+                                <a class="nav-link" href="{{ url_for('templates.index') }}">Templates</a>
+                            </li>
+                        {% endif %}
                     {% endblock %}
                 </ul>
                 {% if current_user.is_authenticated %}

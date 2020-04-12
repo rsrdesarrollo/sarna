@@ -72,16 +72,17 @@ class Client(Base, db.Model):
     managers = db.relationship('User', secondary=client_management, back_populates='managed_clients')
     auditors = db.relationship('User', secondary=client_audit, back_populates='audited_clients')
 
-    def template_path(self):
-        return os.path.join(config.TEMPLATES_PATH, str(self.id))
-
 
 class Template(Base, db.Model):
-    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(32), unique=True, nullable=False)
-    description = db.Column(db.String(128))
+    description = db.Column(db.String(128), nullable=False)
     last_modified = db.Column(db.DateTime, default=lambda: datetime.now(), nullable=False)
     file = db.Column(db.String(128), nullable=False)
 
     clients = db.relationship('Client', secondary=client_template, back_populates='templates')
+
+    @staticmethod
+    def template_path():
+        return config.TEMPLATES_PATH

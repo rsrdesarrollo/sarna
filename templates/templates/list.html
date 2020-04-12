@@ -1,0 +1,51 @@
+{% extends "templates/base.html" %}
+{% from "macros.html" import render_pill, render_assessment_status_pill %}
+{% block body %}
+    <div class="row mt-3">
+        <div class="col-lg-12">
+            {% if templates %}
+                <table id="table_data" class="table table-striped">
+                    <thead class="thead-dark">
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Last modified</th>
+                    <th>#Client Refs</th>
+                    <th class="text-right">Actions</th>
+                    </thead>
+                    <tbody>
+                    {% for template in templates %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('.edit', template_id=template.id, next=request.path) }}">
+                                    {{ template.name }}
+                                </a>
+                            </td>
+                            <td>{{ template.description }}</td>
+                            <td>{{ template.last_modified }}</td>
+                            <td>{{ template.clients | length }}</td>
+                            <td>
+                                <div class="btn-group float-right">
+                                    <a class="need-confirm btn btn-danger" title="Delete Template"
+                                       href="{{ url_for('.delete', template_id=template.id, next=request.path) }}">
+                                        <span class="fa fa-trash"></span>
+                                    </a>
+                                    <a class="btn btn-secondary" title="Edit Template"
+                                       href="{{ url_for('.edit', template_id=template.id, next=request.path) }}">
+                                        <span class="fa fa-pencil"></span>
+                                    </a>
+                                    <a class="btn btn-success" title="Download Template"
+                                       href="{{ url_for('.download', template_id=template.id, next=request.path) }}">
+                                        <span class="fa fa-download"></span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <h4 class="text-center">No templates!</h4>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
