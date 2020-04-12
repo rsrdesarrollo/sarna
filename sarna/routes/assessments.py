@@ -12,7 +12,8 @@ from sarna.core.auth import current_user
 from sarna.core.roles import auditor_required, valid_auditors
 from sarna.core.security import limiter
 from sarna.forms.assessment import AssessmentForm, FindingEditForm, ActiveCreateNewForm, EvidenceCreateNewForm
-from sarna.model import Assessment, User, AffectedResource, Finding, FindingTemplate, db, Active, Image, Template
+from sarna.model import Assessment, User, AffectedResource, Finding, FindingTemplate, db, Active, Image, Template, \
+    Client
 from sarna.model.enums import FindingStatus
 from sarna.report_generator.engine import generate_reports_bundle
 
@@ -386,7 +387,10 @@ def download_reports(assessment_id):
 
     templates = set(request.form.getlist('template_name'))
     templates = Template.query.filter(
-        and_(Template.name.in_(templates), Template.client_id == assessment.client_id)
+        and_(
+            Template.name.in_(templates),
+            Template.clients.any(Client.id == assessment.client.id)
+        )
     ).all()
 
     if not templates:
@@ -412,8 +416,9 @@ def download_report(assessment_id, template_name):
     if not current_user.audits(assessment):
         abort(403)
 
-    template = Template.query.filter_by(
-        client=assessment.client,
+    template = Template.query.filter(
+        Template.clients.any(Client.id == assessment.client.id)
+    ).filter_by(
         name=template_name
     ).one()
 

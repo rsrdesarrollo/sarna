@@ -79,7 +79,7 @@ def generate_reports_bundle(assessment: Assessment, templates: Collection[Templa
             return not_found_image_path
 
     for template in templates:
-        template_path = os.path.join(assessment.client.template_path(), template.file)
+        template_path = os.path.join(template.template_path(), template.file)
 
         template_render = DocxTemplate(template_path)
         render_styles = get_document_render_styles(template_path)
