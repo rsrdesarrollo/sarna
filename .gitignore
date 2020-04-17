@@ -113,3 +113,5 @@ poc_*.py
 node_modules/
 yarn.lock
 volumes
+_requirements.txt
+.vscode

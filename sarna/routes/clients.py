@@ -34,6 +34,7 @@ def new():
 
     form.managers.choices = User.get_choices(User.user_type.in_(valid_managers))
     form.auditors.choices = User.get_choices(User.user_type.in_(valid_auditors))
+    form.templates.choices = Template.get_choices()
 
     context = dict(
         form=form
