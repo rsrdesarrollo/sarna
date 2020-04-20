@@ -148,8 +148,7 @@ class Finding(Base, db.Model):
                     active.active_resources.append(affected_resource)
 
             affected_resources_to_add.add(affected_resource)
-
-        db.session.commit()
+            db.session.commit()
 
         for affected_resource in self.affected_resources:
             if affected_resource not in affected_resources_to_add:
