@@ -3,8 +3,8 @@ services:
   sarna:
     build: .
     volumes:
-      - ./volumes/uploaded_data:/sarna/uploaded_data
-      - ./volumes/config:/sarna/config
+      - vol_sarna_upload:/sarna/uploaded_data
+      - vol_sarna_config:/sarna/config
     environment:
       FLASK_ENV: 'production'
       SQLALCHEMY_DATABASE_URI: 'postgres://user:password@psql/sarna'
@@ -16,10 +16,14 @@ services:
   psql:
     image: postgres
     environment:
-      POSTGRES_USER: 'sarna'
-      POSTGRES_PASSWORD: 'InsecurePasswordChangeMe'
+      POSTGRES_USER: 'user'
+      POSTGRES_PASSWORD: 'password'
       POSTGRES_DB: 'sarna'
     volumes:
-      - ./volumes/database:/var/lib/postgresql/data
+      - vol_sarna_db:/var/lib/postgresql/data
     ports:
       - 127.0.0.1:5432:5432
+volumes:
+  vol_sarna_db:
+  vol_sarna_upload:
+  vol_sarna_config:

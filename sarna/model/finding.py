@@ -142,6 +142,8 @@ class Finding(Base, db.Model):
                 active = Active(assessment=self.assessment, name=active_name)
                 affected_resource = AffectedResource(active=active, route=resource_route)
                 active.active_resources.append(affected_resource)
+                db.session.add(active)
+                db.session.add(affected_resource)
             else:
                 affected_resource = AffectedResource.query.filter_by(
                     active=active, route=resource_route
@@ -150,10 +152,10 @@ class Finding(Base, db.Model):
                 if not affected_resource:
                     affected_resource = AffectedResource(active=active, route=resource_route)
                     active.active_resources.append(affected_resource)
+                    db.session.add(affected_resource)
 
             affected_resources_to_add.add(affected_resource)
-
-        db.session.commit()
+            db.session.commit()
 
         for affected_resource in self.affected_resources:
             if affected_resource not in affected_resources_to_add:
