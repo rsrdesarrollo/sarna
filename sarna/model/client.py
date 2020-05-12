@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlathanor import AttributeConfiguration
+from unidecode import unidecode
 
 from sarna.core.config import config
 from sarna.model.base import Base, db, supported_serialization
@@ -70,6 +71,25 @@ class Client(Base, db.Model):
 
     managers = db.relationship('User', secondary=client_management, back_populates='managed_clients')
     auditors = db.relationship('User', secondary=client_audit, back_populates='audited_clients')
+
+    finding_counter = db.Column(db.Integer, default=0, nullable=False)
+
+    def generate_finding_counter(self) -> int:
+        tx_commit = False
+        while not tx_commit:
+            self.finding_counter = Client.finding_counter + 1
+            db.session.add(self)
+            try:
+                db.session.commit()
+                tx_commit = True
+            except Exception as ex:
+                pass
+
+        return self.finding_counter
+
+    def format_finding_code(self, finding) -> str:
+        prefix = unidecode(self.short_name).replace(" ", "_").upper()
+        return "{}_{:06d}".format(prefix, finding.client_finding_id)
 
 
 class Template(Base, db.Model):

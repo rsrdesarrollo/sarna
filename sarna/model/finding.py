@@ -52,6 +52,8 @@ class Finding(Base, db.Model):
         AttributeConfiguration(name='cvss_v3_vector', **supported_serialization),
         AttributeConfiguration(name='cvss_v3_score', **supported_serialization),
         AttributeConfiguration(name='cvss_v3_severity', **supported_serialization),
+        AttributeConfiguration(name='client_finding_id', **supported_serialization),
+        AttributeConfiguration(name='client_finding_code', **supported_serialization),
     ]
 
     id = db.Column(db.Integer, primary_key=True)
@@ -87,6 +89,8 @@ class Finding(Base, db.Model):
 
     cvss_v3_vector = db.Column(db.String(128))
     cvss_v3_score = db.Column(db.Float, default=0.0, nullable=False)
+
+    client_finding_id = db.Column(db.Integer(), nullable=False)
 
     def update_affected_resources(self, resources: Collection[AnyStr]):
         resource_uris = []
@@ -176,9 +180,14 @@ class Finding(Base, db.Model):
         else:
             return Score.Critical
 
+    @property
+    def client_finding_code(self):
+        return self.assessment.client.format_finding_code(self)
+
     @classmethod
     def build_from_template(cls, template: FindingTemplate, assessment: Assessment):
         lang = assessment.lang
+        client = assessment.client
         translation: FindingTemplateTranslation = None
         for t in template.translations:
             translation = t
@@ -210,6 +219,8 @@ class Finding(Base, db.Model):
 
             cvss_v3_vector=template.cvss_v3_vector,
             cvss_v3_score=template.cvss_v3_score,
+
+            client_finding_id=client.generate_finding_counter()
         )
 
 
