@@ -170,7 +170,7 @@ class Finding(Base, db.Model):
     def cvss_v3_severity(self):
         score = self.cvss_v3_score
         if score == 0:
-            return Score.NA
+            return Score.Info
         elif 0 < score < 4:
             return Score.Low
         elif 4 <= score < 7:
