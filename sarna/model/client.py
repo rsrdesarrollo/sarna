@@ -88,8 +88,9 @@ class Client(Base, db.Model):
         return self.finding_counter
 
     def format_finding_code(self, finding) -> str:
-        prefix = unidecode(self.short_name).replace(" ", "_").upper()
-        return "{}_{:06d}".format(prefix, finding.client_finding_id)
+        client_name_prefix = unidecode(self.short_name).replace(" ", "_").upper()
+
+        return f"{client_name_prefix}_{finding.assessment.creation_date:%Y%m%d}_{finding.client_finding_id:06d}"
 
 
 class Template(Base, db.Model):
