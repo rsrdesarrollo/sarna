@@ -51,6 +51,13 @@ class BaseConfig:
     AD_USER_FILTER = '(&(objectClass=person)(sAMAccountName={username}))'
     AD_GROUP_ATTR = 'memberOf'
 
+    # User session timeout in seconds.
+    PERMANENT_SESSION_LIFETIME = 604800
+    # Refresh the session cookie with every request, extending the timeout.
+    SESSION_REFRESH_EACH_REQUEST = False
+    # User session protection based on a hash of the IP address and user agent.
+    SESSION_PROTECTION = None
+
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True

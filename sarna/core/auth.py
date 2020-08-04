@@ -10,7 +10,6 @@ __all__ = [
 login_manager = LoginManager()
 
 login_manager.login_view = "index.index"
-login_manager.session_protection = "strong"
 login_manager.login_message_category = 'success'
 
 current_user: User = current_user

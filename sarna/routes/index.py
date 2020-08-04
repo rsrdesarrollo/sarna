@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, session
 
 from sarna.auxiliary import redirect_back
 from sarna.core.auth import login_required, logout_user
@@ -28,7 +28,11 @@ def index():
                 form.password.data,
                 form.otp.data
             )
+
+            session.permanent = True
+
             flash('Logged in successfully.', 'success')
+
             return redirect_back('index.index')
 
         except AuthException:
