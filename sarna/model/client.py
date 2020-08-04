@@ -98,6 +98,7 @@ class Template(Base, db.Model):
 
     name = db.Column(db.String(32), unique=True, nullable=False)
     description = db.Column(db.String(128), nullable=False)
+    report_suffix = db.Column(db.String(128), nullable=False)
     last_modified = db.Column(db.DateTime, default=lambda: datetime.now(), nullable=False)
     file = db.Column(db.String(128), nullable=False)
 
