@@ -8,7 +8,7 @@ from sarna.model.client import Client, Template
 from sarna.model.user import User
 
 
-class ClientForm(BaseEntityForm(Client)):
+class ClientForm(BaseEntityForm(Client, skip_attrs={'finding_counter'})):
     managers = SelectMultipleField(
         coerce=User.coerce,
         validators=[Optional(), users_are_managers]
