@@ -4,6 +4,18 @@
     <div class="row mt-3">
         <div class="col-lg-12">
             {% if assessments %}
+                <table id="table_search" class="table table-striped">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th>Search</th>
+                        <th colspan="6">
+                            <input style="width:100%" type="text" id="searchinput" onkeyup="refresh_search()"
+                                   placeholder="Search for...">
+                        </th>
+                    </tr>
+                    </thead>
+                </table>
+
                 <table id="table_data" class="table table-striped">
                     <thead class="thead-dark">
                     <th>Name</th>
@@ -65,4 +77,33 @@
             {% endif %}
         </div>
     </div>
+
+    <script>
+        function refresh_search() {
+            function parse_tds(tds) {
+                return {
+                    name: tds[0].firstElementChild.innerText,
+                    client_short_name: tds[1].textContent,
+                    platform: tds[2].textContent,
+                    type: tds[3].firstElementChild.innerText,
+                    creator_name: tds[6].textContent
+                };
+            }
+
+            function search(tds, re) {
+                return re.test(tds.name) || re.test(tds.client_short_name) || re.test(tds.platform) ||
+                    re.test(tds.type) || re.test(tds.risk) || re.test(tds.creator_name);
+            }
+
+            let trs = document.getElementById("table_data").getElementsByTagName("tr");
+
+            if (trs.length > 2) {
+                let input = new RegExp(document.getElementById("searchinput").value, 'i');
+
+                for (let i = 1; i < trs.length; i++) {
+                    trs[i].style.display = search(parse_tds(trs[i].getElementsByTagName("td")), input) ? "" : "none";
+                }
+            }
+        }
+    </script>
 {% endblock %}
