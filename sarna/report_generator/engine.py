@@ -121,7 +121,7 @@ def generate_reports_bundle(assessment: Assessment, templates: Collection[Templa
             ),
             jinja_env=jinja2_env
         )
-        out_file = secure_filename("{}-{}.docx".format(assessment.name, template.name))
+        out_file = secure_filename(f"{assessment.name}{template.report_suffix}.docx")
         template_render.save(os.path.join(out_dir, out_file))
 
     if len(templates) > 1:

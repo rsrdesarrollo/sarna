@@ -8,6 +8,7 @@
                     <thead class="thead-dark">
                     <th>Name</th>
                     <th>Description</th>
+                    <th>Report suffix</th>
                     <th>Last modified</th>
                     <th>#Client Refs</th>
                     <th class="text-right">Actions</th>
@@ -21,6 +22,7 @@
                                 </a>
                             </td>
                             <td>{{ template.description }}</td>
+                            <td>{{ template.report_suffix }}</td>
                             <td>{{ template.last_modified }}</td>
                             <td>{{ template.clients | length }}</td>
                             <td>
