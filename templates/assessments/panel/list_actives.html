@@ -15,7 +15,7 @@
                     <th>#</th>
                     </thead>
                     <tbody>
-                    {% for active in actives %}
+                    {% for active in actives | sort(attribute='name') %}
                         <tr>
                             <td rowspan="{{ active.active_resources|length }}">{{ active.name }}</td>
 

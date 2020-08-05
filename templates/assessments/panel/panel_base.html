@@ -58,7 +58,7 @@
                     <div class="container-fluid">
                         {% if evidences %}
                             <div class="row">
-                                {% for evidence in evidences %}
+                                {% for evidence in evidences | sort(attribute='name') %}
                                     <div class="col-xl-3 col-lg-4 col-md-6 py-3 image-card">
                                         <a target="_blank"
                                            href="{{ url_for('.get_evidence', assessment_id=assessment.id, evidence_name=evidence.name) }}">

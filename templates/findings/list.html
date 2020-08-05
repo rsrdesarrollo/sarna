@@ -28,7 +28,7 @@
                     <th class="text-right">Actions</th>
                     </thead>
                     <tbody>
-                    {% for finding in findings %}
+                    {% for finding in findings | sort(attribute='name') %}
                         <tr>
                             <td>
                                 <a title="Edit Finding"

@@ -14,7 +14,7 @@
                     <th class="text-right">Actions</th>
                     </thead>
                     <tbody>
-                    {% for template in templates %}
+                    {% for template in templates | sort(attribute='name') %}
                         <tr>
                             <td>
                                 <a href="{{ url_for('.edit', template_id=template.id, next=request.path) }}">

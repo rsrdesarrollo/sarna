@@ -28,7 +28,7 @@
                             <th style="width: 20%" class="text-right">Actions</th>
                             </thead>
                             <tbody>
-                            {% for assessment in client.assessments %}
+                            {% for assessment in client.assessments | sort(attribute='name') %}
                                 <tr>
                                     <td>
                                         <a href="{{ url_for('assessments.summary', assessment_id=assessment.id, next=request.path) }}">

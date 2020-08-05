@@ -22,7 +22,7 @@
                     <th style="width: 20%" class="text-right">Actions</th>
                     </thead>
                     <tbody>
-                    {% for client in clients %}
+                    {% for client in clients | sort(attribute='long_name') %}
                         <tr>
                             <td>
 

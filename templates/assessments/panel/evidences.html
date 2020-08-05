@@ -36,7 +36,7 @@
 
 
     <div class="row mx-2" id="previews">
-        {% for evidence in evidences %}
+        {% for evidence in assessment.images | sort(attribute='name') %}
             <div class="col-xl-3 col-lg-4 col-md-6 py-3 border-secondary border image-card">
                 <div class="d-flex mb-2">
                     <strong class="flex-grow-1 align-self-center text-break">{{ evidence.name }}</strong>

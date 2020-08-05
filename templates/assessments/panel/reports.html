@@ -34,7 +34,7 @@
                     <th class="text-right">Actions</th>
                     </thead>
                     <tbody>
-                    {% for template in assessment.client.templates %}
+                    {% for template in assessment.client.templates | sort(attribute='name') %}
                         <tr>
                             <td>
                                 <label class="custom_checkbox">

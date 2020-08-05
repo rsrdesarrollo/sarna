@@ -113,9 +113,6 @@ def findings(assessment_id):
         assessment=assessment
     )
 
-    context['findings'] = Finding.query.filter(Finding.assessment == assessment) \
-        .order_by(Finding.cvss_v3_score.desc(), Finding.id)
-
     return render_template('assessments/panel/list_findings.html', **context)
 
 
@@ -142,7 +139,7 @@ def edit_finding(assessment_id, finding_id):
             a.name: a.text
             for a in solutions
         },
-        evidences=Image.query.filter_by(assessment_id=assessment_id).order_by(Image.name).all()
+        evidences=assessment.images
     )
     if form.validate_on_submit():
         data = dict(form.data)
@@ -289,8 +286,7 @@ def evidences(assessment_id):
 
     form = EvidenceCreateNewForm()
     context = dict(
-        assessment=assessment,
-        evidences=Image.query.filter_by(assessment_id=assessment_id).order_by(Image.name).all()
+        assessment=assessment
     )
     if form.is_submitted():
         if form.validate_on_submit():

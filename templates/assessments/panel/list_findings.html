@@ -9,7 +9,7 @@
     </form>
 {% endblock %}
 {% block action_buttons %}
-    {% if findings %}
+    {% if assessment.findings %}
         <div class="btn-group float-right" role="group">
             <button type="submit" class="btn btn-danger need-confirm" value="delete" name="action">
                 <span class="fa fa-trash"></span>
@@ -43,7 +43,7 @@
 {% block content %}
     <div class="row">
         <div class="col">
-            {% if findings %}
+            {% if assessment.findings %}
 
                 <table id="table_data" class="table table-striped">
                     <thead class="thead-dark">
@@ -61,7 +61,7 @@
                     <th class="text-right">Actions</th>
                     </thead>
                     <tbody>
-                    {% for finding in findings | sort(attribute='cvss_v3_score', reverse=true) %}
+                    {% for finding in assessment.findings | sort(attribute='cvss_v3_score', reverse=true) %}
                         <tr>
                             <td>
                                 <label class="custom_checkbox">

@@ -11,11 +11,12 @@
                         <th>Search</th>
                         <th colspan="6">
                             <input style="width:100%" type="text" id="searchinput" onkeyup="refresh_search()"
-                                   placeholder="Search for ...">
+                                   placeholder="Search for...">
                         </th>
                     </tr>
                     </thead>
                 </table>
+
                 <table id="table_data" class="table table-striped">
                     <thead class="thead-dark">
                     <th>Name</th>
@@ -26,7 +27,7 @@
                     <th class="text-right">Actions</th>
                     </thead>
                     <tbody>
-                    {% for finding in findings %}
+                    {% for finding in findings | sort(attribute='name') %}
                         <tr>
                             <td>{{ finding.name }}</td>
                             <td>{{ finding.type }}</td>
@@ -68,36 +69,28 @@
             {% endif %}
         </div>
     </div>
+
     <script>
         function refresh_search() {
-
             function parse_tds(tds) {
                 return {
-                    id: tds[0].textContent,
+                    name: tds[0].textContent,
                     type: tds[1].textContent,
-                    risk: tds[3].firstElementChild.innerText
                 }
             }
 
             function search(tds, re) {
-                if (
-                    re.test(tds.id) ||
-                    re.test(tds.type) ||
-                    re.test(tds.risk)
-                ) return true;
-                return false;
+                console.log(tds);
+                return re.test(tds.name) || re.test(tds.type);
             }
 
-            let i = new RegExp(document.getElementById("searchinput").value, 'i');
-            let table = document.getElementById("table_data");
-            let tr = table.getElementsByTagName("tr");
+            let trs = document.getElementById("table_data").getElementsByTagName("tr");
 
-            let d = null;
-            for (let j = 0; j < tr.length; j++) {
-                if (j > 0) {
-                    let r = search(parse_tds(tr[j].getElementsByTagName("td")), i);
+            if (trs.length > 2) {
+                let input = new RegExp(document.getElementById("searchinput").value, 'i');
 
-                    tr[j].style.display = r ? "" : "none"
+                for (let i = 1; i < trs.length; i++) {
+                    trs[i].style.display = search(parse_tds(trs[i].getElementsByTagName("td")), input) ? "" : "none";
                 }
             }
         }
