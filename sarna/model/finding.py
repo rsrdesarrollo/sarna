@@ -54,6 +54,7 @@ class Finding(Base, db.Model):
         AttributeConfiguration(name='cvss_v3_severity', **supported_serialization),
         AttributeConfiguration(name='client_finding_id', **supported_serialization),
         AttributeConfiguration(name='client_finding_code', **supported_serialization),
+        AttributeConfiguration(name='notes', **supported_serialization)
     ]
 
     id = db.Column(db.Integer, primary_key=True)
@@ -91,6 +92,8 @@ class Finding(Base, db.Model):
     cvss_v3_score = db.Column(db.Float, default=0.0, nullable=False)
 
     client_finding_id = db.Column(db.Integer(), nullable=False)
+
+    notes = db.Column(db.String())
 
     def update_affected_resources(self, resources: Collection[AnyStr]):
         resource_uris = []

@@ -22,6 +22,7 @@ class FindingEditForm(BaseEntityForm(Finding, skip_attrs={'name', 'client_findin
                                      hide_attrs={'cvss_v3_score', 'cvss_v3_vector'})):
     affected_resources = TextAreaField(description='List of affected resources. One per line.',
                                        render_kw=dict(class_='noMD', rows=5))
+    notes = TextAreaField(render_kw={'class_': 'noMD', 'placeholder': 'Optional notes.'})
 
 
 class ActiveCreateNewForm(
