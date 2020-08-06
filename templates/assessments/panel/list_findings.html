@@ -61,7 +61,7 @@
                     <th class="text-right">Actions</th>
                     </thead>
                     <tbody>
-                    {% for finding in assessment.findings | sort(attribute='cvss_v3_score', reverse=true) %}
+                    {% for finding in assessment.findings | sort(attribute='cvss_v3_score,business_risk', reverse=true) %}
                         <tr>
                             <td>
                                 <label class="custom_checkbox">
