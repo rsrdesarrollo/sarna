@@ -162,6 +162,7 @@ def delete_findings(assessment_id, finding_id):
     if not current_user.audits(finding.assessment):
         abort(403)
 
+    finding.update_affected_resources([])
     finding.delete()
     flash("Finding deleted", "success")
     return redirect_back('.findings', assessment_id=assessment_id)
@@ -222,7 +223,11 @@ def bulk_action_finding(assessment_id):
         and_(Finding.id.in_(set_findings), Finding.assessment == assessment)
     )
     if action == "delete":
+        for finding in target:
+            finding.update_affected_resources([])
+
         target.delete(synchronize_session=False)
+
         flash("{} items deleted successfully.".format(len(set_findings)), "success")
     elif action.startswith('status_'):
         status = None
