@@ -13,26 +13,29 @@
             </h3>
         </div>
     </div>
+
     {% if assessment.findings|length > 0 %}
-        <div class="row mt-2">
-            <div class="col-md-6 offset-3">
-                <h5 class="text-center">Findings Status</h5>
+        <div class="row mt-2 justify-content-center">
+            <div class="col-md-5">
+                <h5 class="text-center">Findings status</h5>
                 <canvas id="findings_status_chart"></canvas>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-4 offset-1">
-                <h5 class="text-center">Technical Risk</h5>
-                <canvas id="tech_risk_chart"></canvas>
+
+        <div class="row mt-4 justify-content-around">
+            <div class="col-md-4">
+                <h5 class="text-center">CVSS severity</h5>
+                <canvas id="cvss_severity_chart"></canvas>
             </div>
-            <div class="col-md-4 offset-2">
-                <h5 class="text-center">Business Risk</h5>
+
+            <div class="col-md-4">
+                <h5 class="text-center">Business risk</h5>
                 <canvas id="bus_risk_chart"></canvas>
             </div>
         </div>
 
         <script>
-            var ctx_tech_risk = document.getElementById('tech_risk_chart').getContext('2d');
+            var ctx_cvss_severity = document.getElementById('cvss_severity_chart').getContext('2d');
             var ctx_bus_risk = document.getElementById('bus_risk_chart').getContext('2d');
             var ctx_find = document.getElementById('findings_status_chart').getContext('2d');
             var backgrounds = [
@@ -45,20 +48,26 @@
             var options = {
                 legend: {display: false},
                 scales: {
-                    yAxes: [{ticks: {min: 0}}]
+                    yAxes: [{
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }]
                 }
             };
-            new Chart(ctx_tech_risk, {
+
+            new Chart(ctx_cvss_severity, {
                 type: 'bar',
                 data: {
                     labels: ["Info", "Low", "Medium", "High", "Critical"],
                     datasets: [{
                         backgroundColor: backgrounds,
-                        data: {{ assessment.aggregate_technical_risk() | tojson }}
+                        data: {{ assessment.aggregate_cvss_severity() | tojson }}
                     }]
                 },
                 options: options
             });
+
             new Chart(ctx_bus_risk, {
                 type: 'bar',
                 data: {
@@ -70,6 +79,7 @@
                 },
                 options: options
             });
+
             new Chart(ctx_find, {
                 type: 'pie',
                 data: {

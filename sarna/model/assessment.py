@@ -132,6 +132,9 @@ class Assessment(Base, db.Model):
     def aggregate_business_risk(self):
         return self._aggregate_score('business_risk')
 
+    def aggregate_cvss_severity(self):
+        return self._aggregate_score('cvss_v3_severity')
+
     def evidence_path(self):
         return os.path.join(config.EVIDENCES_PATH, str(self.uuid))
 
