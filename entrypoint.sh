@@ -14,6 +14,8 @@ until nc -z -v -w30 $DATABASE_HOST 5432; do
   sleep 5
 done
 
+flask db upgrade 9ab3158991e2 2>/dev/null
+
 su -c 'flask db upgrade' sarna
 su -c 'flask assets build' sarna
 
