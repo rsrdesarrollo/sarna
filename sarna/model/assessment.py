@@ -61,6 +61,8 @@ class Assessment(Base, db.Model):
         AttributeConfiguration(name='status', **supported_serialization),
         AttributeConfiguration(name='client', **supported_serialization),
         AttributeConfiguration(name='findings', **supported_serialization),
+        AttributeConfiguration(name='application', **supported_serialization),
+        AttributeConfiguration(name='bugtracking', **supported_serialization),
     ]
 
     id = db.Column(db.Integer, primary_key=True)
@@ -70,6 +72,8 @@ class Assessment(Base, db.Model):
     lang = db.Column(Enum(Language), nullable=False)
     type = db.Column(Enum(AssessmentType), nullable=False)
     status = db.Column(Enum(AssessmentStatus), nullable=False)
+    application = db.Column(db.String(64), nullable=False)
+    bugtracking = db.Column(db.String(64), nullable=True)
 
     client_id = db.Column(
         db.Integer,
