@@ -41,3 +41,43 @@ flask user add -r manager <user_name>
 ```
 
 Please referer to `flask user add --help` for more info.
+
+### Common issues in development
+
+- If you get an error while starting the image in your local environment about file permissions, check that the `entrypoint.sh` script has UNIX line endings (LF) instead of Windows' (CRLF)
+
+#### DB Migrations
+
+Check that you have the latest migration. First:
+
+```bash
+docker-compose exec sarna /bin/sh
+flask db history
+```
+You should now see a list of every available migration. Check that you're at the HEAD revision:
+
+```bash
+flask db current
+```
+
+Or execute the ones missing:
+
+```bash
+flask db upgrade <revision>
+```
+
+### Create a migration
+
+Write your model changes into the Python classes at `sarna\model` and then, with the PostgresQL container running, execute in your host CMD (at the project's root):
+
+```bash
+flask db migrate -m "Your migration description message"
+```
+
+To quickly update the database image after creating a migration, stop the SARNA containers and run the following:
+
+```bash
+docker container rm sarna_psql_1 \
+    && docker volume rm sarna_vol_sarna_db \
+    && docker-compose up --build
+```
