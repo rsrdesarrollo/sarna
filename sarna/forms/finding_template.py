@@ -1,4 +1,4 @@
-from wtforms import validators
+from wtforms import validators, StringField
 
 from sarna.forms.base_entity_form import BaseEntityForm
 from sarna.model.finding_template import FindingTemplate, FindingTemplateTranslation, Solution
@@ -8,12 +8,27 @@ class FindingTemplateCreateNewForm(
     BaseEntityForm(FindingTemplate, hide_attrs={'cvss_v3_score', 'cvss_v3_vector'}),
     BaseEntityForm(FindingTemplateTranslation, skip_pk=False)
 ):
-    pass
-
+    masvs = StringField(
+        label = "MASVS - OWASP Mobile Application Security Verification Standard Requirement #", 
+        render_kw = {'placeholder': '0.0.0'},
+        validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')]
+    )
+    asvs = StringField(
+        label = "ASVS - OWASP Application Security Verification Standard Requirement #", 
+        render_kw = {'placeholder': '0.0.0'},
+        validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')])
 
 class FindingTemplateEditForm(BaseEntityForm(FindingTemplate, hide_attrs={'cvss_v3_score', 'cvss_v3_vector'})):
-    pass
 
+    masvs = StringField(
+        label = "MASVS - OWASP Mobile Application Security Verification Standard Requirement #", 
+        render_kw = {'placeholder': '0.0.0'},
+        validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')]
+    )
+    asvs = StringField(
+        label = "ASVS - OWASP Application Security Verification Standard Requirement #", 
+        render_kw={'placeholder': '0.0.0'},
+        validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')])
 
 class FindingTemplateAddTranslationForm(BaseEntityForm(
     FindingTemplateTranslation,
