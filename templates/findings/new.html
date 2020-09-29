@@ -9,27 +9,54 @@
             <h1>New finding</h1>
             {{ render_form(form) }}
         </div>
-        <div class="col-lg-5 mt-5">
-            <div id="cvssboard"></div>
+        <div class="col-lg-7 mt-7">
+            <div class="row cvssjs" id="cvssresults">
+                <dl>
+                    <dt>Base Score</dt>
+                    <dd>
+                        <label class="base-results">
+                            <span class="severity"></span>                            
+                            <span class="score"></span>
+                            <a class="vector"></a>
+                        </label>
+                    </dd>
+                    <dt>Temporal Score</dt>
+                    <dd>
+                        <label class="temp-results">
+                            <span class="severity"></span>                            
+                            <span class="score"></span>
+                        </label>
+                    </dd>
+                    <dt>Environmental Score</dt>
+                    <dd>
+                        <label class="env-results">
+                            <span class="severity"></span>                            
+                            <span class="score"></span>
+                        </label>
+                    </dd>
+                </dl>
+            </div>            
+            <hr>
+            <div class="row" id="cvssboard"></div>
         </div>
     </div>
 
     <script>
         $(document).ready(function () {
-
+            // Base Score
             var cvss = new CVSS("cvssboard", {
                 onchange: function () {
                     var vector = cvss.get()['vector'];
                     var score = parseFloat(cvss.get()['score']);
-                    $('#cvss_v3_vector').val(vector);
+                    $('#cvssresults .base-results .vector').val(vector);
                     if (isNaN(score)) {
-                        $('#cvss_v3_score').val(0);
+                        $('#cvssresults .base-results .score').val(0);
                     } else {
-                        $('#cvss_v3_score').val(score);
+                        $('#cvssresults .base-results .score').val(score);
                     }
                 }
-            });
-            cvss.set($('#cvss_v3_vector').val());
+            }, 2);
+            cvss.set($('#cvssresults .base-results .vector').val());
         });
     </script>
 {% endblock %}
