@@ -186,6 +186,9 @@ class Finding(Base, db.Model):
     @property
     def client_finding_code(self):
         return self.assessment.client.format_finding_code(self)
+    
+    asvs = db.Column(db.String(8))
+    masvs = db.Column(db.String(8))
 
     @classmethod
     def build_from_template(cls, template: FindingTemplate, assessment: Assessment):
