@@ -70,7 +70,7 @@ class Assessment(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(GUID, default=uuid4, unique=True, nullable=False)
     name = db.Column(db.String(64), nullable=False)
-    platform = db.Column(db.String(64), nullable=False)
+    platform = db.Column(db.String(64))
     lang = db.Column(Enum(Language), nullable=False)
     type = db.Column(Enum(AssessmentType), nullable=False)
     status = db.Column(Enum(AssessmentStatus), nullable=False)

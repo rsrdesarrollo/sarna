@@ -21,10 +21,11 @@
                     <thead class="thead-dark">
                     <th>Name</th>
                     <th>Type</th>
-                    <th>Languages</th>
+                    <th>ASVS</th>
+                    <th>MASVS</th>
                     <th>CVSS Score</th>
                     <th># Solutions</th>
-                    <th>Creator</th>
+                    <th>Created by</th>
                     <th class="text-right">Actions</th>
                     </thead>
                     <tbody>
@@ -37,7 +38,8 @@
                                 </a>
                             </td>
                             <td>{{ finding.type }}</td>
-                            <td>{% for lang in finding.langs %}{{ render_pill(lang, 'secondary') }}{% endfor %}</td>
+                            <td>{{ finding.asvs }}</td>
+                            <td>{{ finding.masvs }}</td>
                             <td>{{ render_cvss_pill(finding.cvss_v3_severity, finding.cvss_v3_score) }}</td>
                             <td>{{ finding.solutions|length }}</td>
                             <td>{{ finding.creator.name }}</td>
@@ -81,12 +83,13 @@
                 return {
                     name: tds[0].firstElementChild.innerText,
                     type: tds[1].textContent,
-                    creator_name: tds[5].textContent
+                    asvs: tds[2].textContent,
+                    masvs: tds[2].textContent
                 }
             }
 
             function search(tds, re) {
-                return re.test(tds.name) || re.test(tds.type) || re.test(tds.creator_name);
+                return re.test(tds.name) || re.test(tds.type) || re.test(tds.asvs) || re.test(tds.masvs);
             }
 
             let trs = document.getElementById("table_data").getElementsByTagName("tr");

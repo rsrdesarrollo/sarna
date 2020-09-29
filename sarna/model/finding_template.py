@@ -15,11 +15,11 @@ class FindingTemplate(Base, db.Model):
     owasp_mobile_category = db.Column(Enum(OWASPMobileTop10Category))
     owisam_category = db.Column(Enum(OWISAMCategory))
 
-    tech_risk = db.Column(Enum(Score), nullable=False)
-    business_risk = db.Column(Enum(Score), nullable=False)
-    exploitability = db.Column(Enum(Score), nullable=False)
-    dissemination = db.Column(Enum(Score), nullable=False)
-    solution_complexity = db.Column(Enum(Score), nullable=False)
+    tech_risk = db.Column(Enum(Score))
+    business_risk = db.Column(Enum(Score))
+    exploitability = db.Column(Enum(Score))
+    dissemination = db.Column(Enum(Score))
+    solution_complexity = db.Column(Enum(Score))
 
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
     creator = db.relationship('User', back_populates='created_findings', uselist=False)
@@ -47,6 +47,12 @@ class FindingTemplate(Base, db.Model):
             return Score.High
         else:
             return Score.Critical
+    
+    asvs = db.Column(db.String(8))
+    masvs = db.Column(db.String(8))
+
+    asvs = db.Column(db.String(8))
+    masvs = db.Column(db.String(8))
 
 
 class FindingTemplateTranslation(Base, db.Model):

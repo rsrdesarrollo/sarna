@@ -19,10 +19,10 @@
                 <table id="table_data" class="table table-striped">
                     <thead class="thead-dark">
                     <th>Name</th>
-                    <th>Client</th>
-                    <th>Platform</th>
-                    <th>Type</th>
-                    <th>Language</th>
+                    <th>Application</th>
+                    <th>Bug Tracking</th>
+                    <th>SAST</th>
+                    <th>SCA</th>
                     <th>Status</th>
                     <th>Creator</th>
                     <th class="text-right">Actions</th>
@@ -35,10 +35,10 @@
                                     {{ assessment.name }}
                                 </a>
                             </td>
-                            <td>{{ assessment.client.short_name }}</td>
-                            <td>{{ assessment.platform }}</td>
-                            <td>{{ render_pill(assessment.type, 'secondary') }}</td>
-                            <td>{{ render_pill(assessment.lang, 'primary') }}</td>
+                            <td>{{ assessment.application }}</td>
+                            <td>{{ assessment.bugtracking }}</td>
+                            <td>{{ assessment.sast }}</td>
+                            <td>{{ assessment.sca }}</td>
                             <td>{{ render_assessment_status_pill(assessment.status) }}</td>
                             <td>{{ assessment.creator.name }}</td>
                             <td>
@@ -83,16 +83,14 @@
             function parse_tds(tds) {
                 return {
                     name: tds[0].firstElementChild.innerText,
-                    client_short_name: tds[1].textContent,
-                    platform: tds[2].textContent,
-                    type: tds[3].firstElementChild.innerText,
-                    creator_name: tds[6].textContent
+                    application: tds[1].textContent,
+                    bugtracking: tds[2].textContent,
+                    creator_name: tds[7].textContent
                 };
             }
 
             function search(tds, re) {
-                return re.test(tds.name) || re.test(tds.client_short_name) || re.test(tds.platform) ||
-                    re.test(tds.type) || re.test(tds.risk) || re.test(tds.creator_name);
+                return re.test(tds.name) || re.test(tds.application) || re.test(tds.bugtracking) || re.test(tds.creator_name);
             }
 
             let trs = document.getElementById("table_data").getElementsByTagName("tr");

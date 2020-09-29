@@ -5,7 +5,10 @@ from sarna.model.finding_template import FindingTemplate, FindingTemplateTransla
 
 
 class FindingTemplateCreateNewForm(
-    BaseEntityForm(FindingTemplate, hide_attrs={'cvss_v3_score', 'cvss_v3_vector'}),
+    BaseEntityForm(
+        FindingTemplate,
+        hide_attrs={'cvss_v3_score', 'cvss_v3_vector'},
+        skip_attrs={'tech_risk', 'business_risk', 'exploitability', 'dissemination', 'solution_complexity'}),
     BaseEntityForm(FindingTemplateTranslation, skip_pk=False)
 ):
     masvs = StringField(
@@ -18,8 +21,14 @@ class FindingTemplateCreateNewForm(
         render_kw = {'placeholder': '0.0.0'},
         validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')])
 
-class FindingTemplateEditForm(BaseEntityForm(FindingTemplate, hide_attrs={'cvss_v3_score', 'cvss_v3_vector'})):
 
+class FindingTemplateEditForm(
+    BaseEntityForm(
+        FindingTemplate,
+        hide_attrs={'cvss_v3_score', 'cvss_v3_vector'},
+        skip_attrs={'tech_risk', 'business_risk', 'exploitability', 'dissemination', 'solution_complexity'}
+    )
+):
     masvs = StringField(
         label = "MASVS - OWASP Mobile Application Security Verification Standard Requirement #", 
         render_kw = {'placeholder': '0.0.0'},
