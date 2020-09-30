@@ -14,12 +14,15 @@ class FindingTemplateCreateNewForm(
     masvs = StringField(
         label = "MASVS - OWASP Mobile Application Security Verification Standard Requirement #", 
         render_kw = {'placeholder': '0.0.0'},
-        validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')]
+        validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')],
+        default = "0.0.0"
     )
     asvs = StringField(
         label = "ASVS - OWASP Application Security Verification Standard Requirement #", 
         render_kw = {'placeholder': '0.0.0'},
-        validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')])
+        validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')],
+        default = "0.0.0"
+    )
 
 
 class FindingTemplateEditForm(
@@ -32,12 +35,15 @@ class FindingTemplateEditForm(
     masvs = StringField(
         label = "MASVS - OWASP Mobile Application Security Verification Standard Requirement #", 
         render_kw = {'placeholder': '0.0.0'},
-        validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')]
+        validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')],
+        default = "0.0.0"
     )
     asvs = StringField(
         label = "ASVS - OWASP Application Security Verification Standard Requirement #", 
         render_kw={'placeholder': '0.0.0'},
-        validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')])
+        validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')],
+        default = "0.0.0"
+    )
 
 class FindingTemplateAddTranslationForm(BaseEntityForm(
     FindingTemplateTranslation,
