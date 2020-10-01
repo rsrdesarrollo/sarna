@@ -1,10 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
-<<<<<<< HEAD
 from wtforms import SelectMultipleField, TextAreaField, StringField, FloatField
-=======
-from wtforms import SelectMultipleField, TextAreaField, StringField
->>>>>>> develop
 from wtforms.validators import Optional
 
 from sarna.auxiliary.upload_helpers import is_valid_evidence
@@ -22,10 +18,7 @@ class AssessmentForm(BaseEntityForm(Assessment, skip_attrs={'estimated_hours', '
     )
     bugtracking = StringField(label='Bug Tracking ticket #', render_kw={'placeholder': 'APPSECSER-XXX'})
     application = StringField(label='Application to assess', render_kw={'placeholder': 'APPWEB-MyApp'})
-<<<<<<< HEAD
     riskprof_score = FloatField(label='Risk Profile Score', render_kw={'placeholder': '0.0'})
-=======
->>>>>>> develop
 
 
 class FindingEditForm(BaseEntityForm(Finding, skip_attrs={'name', 'client_finding_id', 'tech_risk', 'business_risk', 'exploitability', 'dissemination', 'solution_complexity'},
