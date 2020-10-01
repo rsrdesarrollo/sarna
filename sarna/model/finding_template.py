@@ -1,5 +1,5 @@
 from sarna.model.base import Base, db
-from sarna.model.enums import Score, OWASPCategory, OWISAMCategory, FindingType, Language
+from sarna.model.enums import Score, WSTG, OWISAMCategory, FindingType, Language
 from sarna.model.enums.category import OWASPMobileTop10Category
 from sarna.model.sql_types import Enum
 
@@ -11,7 +11,7 @@ class FindingTemplate(Base, db.Model):
     name = db.Column(db.String(64), nullable=False)
     type = db.Column(Enum(FindingType), nullable=False)
 
-    owasp_category = db.Column(Enum(OWASPCategory))
+    owasp_category = db.Column(Enum(WSTG))
     owasp_mobile_category = db.Column(Enum(OWASPMobileTop10Category))
     owisam_category = db.Column(Enum(OWISAMCategory))
 
