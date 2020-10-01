@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
-from wtforms import SelectMultipleField, TextAreaField
+from wtforms import SelectMultipleField, TextAreaField, StringField
 from wtforms.validators import Optional
 
 from sarna.auxiliary.upload_helpers import is_valid_evidence
@@ -16,6 +16,8 @@ class AssessmentForm(BaseEntityForm(Assessment)):
         coerce=User.coerce,
         validators=[Optional(), user_is_auditor]
     )
+    bugtracking = StringField(label='Bug Tracking ticket #', render_kw={'placeholder': 'APPSECSER-XXX'})
+    application = StringField(label='Application to assess', render_kw={'placeholder': 'APPWEB-MyApp'})
 
 
 class FindingEditForm(BaseEntityForm(Finding, skip_attrs={'name', 'client_finding_id'},

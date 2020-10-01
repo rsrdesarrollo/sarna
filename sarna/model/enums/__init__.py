@@ -5,8 +5,9 @@ from .language import Language
 from .report import SequenceName
 from .score import Score
 from .user import UserType, AuthSource
+from .analysis import AnalysisResultType
 
 __all__ = [
     'UserType', 'AuthSource', 'AssessmentStatus', 'AssessmentType', 'OWISAMCategory', 'OWASPCategory',
-    'FindingStatus', 'FindingType', 'Language', 'Score', 'SequenceName'
+    'FindingStatus', 'FindingType', 'Language', 'Score', 'SequenceName', 'AnalysisResultType'
 ]
