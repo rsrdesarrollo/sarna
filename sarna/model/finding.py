@@ -5,8 +5,7 @@ from sqlathanor import AttributeConfiguration
 
 from sarna.model.assessment import Assessment
 from sarna.model.base import Base, db, supported_serialization
-from sarna.model.enums import Score, OWASPCategory, OWISAMCategory, FindingType, FindingStatus
-from sarna.model.enums.category import OWASPMobileTop10Category
+from sarna.model.enums import Score, WSTG, MSTG, OWISAMCategory, FindingType, FindingStatus
 from sarna.model.finding_template import FindingTemplate, FindingTemplateTranslation
 from sarna.model.sql_types import Enum
 
@@ -70,8 +69,8 @@ class Finding(Base, db.Model):
     title = db.Column(db.String(128), nullable=False)
     status = db.Column(Enum(FindingStatus), nullable=False, default=FindingStatus.Pending)
 
-    owasp_category = db.Column(Enum(OWASPCategory))
-    owasp_mobile_category = db.Column(Enum(OWASPMobileTop10Category))
+    owasp_category = db.Column(Enum(WSTG))
+    owasp_mobile_category = db.Column(Enum(MSTG))
     owisam_category = db.Column(Enum(OWISAMCategory))
 
     description = db.Column(db.String())
