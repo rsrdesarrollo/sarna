@@ -11,23 +11,15 @@ class FindingTemplateCreateNewForm(
     masvs = StringField(
         label = "MASVS - OWASP Mobile Application Security Verification Standard Requirement #", 
         render_kw = {'placeholder': '0.0.0'},
-<<<<<<< HEAD
-        validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')]
-=======
         validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')],
         default = "0.0.0"
->>>>>>> origin/feature/asvs-masvs
     )
     asvs = StringField(
         label = "ASVS - OWASP Application Security Verification Standard Requirement #", 
         render_kw = {'placeholder': '0.0.0'},
-<<<<<<< HEAD
-        validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')])
-=======
         validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')],
         default = "0.0.0"
     )
->>>>>>> origin/feature/asvs-masvs
 
 class FindingTemplateEditForm(BaseEntityForm(FindingTemplate, hide_attrs={'cvss_v3_score', 'cvss_v3_vector'})):
 
