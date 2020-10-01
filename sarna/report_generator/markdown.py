@@ -191,6 +191,8 @@ class DOCXRenderer(BaseRenderer):
 
 
 def markdown_to_docx(markdown, render: DOCXRenderer):
+    if markdown is None:
+        markdown = ""
     ret = mistletoe.markdown(markdown + "\r\n", render)
     for warn in render.warnings:
         # TODO: something

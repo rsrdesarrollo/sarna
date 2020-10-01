@@ -54,6 +54,9 @@ class FindingTemplate(Base, db.Model):
     asvs = db.Column(db.String(8))
     masvs = db.Column(db.String(8))
 
+    asvs = db.Column(db.String(8))
+    masvs = db.Column(db.String(8))
+
 
 class FindingTemplateTranslation(Base, db.Model):
     lang = db.Column(Enum(Language), primary_key=True)
