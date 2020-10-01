@@ -31,91 +31,91 @@
     font-size: 40px;
 }
 
-.cvssjs i.AVN {
+.cvssjs i.AVN, .cvssjs i.MAVN, i.EU {
     background-position: -3em 0;
 }
 
-.cvssjs i.AVA {
+.cvssjs i.AVA, .cvssjs i.MAVA, i.EF {
     background-position: -2em 0;
 }
 
-.cvssjs i.AVL {
+.cvssjs i.AVL, .cvssjs i.MAVL, i.EH {
     background-position: -1em 0;
 }
 
-.cvssjs i.AVP {
+.cvssjs i.AVP, .cvssjs i.MAVP {
     background-position: 0 0;
 }
 
-.cvssjs i.ACL {
+.cvssjs i.ACL, i.MACL, i.RLT, i.RLW {
     background-position: -4em 0;
 }
 
-.cvssjs i.ACH {
+.cvssjs i.ACH, i.MACH, i.RLO {
     background-position: -5em 0;
 }
 
-.cvssjs i.PRN {
+.cvssjs i.PRN, i.EX, i.RLX, i.RCX, i.CRX, i.IRX, i.ARX, i.MAVX, i.MACX, i.MPRX, i.MPRN, i.MUIX, i.MSX, i.MCX, i.MIX, i.MAX {
     background-position: -6em 0;
 }
 
-.cvssjs i.PRL {
+.cvssjs i.PRL, i.MPRL {
     background-position: -7em 0;
 }
 
-.cvssjs i.PRH {
+.cvssjs i.PRH, i.MPRH {
     background-position: -8em 0;
 }
 
-.cvssjs i.UIN {
+.cvssjs i.UIN, i.MUIN {
     background-position: -10em 0;
 }
 
-.cvssjs i.UIR {
+.cvssjs i.UIR, i.MUIR {
     background-position: -9em 0;
 }
 
-.cvssjs i.SC {
+.cvssjs i.SC, i.MSCR {
     background-position: -11em 0;
 }
 
-.cvssjs i.SU {
+.cvssjs i.SU, i.MSU {
     background-position: -10em 0;
 }
 
-.cvssjs i.CH {
+.cvssjs i.CH, i.MCH, i.CRH, i.RCC {
     background-position: -14em 0;
 }
 
-.cvssjs i.CL {
+.cvssjs i.CL, i.RCR, i.MCL, i.CRM {
     background-position: -13em 0;
 }
 
-.cvssjs i.CN {
+.cvssjs i.CN, i.MCN, i.CRL, i.RLU, i.RCU {
     background-position: -12em 0;
 }
 
-.cvssjs i.IH {
+.cvssjs i.IH, i.MIH, i.IRH {
     background-position: -16em 0;
 }
 
-.cvssjs i.IL {
+.cvssjs i.IL, i.MIL, i.IRL {
     background-position: -17em 0;
 }
 
-.cvssjs i.IN {
+.cvssjs i.IN, i.MIN, i.IRN {
     background-position: -15em 0;
 }
 
-.cvssjs i.AH {
+.cvssjs i.AH, i.MAH, i.ARH {
     background-position: -20em 0;
 }
 
-.cvssjs i.AL {
+.cvssjs i.AL, i.MAL, i.ARM {
     background-position: -19em 0;
 }
 
-.cvssjs i.AN {
+.cvssjs i.AN, i.MAN, i.ARL {
     background-position: -18em 0;
 }
 
