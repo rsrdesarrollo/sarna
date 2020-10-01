@@ -48,11 +48,11 @@
                 onchange: function () {
                     var vector = cvss.get()['vector'];
                     var score = parseFloat(cvss.get()['score']);
-                    $('#cvssresults .base-results .vector').val(vector);
+                    $('#cvss_v3_vector').val(vector);
                     if (isNaN(score)) {
-                        $('#cvssresults .base-results .score').val(0);
+                        $('#cvss_v3_score').val(0);
                     } else {
-                        $('#cvssresults .base-results .score').val(score);
+                        $('#cvss_v3_score').val(score);
                     }
                 }
             }, 2);
