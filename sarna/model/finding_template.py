@@ -1,5 +1,5 @@
 from sarna.model.base import Base, db
-from sarna.model.enums import Score, WSTG, MSTG, OWISAMCategory, FindingType, Language
+from sarna.model.enums import Score, WSTG, MSTG, OWISAMCategory, FindingType, Language, CWE
 from sarna.model.sql_types import Enum
 
 __all__ = ['FindingTemplateTranslation', 'FindingTemplate', 'Solution']
@@ -55,7 +55,7 @@ class FindingTemplate(Base, db.Model):
 
     asvs = db.Column(db.String(8))
     masvs = db.Column(db.String(8))
-    cwe = db.Column(db.String(8))
+    cwe = db.Column(Enum(CWE))
 
 
 class FindingTemplateTranslation(Base, db.Model):

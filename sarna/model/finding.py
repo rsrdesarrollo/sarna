@@ -5,7 +5,7 @@ from sqlathanor import AttributeConfiguration
 
 from sarna.model.assessment import Assessment
 from sarna.model.base import Base, db, supported_serialization
-from sarna.model.enums import Score, WSTG, MSTG, OWISAMCategory, FindingType, FindingStatus
+from sarna.model.enums import Score, WSTG, MSTG, OWISAMCategory, FindingType, FindingStatus, CWE
 from sarna.model.finding_template import FindingTemplate, FindingTemplateTranslation
 from sarna.model.sql_types import Enum
 
@@ -189,7 +189,7 @@ class Finding(Base, db.Model):
     
     asvs = db.Column(db.String(8))
     masvs = db.Column(db.String(8))
-    cwe = db.Column(db.String(8))
+    cwe = db.Column(Enum(CWE), nullable=False)
 
     @classmethod
     def build_from_template(cls, template: FindingTemplate, assessment: Assessment):
