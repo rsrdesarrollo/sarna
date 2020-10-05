@@ -1,5 +1,5 @@
 from .assessment import AssessmentStatus, AssessmentType
-from .category import OWISAMCategory, WSTG, MSTG
+from .category import OWISAMCategory, WSTG, MSTG, CWE
 from .finding import FindingStatus, FindingType
 from .language import Language
 from .report import SequenceName
@@ -9,7 +9,7 @@ from .riskprofile import RiskProfileType
 from .analysis import AnalysisResultType
 
 __all__ = [
-    'UserType', 'AuthSource', 'AssessmentStatus', 'AssessmentType', 'OWISAMCategory', 'OWASPCategory',
-    'FindingStatus', 'FindingType', 'Language', 'Score', 'SequenceName', 'RiskProfileType', 'AnalysisResultType', 
-    'WSTG', 'MSTG'
+    'UserType', 'AuthSource', 'AssessmentStatus', 'AssessmentType', 'OWISAMCategory',
+    'FindingStatus', 'FindingType', 'Language', 'Score', 'SequenceName', 'AnalysisResultType', 
+    'WSTG', 'MSTG', 'CWE'
 ]

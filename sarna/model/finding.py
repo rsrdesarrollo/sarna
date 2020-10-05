@@ -53,7 +53,8 @@ class Finding(Base, db.Model):
         AttributeConfiguration(name='cvss_v3_severity', **supported_serialization),
         AttributeConfiguration(name='client_finding_id', **supported_serialization),
         AttributeConfiguration(name='client_finding_code', **supported_serialization),
-        AttributeConfiguration(name='notes', **supported_serialization)
+        AttributeConfiguration(name='notes', **supported_serialization),
+        AttributeConfiguration(name='cwe', **supported_serialization)
     ]
 
     id = db.Column(db.Integer, primary_key=True)
@@ -188,6 +189,7 @@ class Finding(Base, db.Model):
     
     asvs = db.Column(db.String(8))
     masvs = db.Column(db.String(8))
+    cwe = db.Column(db.String(8))
 
     @classmethod
     def build_from_template(cls, template: FindingTemplate, assessment: Assessment):
