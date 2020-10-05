@@ -1,7 +1,7 @@
 """CWE
 
 Revision ID: 81282ee00276
-Revises: 44c6c91dd3c4
+Revises: 21eef33e8366
 Create Date: 2020-10-05 11:26:02.075780
 
 """
@@ -12,7 +12,7 @@ import sarna
 
 # revision identifiers, used by Alembic.
 revision = '81282ee00276'
-down_revision = '44c6c91dd3c4'
+down_revision = '21eef33e8366'
 branch_labels = None
 depends_on = None
 
