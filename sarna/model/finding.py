@@ -77,11 +77,11 @@ class Finding(Base, db.Model):
     description = db.Column(db.String())
     solution = db.Column(db.String())
 
-    tech_risk = db.Column(Enum(Score))
-    business_risk = db.Column(Enum(Score))
-    exploitability = db.Column(Enum(Score))
-    dissemination = db.Column(Enum(Score))
-    solution_complexity = db.Column(Enum(Score))
+    tech_risk = db.Column(Enum(Score), default=Score.NA)
+    business_risk = db.Column(Enum(Score), default=Score.NA)
+    exploitability = db.Column(Enum(Score), default=Score.NA)
+    dissemination = db.Column(Enum(Score), default=Score.NA)
+    solution_complexity = db.Column(Enum(Score), default=Score.NA)
 
     definition = db.Column(db.String(), nullable=False)
     references = db.Column(db.String(), nullable=False)
@@ -227,7 +227,11 @@ class Finding(Base, db.Model):
             cvss_v3_vector=template.cvss_v3_vector,
             cvss_v3_score=template.cvss_v3_score,
 
-            client_finding_id=client.generate_finding_counter()
+            client_finding_id=client.generate_finding_counter(),
+
+            asvs=template.asvs,
+            masvs=template.masvs,
+            cwe=template.cwe
         )
 
 

@@ -14,11 +14,11 @@ class FindingTemplate(Base, db.Model):
     owasp_mobile_category = db.Column(Enum(MSTG))
     owisam_category = db.Column(Enum(OWISAMCategory))
 
-    tech_risk = db.Column(Enum(Score))
-    business_risk = db.Column(Enum(Score))
-    exploitability = db.Column(Enum(Score))
-    dissemination = db.Column(Enum(Score))
-    solution_complexity = db.Column(Enum(Score))
+    tech_risk = db.Column(Enum(Score), default=Score.NA)
+    business_risk = db.Column(Enum(Score), default=Score.NA)
+    exploitability = db.Column(Enum(Score), default=Score.NA)
+    dissemination = db.Column(Enum(Score), default=Score.NA)
+    solution_complexity = db.Column(Enum(Score), default=Score.NA)
 
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
     creator = db.relationship('User', back_populates='created_findings', uselist=False)

@@ -444,6 +444,7 @@ class MSTG(BaseChoice):
     MSTG_CODE_9 = 71, 'MSTG-CODE-9', 'Free security features offered by the toolchain, such as byte-code minification, stack protection, PIE support and automatic reference counting, are activated.'
     
 class CWE(BaseChoice):
+    _init_ = "value code desc"
     CWE_15 = 15, 'CWE-15', 'External Control of System or Configuration Setting'
     CWE_23 = 23, 'CWE-23', 'Relative Path Traversal'
     CWE_36 = 36, 'CWE-36', 'Absolute Path Traversal'
