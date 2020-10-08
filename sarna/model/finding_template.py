@@ -36,9 +36,9 @@ class FindingTemplate(Base, db.Model):
     @property
     def cvss_v3_severity(self):
         score = self.cvss_v3_score
-        if score == 0:
+        if score <  1:
             return Score.Info
-        elif 0 < score < 4:
+        elif 1 <= score < 4:
             return Score.Low
         elif 4 <= score < 7:
             return Score.Medium
@@ -48,13 +48,7 @@ class FindingTemplate(Base, db.Model):
             return Score.Critical
     
     asvs = db.Column(db.String(8))
-    masvs = db.Column(db.String(8))
-
-    asvs = db.Column(db.String(8))
-    masvs = db.Column(db.String(8))
-
-    asvs = db.Column(db.String(8))
-    masvs = db.Column(db.String(8))
+    masvs = db.Column(db.String(8))    
     cwe = db.Column(Enum(CWE))
 
 

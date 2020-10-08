@@ -56,7 +56,7 @@
                     <th>Title</th>
                     <th>Type</th>
                     <th>CVSS score</th>
-                    <th>Business risk</th>
+                    <th>Bug Tracking #</th>
                     <th>Status</th>
                     <th class="text-right">Actions</th>
                     </thead>
@@ -72,7 +72,7 @@
                             <td>{{ finding.title }}</td>
                             <td>{{ finding.type }}</td>
                             <td>{{ render_cvss_pill(finding.cvss_v3_severity, finding.cvss_v3_score) }}</td>
-                            <td>{{ render_score_pill(finding.business_risk) }}</td>
+                            <td>{{ finding.bugtracking }}</td>
                             <td>{{ render_finding_status_pill(finding.status) }}</td>
                             <td>
                                 <div class="btn-group float-right">
@@ -85,6 +85,17 @@
                                        href="{{ url_for('.edit_finding', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}">
                                         <span class="fa fa-pencil"></span>
                                     </a>
+
+                                    {% if finding.bugtracking %}
+                                    <a class="btn btn-secondary" href="{{ finding.bugtracking_link }}" target="_blank">    
+                                        <span class="fa fa-external-link"></span>
+                                    </a>
+                                    {% else %}
+                                    <a class="btn btn-secondary" 
+                                        href="{{ url_for('.report_finding', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}">    
+                                        <span class="fa fa-bug"></span>
+                                    </a>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>

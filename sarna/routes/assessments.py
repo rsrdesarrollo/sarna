@@ -17,6 +17,8 @@ from sarna.model import Assessment, User, AffectedResource, Finding, FindingTemp
 from sarna.model.enums import FindingStatus
 from sarna.report_generator.engine import generate_reports_bundle
 
+from sarna.bugtracking.jira import JiraAPI
+
 blueprint = Blueprint('assessments', __name__)
 
 
@@ -167,6 +169,16 @@ def delete_findings(assessment_id, finding_id):
     flash("Finding deleted", "success")
     return redirect_back('.findings', assessment_id=assessment_id)
 
+@blueprint.route('/<assessment_id>/findings/<finding_id>/report', methods=('GET',))
+@auditor_required
+def report_finding(assessment_id, finding_id):
+    finding = Finding.query.filter_by(id=finding_id).one()
+    if not current_user.audits(finding.assessment):
+        abort(403)
+
+    JiraAPI().create_finding(finding)
+
+    return redirect_back('.findings', assessment_id=assessment_id)
 
 @blueprint.route('/<assessment_id>/add')
 @auditor_required

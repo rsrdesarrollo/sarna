@@ -9,6 +9,10 @@ services:
       FLASK_ENV: 'production'
       SQLALCHEMY_DATABASE_URI: 'postgres://user:password@psql/sarna'
       SECRET_KEY: 'Insecure Secret Change Me!!'
+      JIRA_USER: ${JIRA_USER}
+      JIRA_PASSWORD: ${JIRA_PASSWORD}
+      JIRA_SERVER: ${JIRA_SERVER}
+      JIRA_SSL_CERT: '/jira_ssl_cert.crt'
     depends_on:
       - psql
     ports:

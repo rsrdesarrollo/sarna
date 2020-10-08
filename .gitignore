@@ -115,3 +115,6 @@ yarn.lock
 volumes
 _requirements.txt
 .vscode
+
+# Certificates
+*.crt

@@ -2,7 +2,7 @@ from wtforms import validators, StringField, HiddenField, SelectField
 
 from sarna.forms.base_entity_form import BaseEntityForm
 from sarna.model.finding_template import FindingTemplate, FindingTemplateTranslation, Solution
-from sarna.model.enums import Score, AssessmentStatus, AssessmentType, Language, WSTG, MSTG, CWE
+from sarna.model.enums import Score, FindingStatus, FindingType, Language, WSTG, MSTG, CWE
 
 
 
@@ -28,8 +28,8 @@ class FindingTemplateCreateNewForm(
         validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')],
         default = "0.0.0"
     )
-    status = SelectField("Status", choices=AssessmentStatus.choices(), default=AssessmentStatus.Open, coerce=AssessmentStatus.coerce)
-    type = SelectField("Type", choices=AssessmentType.choices(), default=AssessmentType.Web, coerce=AssessmentType.coerce)
+    status = SelectField("Status", choices=FindingStatus.choices(), default=FindingStatus.Pending, coerce=FindingStatus.coerce)
+    type = SelectField("Type", choices=FindingType.choices(), default=FindingType.Web, coerce=FindingType.coerce)
     lang = SelectField("Language", choices=Language.choices(), default=Language.Spanish, coerce=Language.coerce)
     tech_risk = HiddenField(default=Score.NA)
     business_risk = HiddenField(default=Score.NA)
@@ -57,8 +57,8 @@ class FindingTemplateEditForm(
         validators = [validators.Regexp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}')],
         default = "0.0.0"
     )
-    status = SelectField("Status", choices=AssessmentStatus.choices(), default=AssessmentStatus.Open, coerce=AssessmentStatus.coerce)
-    type = SelectField("Type", choices=AssessmentType.choices(), default=AssessmentType.Web, coerce=AssessmentType.coerce)
+    status = SelectField("Status", choices=FindingStatus.choices(), default=FindingStatus.Pending, coerce=FindingStatus.coerce)
+    type = SelectField("Type", choices=FindingType.choices(), default=FindingType.Web, coerce=FindingType.coerce)
     lang = SelectField("Language", choices=Language.choices(), default=Language.Spanish, coerce=Language.coerce)
     tech_risk = HiddenField(default=Score.NA)
     business_risk = HiddenField(default=Score.NA)

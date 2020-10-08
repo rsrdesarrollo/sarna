@@ -1,3 +1,5 @@
+import os
+
 from typing import Collection, AnyStr
 
 from rfc3986 import URIReference
@@ -54,7 +56,8 @@ class Finding(Base, db.Model):
         AttributeConfiguration(name='client_finding_id', **supported_serialization),
         AttributeConfiguration(name='client_finding_code', **supported_serialization),
         AttributeConfiguration(name='notes', **supported_serialization),
-        AttributeConfiguration(name='cwe', **supported_serialization)
+        AttributeConfiguration(name='cwe', **supported_serialization),
+        AttributeConfiguration(name='bugtracking', **supported_serialization)
     ]
 
     id = db.Column(db.Integer, primary_key=True)
@@ -172,9 +175,9 @@ class Finding(Base, db.Model):
     @property
     def cvss_v3_severity(self):
         score = self.cvss_v3_score
-        if score == 0:
+        if score <  1:
             return Score.Info
-        elif 0 < score < 4:
+        elif 1 <= score < 4:
             return Score.Low
         elif 4 <= score < 7:
             return Score.Medium
@@ -190,6 +193,11 @@ class Finding(Base, db.Model):
     asvs = db.Column(db.String(8))
     masvs = db.Column(db.String(8))
     cwe = db.Column(Enum(CWE), nullable=False)
+    bugtracking = db.Column(db.String(16))
+
+    @property
+    def bugtracking_link(self):
+        return os.getenv('JIRA_SERVER') + "/browse/" + self.bugtracking if self.bugtracking else None
 
     @classmethod
     def build_from_template(cls, template: FindingTemplate, assessment: Assessment):

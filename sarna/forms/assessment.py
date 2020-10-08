@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
-from wtforms import SelectMultipleField, TextAreaField, StringField, FloatField
+from wtforms import SelectMultipleField, TextAreaField, StringField, FloatField, SelectField
 from wtforms.validators import Optional
 
 from sarna.auxiliary.upload_helpers import is_valid_evidence
@@ -9,6 +9,7 @@ from sarna.forms.base_entity_form import BaseEntityForm
 from sarna.model import Assessment, Active, AffectedResource
 from sarna.model.finding import Finding
 from sarna.model.user import User
+from sarna.model.enums import AssessmentType, AssessmentStatus, Language
 
 
 class AssessmentForm(BaseEntityForm(Assessment, skip_attrs={'estimated_hours', 'effective_hours', 'end_date', 'platform'})):
@@ -19,6 +20,9 @@ class AssessmentForm(BaseEntityForm(Assessment, skip_attrs={'estimated_hours', '
     bugtracking = StringField(label='Bug Tracking ticket #', render_kw={'placeholder': 'APPSECSER-XXX'})
     application = StringField(label='Application to assess', render_kw={'placeholder': 'APPWEB-MyApp'})
     riskprof_score = FloatField(label='Risk Profile Score', render_kw={'placeholder': '0.0'})
+    status = SelectField("Status", choices=AssessmentStatus.choices(), default=AssessmentStatus.Open, coerce=AssessmentStatus.coerce)
+    type = SelectField("Type", choices=AssessmentType.choices(), default=AssessmentType.Web, coerce=AssessmentType.coerce)
+    lang = SelectField("Language", choices=Language.choices(), default=Language.Spanish, coerce=Language.coerce)
 
 
 class FindingEditForm(BaseEntityForm(Finding, skip_attrs={'name', 'client_finding_id', 'tech_risk', 'business_risk', 'exploitability', 'dissemination', 'solution_complexity'},
