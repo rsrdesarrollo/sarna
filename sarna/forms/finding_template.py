@@ -15,7 +15,7 @@ class FindingTemplateCreateNewForm(
 ):
     owasp_category = SelectField("Web Security Testing Guide", choices=WSTG.choices(), coerce=WSTG.coerce)
     owasp_mobile_category = SelectField("Mobile Security Testing Guide", choices=MSTG.choices(), coerce=MSTG.coerce)
-    cwe = SelectField("Common Weakness Enumeration", choices=CWE.choices(), coerce=CWE.coerce)
+    cwe = SelectField("Common Weakness Enumeration", choices=CWE.choices(), coerce=CWE.coerce, validators= [validators.DataRequired ()])
     masvs = StringField(
         label = "MASVS - OWASP Mobile Application Security Verification Standard Requirement #", 
         render_kw = {'placeholder': '0.0.0'},
@@ -45,6 +45,9 @@ class FindingTemplateEditForm(
         skip_attrs={ 'owisam_category' }
     )
 ):
+    owasp_category = SelectField("Web Security Testing Guide", choices=WSTG.choices(), coerce=WSTG.coerce)
+    owasp_mobile_category = SelectField("Mobile Security Testing Guide", choices=MSTG.choices(), coerce=MSTG.coerce)
+    cwe = SelectField("Common Weakness Enumeration", choices=CWE.choices(), coerce=CWE.coerce, validators=[validators.DataRequired ()])
     masvs = StringField(
         label = "MASVS - OWASP Mobile Application Security Verification Standard Requirement #", 
         render_kw = {'placeholder': '0.0.0'},
@@ -59,7 +62,7 @@ class FindingTemplateEditForm(
     )
     status = SelectField("Status", choices=FindingStatus.choices(), default=FindingStatus.Pending, coerce=FindingStatus.coerce)
     type = SelectField("Type", choices=FindingType.choices(), default=FindingType.Web, coerce=FindingType.coerce)
-    lang = SelectField("Language", choices=Language.choices(), default=Language.Spanish, coerce=Language.coerce)
+    lang = SelectField("Language", choices=Language.choices(), default=Language.Spanish, coerce=Language.coerce)    
     tech_risk = HiddenField(default=Score.NA)
     business_risk = HiddenField(default=Score.NA)
     exploitability = HiddenField(default=Score.NA)

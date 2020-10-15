@@ -49,7 +49,7 @@ class FindingTemplate(Base, db.Model):
     
     asvs = db.Column(db.String(8))
     masvs = db.Column(db.String(8))    
-    cwe = db.Column(Enum(CWE))
+    cwe = db.Column(Enum(CWE), nullable=False)
 
 
 class FindingTemplateTranslation(Base, db.Model):
