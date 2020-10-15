@@ -95,6 +95,26 @@
                     'cmdListO', 'cmdList', 'cmdUrl', 'cmdHeading', 'cmdItalic', 'cmdBold', 'cmdCode'],
                 additionalButtons: [
                     [{
+                        name: "ProjectKey",
+                        data: [{
+                            name: "cmdProjectKey",
+                            title: "Project Key",
+                            icon: {
+                                fa: 'fa fa-bug',
+                            },
+                            callback: function (e) {
+                                let base = "{{ bugtracking_url }}";
+                                let key = 'PROJECTKEY';
+                                let selected = e.getSelection();
+                                let cursor = selected.start + base.length;
+
+                                image_selector_modal.modal('hide');
+
+                                e.replaceSelection(base + key);
+                                e.setSelection(cursor, cursor + key.length);
+                            }
+                        }]
+                    }, {
                         name: "HttpUrl",
                         data: [{
                             name: "cmdCustomUrl",

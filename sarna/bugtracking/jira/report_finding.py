@@ -6,13 +6,14 @@ from sarna.core.auth import current_user
 from sarna.model import db
 from sarna.model.enums import Score, AssessmentType
 from jira import JIRA
-from flask import flash
+from flask import flash, abort
 
 __all__ = [ 'JiraAPI' ]
 
 class JiraAPI:
     attachment_regex = re.compile('!\[.+\]\((.+)\)')
     reference_regex = re.compile('\[([^\[\]].+)]\((http.+)\)')
+    project_regex = re.compile('^' + os.getenv('JIRA_SERVER').replace(".", "\.") + '/projects/' + '([A-Z]+)$')
 
     def create_finding(self, finding):
         horizontal_line = "\n----\n"
@@ -24,11 +25,23 @@ class JiraAPI:
             auth=(os.getenv('JIRA_USER'), os.getenv('JIRA_PASSWORD'))
         )
 
-        assessment_ticket = jira.issue(finding.assessment.bugtracking, fields='customfield_19160')
-        project_to_report = assessment_ticket.raw['fields']['customfield_19160']
+        project_to_report = None
+        # Affected resources might have a reference to a bugtracking project
+        for resource in finding.affected_resources:
+            match = self.project_regex.search(resource.uri)
+            if match:
+                project_to_report = jira.project(match.group(1)).raw
+                break
+
+        # If not, default to related field at assessment
+        if project_to_report is None and finding.assessment.bugtracking:
+            assessment_ticket = jira.issue(finding.assessment.bugtracking, fields='customfield_19160')
+            project_to_report = assessment_ticket.raw['fields']['customfield_19160']
+        elif finding.assessment.bugtracking:
+            assessment_ticket = jira.issue(finding.assessment.bugtracking, fields='customfield_19160')
 
         if project_to_report is None:
-            abort(400, { 'message': 'Assessment bugtracking ticket does not have a valid related project for issue creation.' })
+            abort(400, description='Unable to determine project for issue creation.')
         
         # Gather Issue information
         severity = None
@@ -91,7 +104,7 @@ class JiraAPI:
             'customfield_13069': goal_date.strftime("%Y-%m-%d"),
             'description': description
         })
-
+        
         task = jira.create_issue(fields=data)
 
         flash('Security Task {} created. Some fields can not be informed on creation. Remember to review it.'.format(task.key), category='warning')
@@ -105,7 +118,7 @@ class JiraAPI:
         base_path = finding.assessment.evidence_path()
         for att in attachments:
             jira.add_attachment(task, base_path + "/" + att)
-
+        
         """
         task.update(fields={ 
             'customfield_19768':  { 'id': severity['id'] },

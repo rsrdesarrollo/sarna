@@ -141,7 +141,8 @@ def edit_finding(assessment_id, finding_id):
             a.name: a.text
             for a in solutions
         },
-        evidences=assessment.images
+        evidences=assessment.images,
+        bugtracking_url=os.getenv('JIRA_SERVER') + '/projects/'
     )
     if form.validate_on_submit():
         data = dict(form.data)
