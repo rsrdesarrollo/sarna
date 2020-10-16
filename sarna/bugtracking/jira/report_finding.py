@@ -36,7 +36,8 @@ class JiraAPI:
         # If not, default to related field at assessment
         if project_to_report is None and finding.assessment.bugtracking:
             assessment_ticket = jira.issue(finding.assessment.bugtracking, fields='customfield_19160')
-            project_to_report = assessment_ticket.raw['fields']['customfield_19160']
+            if assessment_ticket:
+                project_to_report = assessment_ticket.raw['fields']['customfield_19160']
         elif finding.assessment.bugtracking:
             assessment_ticket = jira.issue(finding.assessment.bugtracking, fields='customfield_19160')
 
@@ -113,7 +114,8 @@ class JiraAPI:
 
         db.session.commit()
 
-        jira.create_issue_link('Relates', task, assessment_ticket)
+        if assessment_ticket:
+            jira.create_issue_link('Relates', task, assessment_ticket)
         
         base_path = finding.assessment.evidence_path()
         for att in attachments:
