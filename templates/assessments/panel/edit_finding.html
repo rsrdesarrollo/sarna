@@ -10,6 +10,34 @@
         </div>
 
         <div class="col-lg-7 mt-7">
+            <h5 class="mt-4">Solution Selector</h5>
+            <div class="form-row">
+                <div class="col">
+                    <select id="solution_select" class="form-control col-auto">
+                        <option value=""></option>
+                        {% for solution in solutions %}
+                            <option value="{{ solution.name }}">{{ solution.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-3">
+                    <a class="btn btn-primary btn-block" id="solution_apply" href="#">Apply</a>
+                </div>
+                <div class="col-1">
+                    <a class="btn btn-success btn-block" target="_blank"
+                       href="{{ url_for('findings.add_solution', finding_id=finding.template.id) }}">
+                        <span class="fa fa-plus"></span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="row px-4 pt-2 mt-3 mx-1 ">
+                <div style="border-radius: 0.5em"
+                     class="col border border-secondary bg-light"
+                     id="solution_select_desc">
+                </div>
+            </div>
+
             <h5>CVSS Calculator</h5>
             <div class="row cvssjs" id="cvssresults">
                 <dl>
@@ -38,35 +66,7 @@
                 </dl>
             </div>            
             <hr>
-            <div id="cvssboard"></div>
-               
-            <h5 class="mt-4">Solution Selector</h5>
-            <div class="form-row">
-                <div class="col">
-                    <select id="solution_select" class="form-control col-auto">
-                        <option value=""></option>
-                        {% for solution in solutions %}
-                            <option value="{{ solution.name }}">{{ solution.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-3">
-                    <a class="btn btn-primary btn-block" id="solution_apply" href="#">Apply</a>
-                </div>
-                <div class="col-1">
-                    <a class="btn btn-success btn-block" target="_blank"
-                       href="{{ url_for('findings.add_solution', finding_id=finding.template.id) }}">
-                        <span class="fa fa-plus"></span>
-                    </a>
-                </div>
-            </div>
-
-            <div class="row px-4 pt-2 mt-3 mx-1 ">
-                <div style="border-radius: 0.5em"
-                     class="col border border-secondary bg-light"
-                     id="solution_select_desc">
-                </div>
-            </div>
+            <div id="cvssboard"></div>                          
 
             <script>
                 $(document).ready(function () {
