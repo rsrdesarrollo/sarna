@@ -22,7 +22,6 @@
                     <th>Name</th>
                     <th>Type</th>
                     <th>ASVS</th>
-                    <th>MASVS</th>
                     <th>CVSS Score</th>
                     <th># Solutions</th>
                     <th>Created by</th>
@@ -38,8 +37,7 @@
                                 </a>
                             </td>
                             <td>{{ finding.type }}</td>
-                            <td>{{ finding.asvs }}</td>
-                            <td>{{ finding.masvs }}</td>
+                            <td></td>
                             <td>{{ render_cvss_pill(finding.cvss_v3_severity, finding.cvss_v3_score) }}</td>
                             <td>{{ finding.solutions|length }}</td>
                             <td>{{ finding.creator.name }}</td>
@@ -83,13 +81,12 @@
                 return {
                     name: tds[0].firstElementChild.innerText,
                     type: tds[1].textContent,
-                    asvs: tds[2].textContent,
-                    masvs: tds[2].textContent
+                    asvs: tds[2].textContent
                 }
             }
 
             function search(tds, re) {
-                return re.test(tds.name) || re.test(tds.type) || re.test(tds.asvs) || re.test(tds.masvs);
+                return re.test(tds.name) || re.test(tds.type) || re.test(tds.asvs);
             }
 
             let trs = document.getElementById("table_data").getElementsByTagName("tr");

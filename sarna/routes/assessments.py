@@ -124,37 +124,41 @@ def edit_finding(assessment_id, finding_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
     if not current_user.audits(assessment):
         abort(403)
-
+    
     finding = Finding.query.filter_by(id=finding_id).one()
-
-    finding_dict = finding.to_dict()
-    finding_dict['affected_resources'] = "\r\n".join(r.uri for r in finding.affected_resources)
-    form_data = request.form.to_dict() or finding_dict
-    form = FindingEditForm(**form_data)
     solutions = finding.template.solutions if finding.template else []
     context = dict(
-        assessment=assessment,
-        form=form,
-        finding=finding,
-        solutions=solutions,
-        solutions_dict={
-            a.name: a.text
-            for a in solutions
-        },
-        evidences=assessment.images,
-        bugtracking_url=os.getenv('JIRA_SERVER') + '/projects/'
-    )
-    if form.validate_on_submit():
-        data = dict(form.data)
-        data.pop('csrf_token', None)
-        affected_resources = data.pop('affected_resources', '').split('\n')
-        try:
-            finding.update_affected_resources(affected_resources)  # TODO: Raise different exception
-            finding.set(**data)
-            return redirect_back('.findings', assessment_id=assessment_id)
-        except ValueError as ex:
-            form.affected_resources.errors.append(str(ex))
+            assessment=assessment,
+            finding=finding,
+            evidences=assessment.images,
+            bugtracking_url=os.getenv('JIRA_SERVER') + '/projects/',
+            solutions=solutions,
+            solutions_dict={
+                a.name: a.text
+                for a in solutions
+            }
+        )
 
+    if request.method == 'GET':
+        finding_dict = finding.to_dict()
+        finding_dict['affected_resources'] = "\r\n".join(r.uri for r in finding.affected_resources)
+        finding_dict = finding.display_one_to_manies(finding_dict)
+        context['form'] = FindingEditForm(**finding_dict)
+    else:
+        form = FindingEditForm(request.form)
+        context['form'] = form
+        if form.validate_on_submit():
+            data = dict(form.data)
+            data.pop('csrf_token', None)
+            affected_resources = data.pop('affected_resources', '').split('\n')
+            try:
+                finding.update_affected_resources(affected_resources)  # TODO: Raise different exception
+                finding.update_one_to_manies(form)
+                finding.set(**data)
+                return redirect_back('.findings', assessment_id=assessment_id)
+            except ValueError as ex:
+                form.affected_resources.errors.append(str(ex))
+    
     return render_template('assessments/panel/edit_finding.html', **context)
 
 
@@ -170,7 +174,8 @@ def delete_findings(assessment_id, finding_id):
     flash("Finding deleted", "success")
     return redirect_back('.findings', assessment_id=assessment_id)
 
-@blueprint.route('/<assessment_id>/findings/<finding_id>/report', methods=('GET',))
+
+@blueprint.route('/<assessment_id>/findings/<finding_id>/report', methods=('GET', 'POST'))
 @auditor_required
 def report_finding(assessment_id, finding_id):
     finding = Finding.query.filter_by(id=finding_id).one()
@@ -180,6 +185,7 @@ def report_finding(assessment_id, finding_id):
     JiraAPI().create_finding(finding)
 
     return redirect_back('.findings', assessment_id=assessment_id)
+
 
 @blueprint.route('/<assessment_id>/add')
 @auditor_required

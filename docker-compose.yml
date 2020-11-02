@@ -27,6 +27,13 @@ services:
       - vol_sarna_db:/var/lib/postgresql/data
     ports:
       - 127.0.0.1:5432:5432
+  #pgadmin:
+      #image: dpage/pgadmin4
+      #environment: 
+        #PGADMIN_DEFAULT_EMAIL: user@sarna.com
+        #PGADMIN_DEFAULT_PASSWORD: admin
+      #ports:
+        #- 127.0.0.1:8089:80
 volumes:
   vol_sarna_db:
   vol_sarna_upload:

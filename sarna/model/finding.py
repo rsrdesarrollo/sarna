@@ -7,11 +7,14 @@ from sqlathanor import AttributeConfiguration
 
 from sarna.model.assessment import Assessment
 from sarna.model.base import Base, db, supported_serialization
-from sarna.model.enums import Score, WSTG, MSTG, OWISAMCategory, FindingType, FindingStatus, CWE
+from sarna.model.enums import Score, WSTG, MSTG, OWISAMCategory, FindingType, FindingStatus, CWE, ASVS, MASVS
 from sarna.model.finding_template import FindingTemplate, FindingTemplateTranslation
 from sarna.model.sql_types import Enum
 
-__all__ = ['Finding', 'Active', 'AffectedResource', 'finding_affected_resource']
+from flask_wtf import FlaskForm
+
+__all__ = ['FindingMobileTest', 'FindingWebTest', 'FindingWebRequirement', 'FindingMobileRequirement',
+           'Finding', 'Active', 'AffectedResource', 'finding_affected_resource', 'FindingCWE']
 
 finding_affected_resource = db.Table(
     'finding_affected_resource',
@@ -37,8 +40,6 @@ class Finding(Base, db.Model):
         AttributeConfiguration(name='title', **supported_serialization),
         AttributeConfiguration(name='type', **supported_serialization),
         AttributeConfiguration(name='status', **supported_serialization),
-        AttributeConfiguration(name='owasp_category', **supported_serialization),
-        AttributeConfiguration(name='owasp_mobile_category', **supported_serialization),
         AttributeConfiguration(name='owisam_category', **supported_serialization),
         AttributeConfiguration(name='description', **supported_serialization),
         AttributeConfiguration(name='solution', **supported_serialization),
@@ -73,8 +74,6 @@ class Finding(Base, db.Model):
     title = db.Column(db.String(128), nullable=False)
     status = db.Column(Enum(FindingStatus), nullable=False, default=FindingStatus.Pending)
 
-    owasp_category = db.Column(Enum(WSTG))
-    owasp_mobile_category = db.Column(Enum(MSTG))
     owisam_category = db.Column(Enum(OWISAMCategory))
 
     description = db.Column(db.String())
@@ -97,6 +96,8 @@ class Finding(Base, db.Model):
     client_finding_id = db.Column(db.Integer(), nullable=False)
 
     notes = db.Column(db.String())
+
+    bugtracking = db.Column(db.String(16))
 
     def update_affected_resources(self, resources: Collection[AnyStr]):
         resource_uris = []
@@ -190,11 +191,6 @@ class Finding(Base, db.Model):
     def client_finding_code(self):
         return self.assessment.client.format_finding_code(self)
     
-    asvs = db.Column(db.String(8))
-    masvs = db.Column(db.String(8))
-    cwe = db.Column(Enum(CWE), nullable=False)
-    bugtracking = db.Column(db.String(16))
-
     @property
     def bugtracking_link(self):
         return os.getenv('JIRA_SERVER') + "/browse/" + self.bugtracking if self.bugtracking else None
@@ -208,8 +204,8 @@ class Finding(Base, db.Model):
             translation = t
             if t.lang == lang:
                 break
-
-        return Finding(
+        
+        new_finding = Finding(
             name=template.name,
             type=template.type,
 
@@ -219,8 +215,6 @@ class Finding(Base, db.Model):
             dissemination=template.dissemination,
             solution_complexity=template.solution_complexity,
 
-            owasp_category=template.owasp_category,
-            owasp_mobile_category=template.owasp_mobile_category,
             owisam_category=template.owisam_category,
 
             template=template,
@@ -236,11 +230,196 @@ class Finding(Base, db.Model):
             cvss_v3_score=template.cvss_v3_score,
 
             client_finding_id=client.generate_finding_counter(),
-
-            asvs=template.asvs,
-            masvs=template.masvs,
-            cwe=template.cwe
         )
+
+        for requirement in template.web_requirements:
+            FindingWebRequirement(finding=new_finding, asvs_req=requirement.asvs_req)
+        for requirement in template.mobile_requirements:
+            FindingMobileRequirement(finding=new_finding, masvs_req=requirement.masvs_req)
+        for ref in template.wstg_refs:
+            FindingWebTest(finding=new_finding, wstg_ref=ref.wstg_ref)
+        for ref in template.mstg_refs:
+            FindingMobileTest(finding=new_finding, mstg_ref=ref.mstg_ref)
+        for ref in template.cwe_refs:
+            FindingCWE(finding=new_finding, cwe_ref=ref.cwe_ref)
+
+        return new_finding
+
+    def update_one_to_manies(self, form: FlaskForm):
+        # CWE
+        data_cwe = {k: v for k, v in dict(form.data).items() if k in FindingCWE.__dict__}
+        if data_cwe:
+            data_cwe = data_cwe['cwe_ref']
+            # Delete current relation
+            for ref in self.cwe_refs:
+                if not ref.cwe_ref in data_cwe:
+                    ref.delete()
+                else:
+                    data_cwe.remove(ref.cwe_ref)
+            # Create new refs
+            for ref in data_cwe:
+                FindingCWE(finding=self, cwe_ref=ref)
+        # ASVS
+        data_asvs = {k: v for k, v in dict(form.data).items() if k in FindingWebRequirement.__dict__}
+        if data_asvs:
+            data_asvs = data_asvs['asvs_req']
+            # Delete current relation
+            for requirement in self.web_requirements:
+                if not requirement.asvs_req in data_asvs:
+                    requirement.delete()
+                else:
+                    data_asvs.remove(requirement.asvs_req)
+            # Create new requirements
+            for asvs in data_asvs:
+                FindingWebRequirement(finding=self, asvs_req=asvs)
+        # MASVS
+        data_masvs = {k: v for k, v in dict(form.data).items() if k in FindingMobileRequirement.__dict__}
+        if data_masvs:
+            data_masvs = data_masvs['masvs_req']
+            # Delete current relation
+            for requirement in self.mobile_requirements:
+                if not requirement.masvs_req in data_masvs:
+                    requirement.delete()
+                else:
+                    data_masvs.remove(requirement.masvs_req)
+            # Create new requirements
+            for masvs in data_masvs:
+                FindingMobileRequirement(finding=self, masvs_req=masvs)
+        # WSTG
+        data_wstg = {k: v for k, v in dict(form.data).items() if k in FindingWebTest.__dict__}
+        if data_wstg:
+            data_wstg = data_wstg['wstg_ref']
+            # Delete current relation
+            for requirement in self.wstg_refs:
+                if not requirement.wstg_ref in data_wstg:
+                    requirement.delete()
+                else:
+                    data_wstg.remove(requirement.wstg_ref)
+            # Create new requirements
+            for wstg in data_wstg:
+                FindingWebTest(finding=self, wstg_ref=wstg)
+        # MSTG
+        data_mstg = {k: v for k, v in dict(form.data).items() if k in FindingMobileTest.__dict__}
+        if data_mstg:
+            data_mstg = data_mstg['mstg_ref']
+            # Delete current relation
+            for requirement in self.mstg_refs:
+                if not requirement.mstg_ref in data_mstg:
+                    requirement.delete()
+                else:
+                    data_mstg.remove(requirement.mstg_ref)
+            # Create new requirements
+            for mstg in data_mstg:
+                FindingMobileTest(finding=self, mstg_ref=mstg)
+
+    def display_one_to_manies(self, data: dict):
+        if not data:
+            data = []
+        # CWE
+        cwe_refs = []
+        for ref in self.cwe_refs:
+            cwe_refs.append(CWE(ref.cwe_ref))
+        data['cwe_ref'] = cwe_refs
+        # ASVS
+        web_requirements = []
+        for requirement in self.web_requirements:
+            web_requirements.append(ASVS(requirement.asvs_req))
+        data['asvs_req'] = web_requirements
+        # MASVS
+        mobile_requirements = []
+        for requirement in self.mobile_requirements:
+            mobile_requirements.append(MASVS(requirement.masvs_req))
+        data['masvs_req'] = mobile_requirements
+        # WSTG
+        wstg_refs = []
+        for requirement in self.wstg_refs:
+            wstg_refs.append(WSTG(requirement.wstg_ref))
+        data['wstg_ref'] = wstg_refs
+        # MSTG
+        mstg_refs = []
+        for requirement in self.mstg_refs:
+            mstg_refs.append(MSTG(requirement.mstg_ref))
+        data['mstg_ref'] = mstg_refs
+
+        return data
+
+    def get_requirements_string(self):
+        if self.web_requirements:
+            return ", ".join([ref.asvs_req.code for ref in self.web_requirements])
+        elif self.mobile_requirements:
+            return ", ".join([ref.masvs_req.code for ref in self.mobile_requirements])
+        else:
+            return None
+
+    def get_testing_refs(self):
+        if self.wstg_refs:
+            return ", ".join([ref.wstg_ref.code for ref in self.wstg_refs])
+        elif self.mstg_refs:
+            return ", ".join([ref.mstg_ref.code for ref in self.mstg_refs])
+        else:
+            return None
+
+    def get_cwe_refs(self):
+        if self.cwe_refs:
+            return ", ".join([ref.cwe_ref.code for ref in self.cwe_refs])
+        else:
+            return None
+
+    cwe_refs = db.relationship('FindingCWE', back_populates='finding')
+    web_requirements = db.relationship('FindingWebRequirement', back_populates='finding')
+    mobile_requirements = db.relationship('FindingMobileRequirement', back_populates='finding')
+    wstg_refs = db.relationship('FindingWebTest', back_populates='finding')
+    mstg_refs = db.relationship('FindingMobileTest', back_populates='finding')
+
+
+class FindingWebRequirement(Base, db.Model):
+    finding_id = db.Column(
+        db.Integer,
+        db.ForeignKey('finding.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    )    
+    asvs_req = db.Column(Enum(ASVS), primary_key=True)
+    finding = db.relationship('Finding', back_populates='web_requirements')
+
+
+class FindingMobileRequirement(Base, db.Model):
+    finding_id = db.Column(
+        db.Integer,
+        db.ForeignKey('finding.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    )    
+    masvs_req = db.Column(Enum(MASVS), primary_key=True)
+    finding = db.relationship('Finding', back_populates='mobile_requirements')
+
+
+class FindingWebTest(Base, db.Model):
+    finding_id = db.Column(
+        db.Integer,
+        db.ForeignKey('finding.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    )
+    wstg_ref = db.Column(Enum(WSTG), primary_key=True)
+    finding = db.relationship('Finding', back_populates='wstg_refs')
+
+
+class FindingMobileTest(Base, db.Model):
+    finding_id = db.Column(
+        db.Integer,
+        db.ForeignKey('finding.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    )
+    mstg_ref = db.Column(Enum(MSTG), primary_key=True)
+    finding = db.relationship('Finding', back_populates='mstg_refs')
+
+
+class FindingCWE(Base, db.Model):
+    finding_id = db.Column(
+        db.Integer,
+        db.ForeignKey('finding.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True
+    )
+    cwe_ref = db.Column(Enum(CWE), primary_key=True)
+    finding = db.relationship('Finding', back_populates='cwe_refs')
 
 
 class Active(Base, db.Model):

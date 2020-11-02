@@ -5,7 +5,9 @@ from sarna.auxiliary import redirect_back
 from sarna.core.auth import current_user
 from sarna.core.roles import trusted_required
 from sarna.forms.finding_template import *
-from sarna.model import FindingTemplate, FindingTemplateTranslation, db
+from sarna.model import FindingTemplate, FindingTemplateTranslation, \
+    FindingTemplateWebRequirement, FindingTemplateMobileRequirement, db, \
+    FindingTemplateWebTest, FindingTemplateMobileTest
 from sarna.model.enums import Language
 from sarna.model.finding_template import Solution
 
@@ -39,9 +41,37 @@ def new():
         
         data_finding = {k: v for k, v in data.items() if k in FindingTemplate.__dict__}
         data_translation = {k: v for k, v in data.items() if k in FindingTemplateTranslation.__dict__}
+        data_cwe = {k: v for k, v in data.items() if k in FindingTemplateCWE.__dict__}
+        data_asvs = {k: v for k, v in data.items() if k in FindingTemplateWebRequirement.__dict__}
+        data_masvs = {k: v for k, v in data.items() if k in FindingTemplateMobileRequirement.__dict__}
+        data_wstg = {k: v for k, v in data.items() if k in FindingTemplateWebTest.__dict__}
+        data_mstg = {k: v for k, v in data.items() if k in FindingTemplateMobileTest.__dict__}
 
         finding = FindingTemplate(creator=current_user, **data_finding)
+
         FindingTemplateTranslation(finding_template=finding, **data_translation)
+
+        # CWE
+        if data_cwe:
+            for cwe in data_cwe['cwe_ref']:
+                FindingTemplateCWE(finding_template=finding, cwe_ref=cwe)
+        # ASVS
+        if data_asvs:
+            for asvs in data_asvs['asvs_req']:
+                FindingTemplateWebRequirement(finding_template=finding, asvs_req=asvs)
+        # MASVS
+        if data_masvs:
+            for masvs in data_masvs['masvs_req']:
+                FindingTemplateMobileRequirement(finding_template=finding, masvs_req=masvs)
+        # WSTG
+        if data_wstg:
+            for wstg in data_wstg['wstg_ref']:
+                FindingTemplateWebTest(finding_template=finding, wstg_ref=wstg)
+        # MSTG
+        if data_mstg:
+            for mstg in data_mstg['mstg_ref']:
+                FindingTemplateMobileTest(finding_template=finding, mstg_ref=mstg)
+
         return redirect_back('.index')
 
     return render_template('findings/new.html', **context)
@@ -50,21 +80,31 @@ def new():
 @blueprint.route('/<finding_id>', methods=('POST', 'GET'))
 @trusted_required
 def edit(finding_id: int):
+    # Necessary for both GET and POST
     finding = FindingTemplate.query.filter_by(id=finding_id).one()
 
-    form_data = request.form.to_dict() or finding.to_dict()
-    form = FindingTemplateEditForm(**form_data)
-    context = dict(
-        form=form,
-        finding=finding
-    )
-    if form.validate_on_submit():
-        data = dict(form.data)
-        data.pop('csrf_token', None)
-        finding.set(**data)
-        db.session.commit()
-        return redirect_back('.index')
-    return render_template('findings/details.html', **context)
+    if request.method == 'POST':
+        # Process form data to update
+        form = FindingTemplateEditForm(request.form)    
+        if form.validate_on_submit():
+            finding.update_one_to_manies(form)
+            data = dict(form.data)
+            data.pop('csrf_token', None)
+            finding.set(**data)
+            db.session.commit()
+            return redirect_back('.index')
+    else:
+        # Load from DB        
+        data = finding.to_dict()
+        # Pull One to many relations
+        data = finding.display_one_to_manies(data)
+        # Create form
+        form = FindingTemplateEditForm(**data)
+        context = dict(
+            form=form,
+            finding=finding # Used to display solutions and translations
+        )        
+        return render_template('findings/details.html', **context)
 
 
 @blueprint.route('/<finding_id>/delete', methods=('POST',))
