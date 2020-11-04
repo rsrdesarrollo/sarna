@@ -118,3 +118,6 @@ _requirements.txt
 
 # Certificates
 *.crt
+
+# Templates
+*.template.docx
