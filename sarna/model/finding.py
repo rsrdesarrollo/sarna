@@ -249,7 +249,8 @@ class Finding(Base, db.Model):
         # CWE
         data_cwe = {k: v for k, v in dict(form.data).items() if k in FindingCWE.__dict__}
         if data_cwe:
-            data_cwe = data_cwe['cwe_ref']
+            # Filter None values
+            data_cwe = [ref for ref in data_cwe['cwe_ref'] if ref]
             # Delete current relation
             for ref in self.cwe_refs:
                 if not ref.cwe_ref in data_cwe:
@@ -262,7 +263,8 @@ class Finding(Base, db.Model):
         # ASVS
         data_asvs = {k: v for k, v in dict(form.data).items() if k in FindingWebRequirement.__dict__}
         if data_asvs:
-            data_asvs = data_asvs['asvs_req']
+            # Filter None values
+            data_asvs = [ref for ref in data_asvs['asvs_req'] if ref]
             # Delete current relation
             for requirement in self.web_requirements:
                 if not requirement.asvs_req in data_asvs:
@@ -275,7 +277,8 @@ class Finding(Base, db.Model):
         # MASVS
         data_masvs = {k: v for k, v in dict(form.data).items() if k in FindingMobileRequirement.__dict__}
         if data_masvs:
-            data_masvs = data_masvs['masvs_req']
+            # Filter None values
+            data_masvs = [ref for ref in data_masvs['masvs_req'] if ref]
             # Delete current relation
             for requirement in self.mobile_requirements:
                 if not requirement.masvs_req in data_masvs:
@@ -288,7 +291,8 @@ class Finding(Base, db.Model):
         # WSTG
         data_wstg = {k: v for k, v in dict(form.data).items() if k in FindingWebTest.__dict__}
         if data_wstg:
-            data_wstg = data_wstg['wstg_ref']
+            # Filter None values
+            data_wstg = [ref for ref in data_wstg['wstg_ref'] if ref]
             # Delete current relation
             for requirement in self.wstg_refs:
                 if not requirement.wstg_ref in data_wstg:
@@ -301,7 +305,8 @@ class Finding(Base, db.Model):
         # MSTG
         data_mstg = {k: v for k, v in dict(form.data).items() if k in FindingMobileTest.__dict__}
         if data_mstg:
-            data_mstg = data_mstg['mstg_ref']
+            # Filter None values
+            data_mstg = [ref for ref in data_mstg['mstg_ref'] if ref]
             # Delete current relation
             for requirement in self.mstg_refs:
                 if not requirement.mstg_ref in data_mstg:
