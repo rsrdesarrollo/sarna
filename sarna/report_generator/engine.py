@@ -3,16 +3,19 @@ import shutil
 import tempfile
 import time
 import zipfile
+import re
 from datetime import datetime
 from typing import *
 
 import jinja2
-from docxtpl import DocxTemplate
+from docxtpl import DocxTemplate, RichText
 from markupsafe import Markup
 from werkzeug.utils import secure_filename
+from flask import flash
 
 from sarna.core.config import config
-from sarna.model import Assessment
+from sarna.model import Assessment, FindingWebRequirement, FindingMobileRequirement, \
+    FindingWebTest, FindingMobileTest, FindingCWE
 from sarna.model.client import Template
 from sarna.model.enums import FindingStatus, SequenceName
 from sarna.report_generator.locale_choice import locale_choice
@@ -96,6 +99,41 @@ def generate_reports_bundle(assessment: Assessment, templates: Collection[Templa
         def locale(choice):
             return locale_choice(choice, assessment.lang)
 
+        def to_url(text):
+            regex = re.compile('\[((?!\]).*)\]\(((?!\])http.*)\)')
+            rt = RichText()
+            for match in regex.finditer(text):
+                rt.add(text=str(match.group(1)) + "\n", style='Hipervnculo',
+                       url_id=template_render.build_url_id(str(match.group(2))))
+            return rt
+        
+        def enum_to_url(list):
+            rt = RichText()
+            for relation in list:
+                if type(relation) == FindingWebRequirement:
+                    rt.add('Application Security Verification Requirement: ' + relation.asvs_req.code + "\n",
+                           style='Hipervnculo',
+                           url_id=template_render.build_url_id(relation.asvs_req.ref))
+                elif type(relation) == FindingMobileRequirement:
+                    rt.add('Mobile Application Security Verification Requirement: ' + relation.masvs_req.code + "\n",
+                           style='Hipervnculo',
+                           url_id=template_render.build_url_id(relation.masvs_req.ref))
+                elif type(relation) == FindingWebTest:
+                    rt.add('Web Security Testing Guide: ' + relation.wstg_ref.code + "\n",
+                           style='Hipervnculo',
+                           url_id=template_render.build_url_id(relation.wstg_ref.ref))
+                elif type(relation) == FindingMobileTest:
+                    rt.add('Mobile Security Testing Guide: ' + relation.mstg_ref.code + "\n",
+                           style='Hipervnculo',
+                           url_id=template_render.build_url_id(relation.mstg_ref.ref))
+                elif type(relation) == FindingCWE:
+                    rt.add('Common Weakness Enumeration: ' + relation.cwe_ref.code + "\n",
+                           style='Hipervnculo',
+                           url_id=template_render.build_url_id(relation.cwe_ref.ref))
+                else:
+                    flash("Unrecognized class for enum: " + str(type(relation)), category='warning')
+            return rt
+
         finding_status_valid = {FindingStatus.Confirmed, FindingStatus.Reviewed}
         assessment_data = assessment.to_dict()
         assessment_data['findings'] = list(
@@ -112,6 +150,8 @@ def generate_reports_bundle(assessment: Assessment, templates: Collection[Templa
         jinja2_env.filters['xref'] = xref
         jinja2_env.filters['bookmark'] = bookmark
         jinja2_env.filters['dateformat'] = dateformat
+        jinja2_env.filters['to_url'] = to_url
+        jinja2_env.filters['enum_to_url'] = enum_to_url
 
         template_render.render(
             dict(
