@@ -782,7 +782,7 @@ CVSS.prototype.valueofradio = function(e) {
 
 CVSS.prototype.get = function() {
     return {
-        score: $("#cvssresults .base-results span.score").text(),
+        score: $("#cvssresults .env-results span.score").text(),
         vector: this.vector.text()
     };
 };
