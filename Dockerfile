@@ -1,9 +1,12 @@
 FROM python:3.6-alpine
 
+# Create a group and user
+RUN addgroup -S sarnag && adduser -S sarnau -G sarnag
+
 RUN apk --update --no-cache add \
     yarn && \
-	mkdir -p /sarna/static/ && \
-	mkdir -p /sarna/uploaded_data
+	mkdir -p /home/sarnau/sarna/static/ && \
+	mkdir -p /home/sarnau/sarna/uploaded_data
 
 ADD requirements.txt /tmp/
 RUN apk --no-cache add --virtual build-deps build-base libxslt-dev python3-dev jpeg-dev zlib-dev postgresql-dev musl-dev libffi-dev && \
@@ -11,17 +14,23 @@ RUN apk --no-cache add --virtual build-deps build-base libxslt-dev python3-dev j
     apk del build-deps &&\
     apk --no-cache add libmagic libxslt jpeg zlib libpq
 
-ADD static/package.json /sarna/static/
+ADD static/package.json /home/sarnau/sarna/static/
 ADD jira_ssl_cert.crt /
 
-RUN cd /sarna/static && yarn install
+RUN cd /home/sarnau/sarna/static && yarn install
 
-RUN echo "1"
+WORKDIR /home/sarnau/sarna
 
-WORKDIR /sarna
-COPY ./ /sarna/
+#RUN echo "1"
+
+COPY ./ /home/sarnau/sarna/
 
 ENV FLASK_ENV=production
 
 EXPOSE 5000
-ENTRYPOINT ["/sarna/entrypoint.sh"]
+
+# Tell docker that all future commands should run as the sarnau user
+RUN chown -R sarnau:sarnag /home/sarnau/sarna
+USER sarnau
+
+ENTRYPOINT ["/home/sarnau/sarna/entrypoint.sh"]
