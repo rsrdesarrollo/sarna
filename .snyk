@@ -1,0 +1,8 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.14.1
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  SNYK-PYTHON-PYYAML-590151:
+    - '* > pyyaml@5.3.1':
+      reason: vulnerable functionality is not exposed to the final user and the safe_loader is used while reading configuration files.
+      expires: '2021-11-24T00:00:00.000Z'
