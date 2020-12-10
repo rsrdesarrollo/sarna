@@ -1,7 +1,9 @@
 from flask import Blueprint, render_template, request, flash, session
 
+from sarna.config import BaseConfig
 from sarna.auxiliary import redirect_back
 from sarna.core.auth import login_required, logout_user
+from sarna.core.auth_saml import getLoginUrl
 from sarna.core.auth_engine.auth_controller import AuthController
 from sarna.core.auth_engine.exceptions import AuthException
 from sarna.core.security import limiter
@@ -13,10 +15,20 @@ blueprint = Blueprint('index', __name__)
 @blueprint.route('/', methods=('GET', 'POST'))
 @limiter.limit('10 per minute')
 def index():
+    url = None
     form = LoginForm(request.form)
+    show_form = False
+
+    if BaseConfig.SAML_AUTH:
+        url = getLoginUrl()
+    else:
+        show_form = True
+    
     context = dict(
         form=form,
-        need_otp=False
+        need_otp=False,
+        url=url,
+        show_form = show_form
     )
 
     if form.validate_on_submit():

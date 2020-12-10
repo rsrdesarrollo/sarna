@@ -6,6 +6,7 @@ from sarna.commands import user_cli
 from sarna.core import app
 from sarna.core import asset
 from sarna.core.auth import login_manager
+from sarna.core.auth_saml import getServiceProvider, isEnabledSAML
 from sarna.core.auth_engine import auth_controller
 from sarna.core.security import csrf, limiter
 from sarna.routes import clients, index, findings, users, assessments, templates
@@ -44,6 +45,10 @@ login_manager.init_app(app)
 auth_controller.init_app(app)
 
 user_cli.init_app(app)
+
+if isEnabledSAML():
+    csrf.exempt(getServiceProvider().blueprint)
+    app.register_blueprint(getServiceProvider().blueprint, url_prefix='/saml/')
 
 app.register_blueprint(index.blueprint)
 app.register_blueprint(clients.blueprint, url_prefix='/clients')

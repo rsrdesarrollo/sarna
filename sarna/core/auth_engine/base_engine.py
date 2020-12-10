@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sarna.core.auth_engine.exceptions import *
 from sarna.model import db, User
 from sarna.model.enums import AuthSource
+from sarna.config import BaseConfig
 
 
 class BaseEngine(metaclass=ABCMeta):
@@ -59,8 +60,9 @@ class BaseEngine(metaclass=ABCMeta):
             if user.is_locked:
                 raise LockedUserException()
 
-            self.verify_passwd(user, password)
-            self.verify_otp(user, otp)
+            if not BaseConfig.SAML_AUTH:
+                self.verify_passwd(user, password)
+                self.verify_otp(user, otp)
 
             db.session.add(user)
             db.session.commit()
