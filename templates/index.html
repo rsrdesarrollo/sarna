@@ -18,40 +18,46 @@
             <div class="col-lg-5 align-content-center text-center bg-light p-5">
                 <h2 class="mt-4">Login</h2>
                 <hr>
-                <form method="POST">
-                    {{ form.csrf_token }}
-                    <div class="input-group mt-5 px-5">
-                        <div class="input-group-append">
-                            <i class="fa fa-user input-group-text" style="min-width: 41px;"></i>
+                {% if show_form %}
+                    <form method="POST">
+                        {{ form.csrf_token }}
+                        <div class="input-group mt-5 px-5">
+                            <div class="input-group-append">
+                                <i class="fa fa-user input-group-text" style="min-width: 41px;"></i>
+                            </div>
+                            {{ render_field(form.username, with_label=False, autofocus=not need_otp) }}
                         </div>
-                        {{ render_field(form.username, with_label=False, autofocus=not need_otp) }}
-                    </div>
-                    <div class="input-group mt-3 px-5">
-                        <div class="input-group-append">
-                            <i class="fa fa-asterisk input-group-text" style="min-width: 41px;"></i>
-                        </div>
-                        {{ render_field(form.password, with_label=False, type='password') }}
-                    </div>
-                    {% if need_otp %}
                         <div class="input-group mt-3 px-5">
                             <div class="input-group-append">
-                                <i class="fa fa-clock-o input-group-text" style="min-width: 41px;"></i>
+                                <i class="fa fa-asterisk input-group-text" style="min-width: 41px;"></i>
                             </div>
-
-                            {{ render_field(
-                                        form.otp,
-                                        with_label=False,
-                                        maxlength="6",
-                                        pattern="[0-9]{6}",
-                                        autocomplete="off",
-                                        autofocus="on"
-                                    ) }}
+                            {{ render_field(form.password, with_label=False, type='password') }}
                         </div>
-                    {% endif %}
+                        {% if need_otp %}
+                            <div class="input-group mt-3 px-5">
+                                <div class="input-group-append">
+                                    <i class="fa fa-clock-o input-group-text" style="min-width: 41px;"></i>
+                                </div>
+
+                                {{ render_field(
+                                            form.otp,
+                                            with_label=False,
+                                            maxlength="6",
+                                            pattern="[0-9]{6}",
+                                            autocomplete="off",
+                                            autofocus="on"
+                                        ) }}
+                            </div>
+                        {% endif %}
+                        <div class="input-group mt-4 px-5">
+                            <button type="submit" class="btn btn-primary btn-block">Login</button>
+                        </div>
+                    </form>
+                {% else %}
                     <div class="input-group mt-4 px-5">
-                        <button type="submit" class="btn btn-primary btn-block">Login</button>
+                        <a href="{{url}}" class="btn btn-primary btn-block" role="button" aria-pressed="true">Corporative Login</a>
                     </div>
-                </form>
+                {% endif %}
             </div>
         {% endif %}
     </div>
