@@ -19,7 +19,7 @@ def index():
     form = LoginForm(request.form)
     show_form = False
 
-    if BaseConfig.SAML_AUTH:
+    if BaseConfig.SAML_AUTH and BaseConfig.SAML_AUTH == 1:
         url = getLoginUrl()
     else:
         show_form = True

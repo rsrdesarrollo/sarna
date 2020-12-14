@@ -60,7 +60,7 @@ class BaseEngine(metaclass=ABCMeta):
             if user.is_locked:
                 raise LockedUserException()
 
-            if not BaseConfig.SAML_AUTH:
+            if not BaseConfig.SAML_AUTH or BaseConfig.SAML_AUTH != 1:
                 self.verify_passwd(user, password)
                 self.verify_otp(user, otp)
 

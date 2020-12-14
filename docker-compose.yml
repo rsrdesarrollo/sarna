@@ -13,7 +13,7 @@ services:
       JIRA_PASSWORD: ${JIRA_PASSWORD}
       JIRA_SERVER: ${JIRA_SERVER}
       JIRA_SSL_CERT: '/jira_ssl_cert.crt'
-      SAML_AUTH: null
+      SAML_AUTH: 0
       SAML_IDP_EID: ${SAML_IDP_EID}
       SAML_IDP_SSO: ${SAML_IDP_SSO}
       SAML_IDP_SLO: ${SAML_IDP_SLO}

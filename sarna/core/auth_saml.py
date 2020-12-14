@@ -13,7 +13,7 @@ def getLogoutUrl():
     return url_for('flask_saml2_sp.logout')
 
 def isEnabledSAML():
-    return BaseConfig.SAML_AUTH
+    return BaseConfig.SAML_AUTH and BaseConfig.SAML_AUTH == 1
 
 def getServiceProvider():
     if isEnabledSAML:
@@ -42,7 +42,7 @@ class MyServiceProvider(ServiceProvider):
             flash('Invalid credentials', 'danger')
         return ServiceProvider.login_successful(self, auth_data, relay_state)
 
-if BaseConfig.SAML_AUTH:
+if BaseConfig.SAML_AUTH and BaseConfig.SAML_AUTH == 1:
 
     def checkParam(param):
         if not param:
