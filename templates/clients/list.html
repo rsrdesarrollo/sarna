@@ -18,7 +18,8 @@
                 <table id="table_data" class="table table-striped">
                     <thead class="thead-dark">
                     <th>Name</th>
-                    <th>Creator</th>
+                    <th>Managers</th>
+                    <th>Auditors</th>
                     <th style="width: 20%" class="text-right">Actions</th>
                     </thead>
                     <tbody>
@@ -26,7 +27,7 @@
                         <tr>
                             <td>
 
-                                {% if current_user.manages(client) %}
+                                {% if current_user.manages(client) or current_user.is_admin %}
                                     <a title="Edit Client"
                                        href="{{ url_for('.edit', client_id=client.id, next=request.path) }}">
                                         {{ client.long_name }}
@@ -35,10 +36,19 @@
                                     {{ client.long_name }}
                                 {% endif %}
                             </td>
-                            <td>{{ client.creator.name }}</td>
+                            <td>
+                                {% for manager in client.managers %}
+                                    <p>{{ manager.username }}</p>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for auditor in client.auditors %}
+                                    <p>{{ auditor.username }}</p>
+                                {% endfor %}
+                            </td>
                             <td>
                                 <div class="btn-group float-right">
-                                    {% if current_user.manages(client) %}
+                                    {% if current_user.is_admin %}
                                         <a class="need-confirm btn btn-danger" title="Delete Client"
                                            href="{{ url_for('.delete', client_id=client.id, next=request.path) }}">
                                             <span class="fa fa-trash"></span>
@@ -69,13 +79,12 @@
         function refresh_search() {
             function parse_tds(tds) {
                 return {
-                    long_name: tds[0].firstElementChild.innerText,
-                    creator_name: tds[1].textContent
+                    long_name: tds[0].firstElementChild.innerText
                 };
             }
 
             function search(tds, re) {
-                return re.test(tds.long_name) || re.test(tds.creator_name);
+                return re.test(tds.long_name);
             }
 
             let trs = document.getElementById("table_data").getElementsByTagName("tr");

@@ -66,6 +66,10 @@ class User(Base, db.Model):
     def name(self):
         return self.username
 
+    @property
+    def is_readonly(self):
+        return not self.user_type in valid_auditors
+
     """
     Assessment access methods
     """

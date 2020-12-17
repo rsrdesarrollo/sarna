@@ -91,6 +91,9 @@ class Client(Base, db.Model):
         client_name_prefix = unidecode(self.short_name).replace(" ", "_").upper()
 
         return f"{client_name_prefix}_{finding.assessment.creation_date:%Y%m%d}_{finding.client_finding_id:06d}"
+    
+    def get_auditor_choices(self):
+        return sorted(list((u, u.name) for u in self.auditors), key=lambda t: t[1])
 
 
 class Template(Base, db.Model):

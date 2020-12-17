@@ -1,0 +1,54 @@
+{% extends "users/base.html" %}
+
+{% from "macros.html" import render_user_type_pill %}
+{% block body %}
+    <div class="row">
+        <div class="col-lg-4 pl-3">
+            <div class="row mt-3">
+                <div class="col">
+                    <h2>Logged on as {{ current_user.username }}</h2>                    
+                </div>
+            </div>            
+        </div>
+    </div>
+    {% if current_user.is_admin %}
+        <div>
+            <div class="col">
+                <h3>List of users</h3>
+                <table id="table_data" class="table table-striped">
+                    <thead class="thead-dark">
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Creation</th>
+                    <th>Last Login</th>
+                    <th class="text-right">Actions</th>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ render_user_type_pill(user.user_type) }}</td>
+                            <td>{{ user.creation_date }}</td>
+                            <td>{{ user.last_access }}</td>
+                            <td>
+                                <div class="btn-group float-right">
+                                    <a class="btn btn-secondary" title="Edit user"
+                                       href="{{ url_for('.edit_user', username=user.username, next=request.path) }}">
+                                        <span class="fa fa-edit"></span>
+                                    </a>
+                                    
+                                    <a class="need-confirm btn btn-danger" title="Delete user"
+                                       href="{{ url_for('.del_user', username=user.username, next=request.path) }}">
+                                        <span class="fa fa-trash"></span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

@@ -21,9 +21,10 @@
                     <thead class="thead-dark">
                     <th>Name</th>
                     <th>Type</th>
-                    <th>ASVS</th>
+                    <th>CWE</th>
+                    <th>Requeriments</th>                    
+                    <th>Testing Ref</th>
                     <th>CVSS Score</th>
-                    <th># Solutions</th>
                     <th>Created by</th>
                     <th class="text-right">Actions</th>
                     </thead>
@@ -37,9 +38,10 @@
                                 </a>
                             </td>
                             <td>{{ finding.type }}</td>
-                            <td></td>
+                            <td>{{ finding.get_cwe_refs() }}</td>
+                            <td>{{ finding.get_requirements_string() }}</td>                            
+                            <td>{{ finding.get_testing_refs() }}</td>
                             <td>{{ render_cvss_pill(finding.cvss_v3_severity, finding.cvss_v3_score) }}</td>
-                            <td>{{ finding.solutions|length }}</td>
                             <td>{{ finding.creator.name }}</td>
                             <td>
                                 <div class="btn-group float-right">
@@ -81,12 +83,14 @@
                 return {
                     name: tds[0].firstElementChild.innerText,
                     type: tds[1].textContent,
-                    asvs: tds[2].textContent
+                    cwe: tds[2].textContent,
+                    xsvs: tds[3].textContent,
+                    xstg: tds[4].textContent                
                 }
             }
 
             function search(tds, re) {
-                return re.test(tds.name) || re.test(tds.type) || re.test(tds.asvs);
+                return re.test(tds.name) || re.test(tds.type) || re.test(tds.cwe) || re.test(tds.xsvs) || re.test(tds.xstg);
             }
 
             let trs = document.getElementById("table_data").getElementsByTagName("tr");

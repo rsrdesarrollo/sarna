@@ -67,7 +67,7 @@
                     {% block navitems %}
                         {% if can_view('index.index') %}
                             <li class="{{ 'active' if is_endpoint('index') }}">
-                                <a class="nav-link" href={{ url_for('index.index') }}>Home</a>
+                                <a class="nav-link" href="{{ url_for('index.index') }}">Home</a>
                             </li>
                         {% endif %}
                         {% if can_view('clients.index') %}

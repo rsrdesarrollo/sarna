@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, send_from_directory, abor
 
 from sarna.auxiliary import redirect_back
 from sarna.core.auth import current_user
-from sarna.core.roles import valid_auditors, valid_managers, manager_required
+from sarna.core.roles import valid_auditors, valid_managers, admin_required, manager_required
 from sarna.forms.assessment import AssessmentForm
 from sarna.forms.client import ClientForm, ClientChangeOwnerForm
 from sarna.model import Assessment
@@ -15,20 +15,22 @@ blueprint = Blueprint('clients', __name__)
 @blueprint.route('/')
 @manager_required
 def index():
-    clients = Client.query.filter(
-        (Client.creator == current_user) |
-        (Client.managers.any(User.id == current_user.id)) |
-        (Client.auditors.any(User.id == current_user.id))
-    ).all()
+    if current_user.is_admin:
+        clients = Client.query.all()
+    else:
+        clients = Client.query.filter(
+            (Client.managers.any(User.id == current_user.id))
+        ).all()
 
     context = dict(
         clients=clients
     )
+    
     return render_template('clients/list.html', **context)
 
 
 @blueprint.route('/new', methods=('POST', 'GET'))
-@manager_required
+@admin_required
 def new():
     form = ClientForm(request.form)
 
@@ -53,12 +55,9 @@ def new():
 
 
 @blueprint.route('/delete/<client_id>', methods=('POST',))
-@manager_required
+@admin_required
 def delete(client_id: int):
     client = Client.query.filter_by(id=client_id).one()
-
-    if not current_user.owns(client):
-        abort(403)
 
     client.delete()
 
@@ -66,11 +65,9 @@ def delete(client_id: int):
 
 
 @blueprint.route('/<client_id>/change_owner', methods=('POST',))
+@admin_required
 def change_owner(client_id: int):
     client: Client = Client.query.filter_by(id=client_id).one()
-
-    if not current_user.owns(client):
-        abort(403)
 
     form = ClientChangeOwnerForm()
     form.owner.choices = User.get_choices(User.user_type.in_(valid_managers))
@@ -82,12 +79,9 @@ def change_owner(client_id: int):
 
 
 @blueprint.route('/<client_id>', methods=('POST', 'GET'))
-@manager_required
+@admin_required
 def edit(client_id: int):
     client: Client = Client.query.filter_by(id=client_id).one()
-
-    if not current_user.manages(client):
-        abort(403)
 
     if request.form:
         form = ClientForm(request.form)
@@ -142,7 +136,7 @@ def add_assessment(client_id: int):
         abort(403)
 
     form = AssessmentForm(request.form)
-    form.auditors.choices = User.get_choices(User.user_type.in_(valid_auditors))
+    form.auditors.choices = client.get_auditor_choices()
     context = dict(
         form=form,
         client=client

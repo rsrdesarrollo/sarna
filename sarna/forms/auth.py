@@ -1,5 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, validators, BooleanField
+from wtforms import StringField, SelectField, validators, BooleanField
+
+from sarna.model.enums import UserType
 
 
 class LoginForm(FlaskForm):
@@ -22,6 +24,10 @@ class ChangePasswordForm(FlaskForm):
 
 class AddUserForm(FlaskForm):
     username = StringField(validators=[validators.DataRequired()])
-    password = StringField(validators=[validators.DataRequired()])
-    passwordrep = StringField(validators=[validators.DataRequired()])
-    isadmin = BooleanField()
+    #password = StringField(validators=[validators.DataRequired()])
+    #passwordrep = StringField(validators=[validators.DataRequired()])
+    #isadmin = BooleanField()    
+    type = SelectField(
+        label="User role",
+        choices=UserType.choices(),
+        coerce=UserType.coerce)

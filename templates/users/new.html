@@ -1,0 +1,17 @@
+{% extends "users/base.html" %}
+
+{% from "macros.html" import render_form %}
+{% block body %}
+
+    <div class="row">
+        <div class="col">
+            <h1>Create a new user</h1>        
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            {{ render_form(form) }}
+        </div>
+    </div>
+
+{% endblock %}

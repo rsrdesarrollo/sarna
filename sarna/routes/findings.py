@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError
 
 from sarna.auxiliary import redirect_back
 from sarna.core.auth import current_user
-from sarna.core.roles import trusted_required
+from sarna.core.roles import trusted_required, auditor_required
 from sarna.forms.finding_template import *
 from sarna.model import FindingTemplate, FindingTemplateTranslation, \
     FindingTemplateWebRequirement, FindingTemplateMobileRequirement, db, \
@@ -24,7 +24,7 @@ def index():
 
 
 @blueprint.route('/new', methods=('GET', 'POST'))
-@trusted_required
+@auditor_required
 def new():
     form = FindingTemplateCreateNewForm(request.form)
     context = dict(
@@ -84,6 +84,9 @@ def edit(finding_id: int):
     finding = FindingTemplate.query.filter_by(id=finding_id).one()
 
     if request.method == 'POST':
+        if current_user.is_readonly():
+            flash('Operation not allowed', 'warning')
+            return redirect_back('.index')
         # Process form data to update
         form = FindingTemplateEditForm(request.form)    
         if form.validate_on_submit():

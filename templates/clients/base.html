@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 
 {% block left_actions %}
-    <div class="btn-group-vertical text-center squared">
-        <a href="{{ url_for('.new') }}" title="New Client"
-           class="btn btn-lg {% if request.url_rule.endpoint=='clients.new' %}btn-success{% else %}btn-dark{% endif %}">
-            <span class="fa fa-plus"></span>
-        </a>
-    </div>
+    {% if current_user.is_admin %}
+        <div class="btn-group-vertical text-center squared">
+            <a href="{{ url_for('.new') }}" title="New Client"
+            class="btn btn-lg {% if request.url_rule.endpoint=='clients.new' %}btn-success{% else %}btn-dark{% endif %}">
+                <span class="fa fa-plus"></span>
+            </a>
+        </div>
+    {% endif %}
 {% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block left_actions %}
+    <div class="btn-group-vertical text-center squared">
+        <a href="{{ url_for('.index') }}" title="Users"
+            class="btn btn-lg {% if request.url_rule.endpoint=='users.index' %}btn-success{% else %}btn-dark{% endif %}">
+            <span class="fa fa-user"></span>
+        </a>
+    </div>
+    <div class="btn-group-vertical text-center squared">
+        <a href="{{ url_for('.new') }}" title="New User"
+           class="btn btn-lg {% if request.url_rule.endpoint=='users.new' %}btn-success{% else %}btn-dark{% endif %}">
+            <span class="fa fa-plus"></span>
+        </a>
+    </div>
+{% endblock %}

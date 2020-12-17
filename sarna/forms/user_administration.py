@@ -1,9 +1,11 @@
-from sarna.forms.base_entity_form import BaseEntityForm
 from sarna.model.user import User
+from sarna.model.enums import UserType
+from flask_wtf import FlaskForm
+from wtforms import SelectField
 
 
-class EditUserForm(BaseEntityForm(
-    User,
-    skip_attrs={'username', 'source', 'creation_date', 'last_access', 'otp_seed'}
-)):
-    pass
+class EditUserForm(FlaskForm):
+    type = SelectField(
+        label="User role",
+        choices=UserType.choices(),
+        coerce=UserType.coerce)

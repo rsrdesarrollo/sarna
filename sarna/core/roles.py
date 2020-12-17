@@ -5,9 +5,9 @@ from werkzeug.exceptions import abort
 
 from sarna.model.enums import UserType
 
-valid_auditors = {UserType.manager, UserType.trusted_auditor, UserType.auditor}
-valid_trusted = {UserType.manager, UserType.trusted_auditor}
-valid_managers = {UserType.manager}
+valid_trusted = {UserType.trusted_auditor, UserType.auditor, UserType.manager, UserType.admin}
+valid_auditors = {UserType.auditor, UserType.manager, UserType.admin}
+valid_managers = {UserType.manager, UserType.admin}
 valid_admins = {UserType.admin}
 
 

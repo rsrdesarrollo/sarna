@@ -152,6 +152,27 @@ class FindingTemplate(Base, db.Model):
 
         return data
 
+    def get_requirements_string(self):
+        if self.web_requirements:
+            return ", ".join([ref.asvs_req.code for ref in self.web_requirements])
+        elif self.mobile_requirements:
+            return ", ".join([ref.masvs_req.code for ref in self.mobile_requirements])
+        else:
+            return None
+
+    def get_testing_refs(self):
+        if self.wstg_refs:
+            return ", ".join([ref.wstg_ref.code for ref in self.wstg_refs])
+        elif self.mstg_refs:
+            return ", ".join([ref.mstg_ref.code for ref in self.mstg_refs])
+        else:
+            return None
+
+    def get_cwe_refs(self):
+        if self.cwe_refs:
+            return ", ".join([ref.cwe_ref.code for ref in self.cwe_refs])
+        else:
+            return None
 
 class FindingTemplateWebRequirement(Base, db.Model):
     finding_template_id = db.Column(

@@ -2,9 +2,11 @@
 
 {% block left_actions %}
     <div class="btn-group-vertical text-center squared">
+        {% if not current_user.is_readonly %}
         <a href="{{ url_for('.new') }}"
            class="btn btn-lg {% if request.url_rule.endpoint=='findings.new' %}btn-success{% else %}btn-dark{% endif %}">
             <span class="fa fa-plus"></span>
         </a>
+        {% endif %}
     </div>
 {% endblock %}
