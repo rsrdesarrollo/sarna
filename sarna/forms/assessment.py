@@ -78,12 +78,5 @@ class FindingEditForm(
         coerce=MSTG.coerce)
 
 
-class ActiveCreateNewForm(
-    BaseEntityForm(Active),
-    BaseEntityForm(AffectedResource)
-):
-    pass
-
-
 class EvidenceCreateNewForm(FlaskForm):
     file = FileField(validators=[FileRequired(), is_valid_evidence])

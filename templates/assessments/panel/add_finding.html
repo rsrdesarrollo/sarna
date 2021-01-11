@@ -1,6 +1,6 @@
 {% extends "assessments/panel/panel_base.html" %}
 
-{% from "macros.html" import render_form, render_score_pill %}
+{% from "macros.html" import render_form, render_score_pill, render_cvss_pill %}
 {% block content %}
     <div class="row">
         <div class="col">
@@ -21,9 +21,10 @@
                     <thead class="thead-dark">
                     <th>Name</th>
                     <th>Type</th>
-                    <th>Languages</th>
-                    <th>Technical Risk</th>
-                    <th># Solutions</th>
+                    <th>CWE</th>
+                    <th>Requirements</th>
+                    <th>Testing Ref</th>
+                    <th>CVSS Score</th>
                     <th class="text-right">Actions</th>
                     </thead>
                     <tbody>
@@ -31,13 +32,10 @@
                         <tr>
                             <td>{{ finding.name }}</td>
                             <td>{{ finding.type }}</td>
-                            <td>
-                                {% for lang in finding.langs %}
-                                    <span class="badge badge-pill badge-primary">{{ lang }}</span>
-                                {% endfor %}
-                            </td>
-                            <td>{{ render_score_pill(finding.tech_risk) }}</td>
-                            <td>{{ finding.solutions|length }}</td>
+                            <td>{{ finding.get_cwe_refs() }}</td>
+                            <td>{{ finding.get_requirements_string() }}</td>
+                            <td>{{ finding.get_testing_refs() }}</td>
+                            <td>{{ render_cvss_pill(finding.cvss_v3_severity, finding.cvss_v3_score) }}</td>
                             <td>
                                 <form action="{{ url_for('.add_finding', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}"
                                       method="POST">
@@ -76,12 +74,16 @@
                 return {
                     name: tds[0].textContent,
                     type: tds[1].textContent,
+                    cwe: tds[2].textContent,
+                    xsvs: tds[3].textContent,
+                    xstg: tds[4].textContent
                 }
             }
 
             function search(tds, re) {
                 console.log(tds);
-                return re.test(tds.name) || re.test(tds.type);
+                return re.test(tds.name) || re.test(tds.type) || re.test(tds.cwe)
+                    || re.test(tds.xsvs) || re.test(tds.xstg);
             }
 
             let trs = document.getElementById("table_data").getElementsByTagName("tr");

@@ -45,28 +45,30 @@
                             <td>{{ assessment.creator.name }}</td>
                             <td>
                                 <div class="btn-group float-right">
-                                    {% if current_user.manages(assessment) %}
-                                        <a class="need-confirm btn btn-danger" title="Delete Assessment"
-                                           href="{{ url_for('.delete', assessment_id=assessment.id, next=request.path) }}">
-                                            <span class="fa fa-trash"></span>
-                                        </a>                                        
-                                    {% endif %}
-                                    <a class="btn btn-secondary" title="Assessment details"
-                                        href="{{ url_for('.detail', assessment_id=assessment.id, next=request.path) }}">
-                                        <span class="fa fa-pencil"></span>
-                                    </a>
                                     <a class="btn btn-info" title="Assessment Panel"
                                        href="{{ url_for('.summary', assessment_id=assessment.id, next=request.path) }}">
                                         <span class="fa fa-tachometer"></span>
                                     </a>
-                                    <a class="btn btn-success" title="Add findings to assessment"
-                                       href="{{ url_for('.add_findings', assessment_id=assessment.id, next=request.path) }}">
-                                        <span class="fa fa-plus"></span>
-                                    </a>
+                                    {% if current_user.manages(assessment) or current_user.is_admin %}
+                                        <a class="btn btn-secondary" title="Assessment details"
+                                            href="{{ url_for('.detail', assessment_id=assessment.id, next=request.path) }}">
+                                            <span class="fa fa-pencil"></span>
+                                        </a>                                    
+                                        <a class="btn btn-success" title="Add findings to assessment"
+                                        href="{{ url_for('.add_findings', assessment_id=assessment.id, next=request.path) }}">
+                                            <span class="fa fa-plus"></span>
+                                        </a>
+                                    {% endif %}
                                     <a class="btn btn-dark" title="Export Assessment JSON"
                                        href="{{ url_for('.export', assessment_id=assessment.id, next=request.path) }}">
                                         <span class="fa fa-download"></span>
                                     </a>
+                                    {% if current_user.manages(assessment) or current_user.is_admin %}
+                                        <a class="need-confirm btn btn-danger" title="Delete Assessment"
+                                           href="{{ url_for('.delete', assessment_id=assessment.id, next=request.path) }}">
+                                            <span class="fa fa-trash"></span>
+                                        </a>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>

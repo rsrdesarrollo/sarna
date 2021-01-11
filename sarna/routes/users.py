@@ -40,7 +40,7 @@ def new():
         except IntegrityError:
             flash('User {} already exist'.format(form.username.data), 'danger')
             db.session.rollback()
-        flash('User {} successfuly created'.format(user.username), 'success')
+        flash('User {} successfully created'.format(user.username), 'success')
         return redirect_back('users.index')
 
     return render_template('users/new.html', **context)

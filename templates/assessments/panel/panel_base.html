@@ -6,25 +6,26 @@
            class="btn btn-lg {% if is_endpoint('.summary') %}btn-info{% else %}btn-dark{% endif %}">
             <span class="fa fa-tachometer"></span>
         </a>
-
-        <a href="{{ url_for('.findings', assessment_id=assessment.id) }}"
-           class="btn btn-lg {% if is_endpoint('.findings') %} btn-warning{% else %}btn-dark{% endif %}">
-            <span class="fa fa-fire"></span>
-        </a>
-
-        <a href="{{ url_for('.add_findings', assessment_id=assessment.id) }}"
-           class="btn btn-lg {% if is_endpoint('.add_findings') %}btn-success{% else %}btn-dark{% endif %}">
-            <span class="fa fa-plus"></span>
-        </a>
+        {% if current_user.audits(assessment) or current_user.manages(assessment) or current_user.is_admin %}
+            <a href="{{ url_for('.findings', assessment_id=assessment.id) }}"
+               class="btn btn-lg {% if is_endpoint('.findings') %} btn-warning{% else %}btn-dark{% endif %}">
+                <span class="fa fa-fire"></span>
+            </a>
+            <a href="{{ url_for('.add_findings', assessment_id=assessment.id) }}"
+            class="btn btn-lg {% if is_endpoint('.add_findings') %}btn-success{% else %}btn-dark{% endif %}">
+                <span class="fa fa-plus"></span>
+            </a>
+        {% endif %}
         <a href="{{ url_for('.actives', assessment_id=assessment.id) }}"
            class="btn btn-lg {% if is_endpoint('.actives') %}btn-primary{% else %}btn-dark{% endif %}">
             <span class="fa fa-server"></span>
         </a>
-        <a href="{{ url_for('.evidences', assessment_id=assessment.id) }}"
-           class="btn btn-lg {% if is_endpoint('.evidences') %}btn-purple{% else %}btn-dark{% endif %}">
-            <span class="fa fa-image"></span>
-        </a>
-
+        {% if current_user.manages(assessment) or current_user.is_admin %}
+            <a href="{{ url_for('.evidences', assessment_id=assessment.id) }}"
+               class="btn btn-lg {% if is_endpoint('.evidences') %}btn-purple{% else %}btn-dark{% endif %}">
+                <span class="fa fa-image"></span>
+            </a>
+        {% endif %}
         <a href="{{ url_for('.reports', assessment_id=assessment.id) }}"
            class="btn btn-lg {% if is_endpoint('.reports') %}btn-secondary{% else %}btn-dark{% endif %}">
             <span class="fa fa-file"></span>

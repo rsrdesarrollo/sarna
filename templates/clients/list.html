@@ -27,7 +27,7 @@
                         <tr>
                             <td>
 
-                                {% if current_user.manages(client) or current_user.is_admin %}
+                                {% if current_user.is_admin %}
                                     <a title="Edit Client"
                                        href="{{ url_for('.edit', client_id=client.id, next=request.path) }}">
                                         {{ client.long_name }}

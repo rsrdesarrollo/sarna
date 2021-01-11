@@ -1,7 +1,6 @@
 {% extends "assessments/panel/panel_base.html" %}
 
-{% from "macros.html" import render_form, render_score_pill, render_finding_status_pill, render_cvss_pill %}
-
+{% set actions_show = True %}
 {% block body %}
     <form action="{{ url_for('.bulk_action_finding', assessment_id=assessment.id) }}" method="post">
         <input type="hidden" value="{{ csrf_token() }}" name="csrf_token">
@@ -9,7 +8,7 @@
     </form>
 {% endblock %}
 {% block action_buttons %}
-    {% if assessment.findings %}
+    {% if assessment.findings and not current_user.is_readonly and actions_show %}
         <div class="btn-group float-right" role="group">
             <button type="submit" class="btn btn-danger need-confirm" value="delete" name="action">
                 <span class="fa fa-trash"></span>
@@ -41,75 +40,5 @@
     {% endif %}
 {% endblock %}
 {% block content %}
-    <div class="row">
-        <div class="col">
-            {% if assessment.findings %}
-
-                <table id="table_data" class="table table-striped">
-                    <thead class="thead-dark">
-                    <th>
-                        <label class="custom_checkbox">
-                            <input type="checkbox" id="all_checked">
-                            <span class="checkmark"></span>
-                        </label>
-                    </th>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>CVSS score</th>
-                    <th>Bug Tracking #</th>
-                    <th>Status</th>
-                    <th class="text-right">Actions</th>
-                    </thead>
-                    <tbody>
-                    {% for finding in assessment.findings | sort(attribute='cvss_v3_score,business_risk', reverse=true) %}
-                        <tr>
-                            <td>
-                                <label class="custom_checkbox">
-                                    <input name="finding_id" value="{{ finding.id }}" type="checkbox">
-                                    <span class="checkmark"></span>
-                                </label>
-                            </td>
-                            <td>{{ finding.title }}</td>
-                            <td>{{ finding.type }}</td>
-                            <td>{{ render_cvss_pill(finding.cvss_v3_severity, finding.cvss_v3_score) }}</td>
-                            <td>{{ finding.bugtracking }}</td>
-                            <td>{{ render_finding_status_pill(finding.status) }}</td>
-                            <td>
-                                <div class="btn-group float-right">
-                                    <a class="btn btn-danger need-confirm"
-                                       href="{{ url_for('.delete_findings', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}">
-                                        <span class="fa fa-trash"></span>
-                                    </a>
-
-                                    <a class="btn btn-secondary"
-                                       href="{{ url_for('.edit_finding', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}">
-                                        <span class="fa fa-pencil"></span>
-                                    </a>
-
-                                    {% if finding.bugtracking %}
-                                    <a class="btn btn-secondary" href="{{ finding.bugtracking_link }}" target="_blank">    
-                                        <span class="fa fa-external-link"></span>
-                                    </a>
-                                    {% else %}
-                                    <a class="btn btn-secondary need-confirm" 
-                                        href="{{ url_for('.report_finding', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}">    
-                                        <span class="fa fa-bug"></span>
-                                    </a>
-                                    {% endif %}
-                                </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <h4 class="text-center">No findings in this assessment</h4>
-                <h5 class="text-center">
-                    <a href="{{ url_for('.add_findings', assessment_id=assessment.id, next=request.path) }}">
-                        You can add some findings here!
-                    </a>
-                </h5>
-            {% endif %}
-        </div>
-    </div>
+    {% include "assessments/panel/findings_table.html" %}
 {% endblock %}

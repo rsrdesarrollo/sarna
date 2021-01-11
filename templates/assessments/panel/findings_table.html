@@ -1,0 +1,90 @@
+{% from "macros.html" import render_finding_status_pill, render_cvss_pill %}
+{% if actions_show %}
+    <div class="row pl-2 pr-2">
+{% else %}
+    <div class="row mt-2 pl-2 pr-2">
+{% endif %}
+    <div class="col">
+        {% if assessment.findings %}
+
+            <table id="table_data" class="table table-striped">
+                <thead class="thead-dark">
+                {% if actions_show %}
+                    <th>
+                        <label class="custom_checkbox">
+                            <input type="checkbox" id="all_checked">
+                            <span class="checkmark"></span>
+                        </label>
+                    </th>
+                {% endif %}
+                <th>Title</th>
+                <th>CWE</th>
+                <th>Requirements</th>
+                <th>Testing Ref</th>
+                <th>CVSS score</th>
+                <th>Bug Tracking #</th>
+                <th>Status</th>
+                {% if not current_user.is_readonly and actions_show %}
+                    <th class="text-right">Actions</th>
+                {% endif %}
+                </thead>
+                <tbody>
+                {% for finding in assessment.findings | sort(attribute='cvss_v3_score,business_risk', reverse=true) %}
+                    <tr>
+                        {% if actions_show %}
+                            <td>
+                                <label class="custom_checkbox">
+                                    <input name="finding_id" value="{{ finding.id }}" type="checkbox">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </td>
+                        {% endif %}
+                        <td>{{ finding.title }}</td>
+                        <td>{{ finding.get_cwe_refs() }}</td>
+                        <td>{{ finding.get_requirements_string() }}</td>
+                        <td>{{ finding.get_testing_refs() }}</td>
+                        <td>{{ render_cvss_pill(finding.cvss_v3_severity, finding.cvss_v3_score) }}</td>
+                        <td>{{ finding.bugtracking }}</td>
+                        <td>{{ render_finding_status_pill(finding.status) }}</td>
+                        {% if not current_user.is_readonly and actions_show %}
+                            <td>
+                                <div class="btn-group float-right">
+                                    <a class="btn btn-danger need-confirm"
+                                       href="{{ url_for('.delete_findings', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}">
+                                        <span class="fa fa-trash"></span>
+                                    </a>
+
+                                    <a class="btn btn-secondary"
+                                       href="{{ url_for('.edit_finding', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}">
+                                        <span class="fa fa-pencil"></span>
+                                    </a>
+
+                                    {% if finding.bugtracking %}
+                                    <a class="btn btn-secondary" href="{{ finding.bugtracking_link }}" target="_blank">
+                                        <span class="fa fa-external-link"></span>
+                                    </a>
+                                    {% else %}
+                                    <a class="btn btn-secondary need-confirm"
+                                        href="{{ url_for('.report_finding', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}">
+                                        <span class="fa fa-bug"></span>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <h4 class="text-center">No findings in this assessment</h4>
+            {% if not current_user.is_readonly %}
+                <h5 class="text-center">
+                    <a href="{{ url_for('.add_findings', assessment_id=assessment.id, next=request.path) }}">
+                        You can add some findings here!
+                    </a>
+                </h5>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>

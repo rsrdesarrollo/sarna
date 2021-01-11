@@ -138,6 +138,9 @@ class Assessment(Base, db.Model):
             counter[FindingStatus.Other]
         ]
 
+    def auditors_list(self):
+        return ", ".join([str(auditor) for auditor in self.auditors])
+
     def aggregate_technical_risk(self):
         return self._aggregate_score('tech_risk')
 

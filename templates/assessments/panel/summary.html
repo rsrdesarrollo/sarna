@@ -1,42 +1,69 @@
 {% extends "assessments/panel/panel_base.html" %}
 
 {% from "macros.html" import render_form %}
+
+
+{% set actions_show = False %}
 {% block content %}
-    <div class="row">
-        <div class="col-md-12">
-            <h1 class="text-center text-uppercase text-info">
-                <span class="badge badge-info">
-                    {{ assessment.findings|length }}
-                </span>
-            </h1>
-            <h3 class="text-center text-uppercase text-info">Findings
-            </h3>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-2">
+                    <h5 class="text-center text-uppercase text-info">
+                        <span class="badge badge-info">
+                            {{ assessment.findings|length }}
+                        </span>
+                    </h5>
+                    <h5 class="text-center text-uppercase text-info">Findings
+                    </h5>
+                </div>
+                <div class="col-md-10">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><b>Application:</b> {{ assessment.application }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><b>Audited by: </b>{{ assessment.auditors_list() }}</p>
+                        </div>
+                        {% if assessment.bugtracking %}
+                            <div class="col-md-4">
+                                <p><b>Ticket:</b> {{ assessment.bugtracking }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><b>Risk Profile:</b> {{ assessment.riskprof_category }} ({{ assessment.riskprof_score }})</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><b>SAST:</b> {{ assessment.sast }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><b>SCA:</b> {{ assessment.sca }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="card-title">Findings status</h5>
+                    <canvas id="findings_status_chart"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="card-title">CVSS severity</h5>
+                    <canvas id="cvss_severity_chart"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 
     {% if assessment.findings|length > 0 %}
-        <div class="row mt-2 justify-content-center">
-            <div class="col-md-5">
-                <h5 class="text-center">Findings status</h5>
-                <canvas id="findings_status_chart"></canvas>
-            </div>
-        </div>
 
-        <div class="row mt-4 justify-content-around">
-            <div class="col-md-4">
-                <h5 class="text-center">CVSS severity</h5>
-                <canvas id="cvss_severity_chart"></canvas>
-            </div>
 
-            <div class="col-md-4">
-                <h5 class="text-center">Business risk</h5>
-                <canvas id="bus_risk_chart"></canvas>
-            </div>
-        </div>
 
         <script>
             var ctx_cvss_severity = document.getElementById('cvss_severity_chart').getContext('2d');
-            var ctx_bus_risk = document.getElementById('bus_risk_chart').getContext('2d');
             var ctx_find = document.getElementById('findings_status_chart').getContext('2d');
             var backgrounds = [
                 '#5bc0de',
@@ -68,18 +95,6 @@
                 options: options
             });
 
-            new Chart(ctx_bus_risk, {
-                type: 'bar',
-                data: {
-                    labels: ["Info", "Low", "Medium", "High", "Critical"],
-                    datasets: [{
-                        backgroundColor: backgrounds,
-                        data: {{ assessment.aggregate_business_risk() | tojson }}
-                    }]
-                },
-                options: options
-            });
-
             new Chart(ctx_find, {
                 type: 'pie',
                 data: {
@@ -98,4 +113,5 @@
             });
         </script>
     {% endif %}
+    {% include "assessments/panel/findings_table.html" %}
 {% endblock %}

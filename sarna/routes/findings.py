@@ -78,7 +78,7 @@ def new():
 
 
 @blueprint.route('/<finding_id>', methods=('POST', 'GET'))
-@trusted_required
+@auditor_required
 def edit(finding_id: int):
     # Necessary for both GET and POST
     finding = FindingTemplate.query.filter_by(id=finding_id).one()
@@ -111,7 +111,7 @@ def edit(finding_id: int):
 
 
 @blueprint.route('/<finding_id>/delete', methods=('POST',))
-@trusted_required
+@auditor_required
 def delete(finding_id: int):
     finding_template = FindingTemplate.query.filter_by(id=finding_id).one()
     finding_template.delete()
@@ -119,7 +119,7 @@ def delete(finding_id: int):
 
 
 @blueprint.route('/<finding_id>/add_translation', methods=('POST', 'GET'))
-@trusted_required
+@auditor_required
 def add_translation(finding_id: int):
     finding = FindingTemplate.query.filter_by(id=finding_id).one()
     form = FindingTemplateAddTranslationForm(request.form)
@@ -154,7 +154,7 @@ def add_translation(finding_id: int):
 
 
 @blueprint.route('/<finding_id>/delete/<language>', methods=('POST',))
-@trusted_required
+@auditor_required
 def delete_translation(finding_id: int, language: str):
     tranlsation = FindingTemplateTranslation.query.filter_by(
         finding_template_id=finding_id,
@@ -166,7 +166,7 @@ def delete_translation(finding_id: int, language: str):
 
 
 @blueprint.route('/<finding_id>/edit/<language>', methods=('POST', 'GET'))
-@trusted_required
+@auditor_required
 def edit_translation(finding_id: int, language: str):
     language = Language[language]
     translation = FindingTemplateTranslation.query.filter_by(
@@ -197,7 +197,7 @@ def edit_translation(finding_id: int, language: str):
 
 @blueprint.route('/<finding_id>/add_solution/<solution_name>', methods=('POST', 'GET'))
 @blueprint.route('/<finding_id>/add_solution', methods=('POST', 'GET'))
-@trusted_required
+@auditor_required
 def add_solution(finding_id: int, solution_name=None):
     finding = FindingTemplate.query.filter_by(id=finding_id).one()
     solution = None
@@ -234,7 +234,7 @@ def add_solution(finding_id: int, solution_name=None):
 
 
 @blueprint.route('/<finding_id>/solution/<solution_name>/delete', methods=('POST',))
-@trusted_required
+@auditor_required
 def delete_solution(finding_id: int, solution_name: str):
     solution = Solution.query.filter_by(
         finding_template_id=finding_id,
@@ -245,7 +245,7 @@ def delete_solution(finding_id: int, solution_name: str):
 
 
 @blueprint.route('/<finding_id>/solution/<solution_name>', methods=('POST', 'GET'))
-@trusted_required
+@auditor_required
 def edit_solution(finding_id: int, solution_name: str):
     solution = Solution.query.filter_by(
         finding_template_id=finding_id,

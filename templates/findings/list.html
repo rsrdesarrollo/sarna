@@ -22,48 +22,54 @@
                     <th>Name</th>
                     <th>Type</th>
                     <th>CWE</th>
-                    <th>Requeriments</th>                    
+                    <th>Requirements</th>
                     <th>Testing Ref</th>
                     <th>CVSS Score</th>
-                    <th>Created by</th>
-                    <th class="text-right">Actions</th>
+                    {% if not current_user.is_readonly %}
+                        <th class="text-right">Actions</th>
+                    {% endif %}
                     </thead>
                     <tbody>
                     {% for finding in findings | sort(attribute='name') %}
                         <tr>
                             <td>
-                                <a title="Edit Finding"
-                                   href="{{ url_for('.edit', finding_id=finding.id, next=request.path) }}">
+                                {% if not current_user.is_readonly %}
+                                    <a title="Edit Finding"
+                                       href="{{ url_for('.edit', finding_id=finding.id, next=request.path) }}">
+                                        {{ finding.name }}
+                                    </a>
+                                {% else %}
                                     {{ finding.name }}
-                                </a>
+                                {% endif %}
                             </td>
                             <td>{{ finding.type }}</td>
                             <td>{{ finding.get_cwe_refs() }}</td>
                             <td>{{ finding.get_requirements_string() }}</td>                            
                             <td>{{ finding.get_testing_refs() }}</td>
                             <td>{{ render_cvss_pill(finding.cvss_v3_severity, finding.cvss_v3_score) }}</td>
-                            <td>{{ finding.creator.name }}</td>
-                            <td>
-                                <div class="btn-group float-right">
-                                    <a class="need-confirm btn btn-danger" title="Delete Finding"
-                                       href="{{ url_for('.delete', finding_id=finding.id, next=request.path) }}">
-                                        <span class="fa fa-trash"></span>
-                                    </a>
-                                    <a class="btn btn-secondary" title="Edit Finding"
-                                       href="{{ url_for('.edit', finding_id=finding.id, next=request.path) }}">
-                                        <span class="fa fa-pencil"></span>
-                                    </a>
-                                    <a class="btn btn-success" title="Add Translation to Finding"
-                                       href="{{ url_for('.add_translation', finding_id=finding.id, next=request.path) }}">
-                                        <span class="fa fa-globe"></span>
-                                    </a>
+                            {% if not current_user.is_readonly %}
+                                <td>
+                                    <div class="btn-group float-right">
+                                        <a class="need-confirm btn btn-danger" title="Delete Finding"
+                                           href="{{ url_for('.delete', finding_id=finding.id, next=request.path) }}">
+                                            <span class="fa fa-trash"></span>
+                                        </a>
+                                        <a class="btn btn-secondary" title="Edit Finding"
+                                           href="{{ url_for('.edit', finding_id=finding.id, next=request.path) }}">
+                                            <span class="fa fa-pencil"></span>
+                                        </a>
+                                        <a class="btn btn-success" title="Add Translation to Finding"
+                                           href="{{ url_for('.add_translation', finding_id=finding.id, next=request.path) }}">
+                                            <span class="fa fa-globe"></span>
+                                        </a>
 
-                                    <a class="btn btn-info" title="Add Solution to Finding"
-                                       href="{{ url_for('.add_solution', finding_id=finding.id, next=request.path) }}">
-                                        <span class="fa fa-flag"></span>
-                                    </a>
-                                </div>
-                            </td>
+                                        <a class="btn btn-info" title="Add Solution to Finding"
+                                           href="{{ url_for('.add_solution', finding_id=finding.id, next=request.path) }}">
+                                            <span class="fa fa-flag"></span>
+                                        </a>
+                                    </div>
+                                </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -90,7 +96,8 @@
             }
 
             function search(tds, re) {
-                return re.test(tds.name) || re.test(tds.type) || re.test(tds.cwe) || re.test(tds.xsvs) || re.test(tds.xstg);
+                return re.test(tds.name) || re.test(tds.type) || re.test(tds.cwe)
+                    || re.test(tds.xsvs) || re.test(tds.xstg);
             }
 
             let trs = document.getElementById("table_data").getElementsByTagName("tr");

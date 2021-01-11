@@ -8,16 +8,15 @@ from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 
 from sarna.auxiliary import redirect_back, redirect_endpoint
-from sarna.core.auth import current_user
-from sarna.core.roles import auditor_required, valid_auditors, trusted_required, manager_required
-from sarna.core.security import limiter
-from sarna.forms.assessment import AssessmentForm, FindingEditForm, ActiveCreateNewForm, EvidenceCreateNewForm
-from sarna.model import Assessment, User, AffectedResource, Finding, FindingTemplate, db, Active, Image, Template, \
-    Client
-from sarna.model.enums import FindingStatus, AssessmentStatus
-from sarna.report_generator.engine import generate_reports_bundle
-
 from sarna.bugtracking.jira import JiraAPI
+from sarna.core.auth import current_user
+from sarna.core.roles import auditor_required, trusted_required, manager_required
+from sarna.core.security import limiter
+from sarna.forms.assessment import AssessmentForm, FindingEditForm, EvidenceCreateNewForm
+from sarna.model import Assessment, Finding, FindingTemplate, db, Image, Template, \
+    Client
+from sarna.model.enums import FindingStatus
+from sarna.report_generator.engine import generate_reports_bundle
 
 blueprint = Blueprint('assessments', __name__)
 
@@ -25,25 +24,16 @@ blueprint = Blueprint('assessments', __name__)
 @blueprint.route('/')
 @trusted_required
 def index():
-    if current_user.is_auditor:
-        assessments = current_user.get_user_assessments()
-    elif current_user.is_admin:
-        assessments = Assessment.query.all()
-    else:
-        assessments = Assessment.query.filter(
-            Assessment.status.in_([AssessmentStatus.Open, AssessmentStatus.Closed])
-        )
-
     context = dict(
-        assessments=assessments
+        assessments=current_user.get_user_assessments()
     )
     return render_template('assessments/list.html', **context)
 
+
 @blueprint.route('/<assessment_id>', methods=['GET'])
-@trusted_required
+@auditor_required
 def detail(assessment_id):    
     assessment: Assessment = Assessment.query.filter_by(id=assessment_id).one()
-
     form = AssessmentForm(**assessment.to_dict(), auditors=assessment.auditors)
     form.auditors.choices = assessment.client.get_auditor_choices()
 
@@ -52,6 +42,7 @@ def detail(assessment_id):
         form=form
     )    
     return render_template('assessments/edit.html', **context)
+
 
 @blueprint.route('/<assessment_id>', methods=['POST'])
 @manager_required
@@ -111,7 +102,7 @@ def delete(assessment_id):
 @trusted_required
 def summary(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.audits(assessment):
+    if not current_user.audits(assessment) and not current_user.is_readonly:
         abort(403)
 
     context = dict(
@@ -124,7 +115,7 @@ def summary(assessment_id):
 @trusted_required
 def findings(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.audits(assessment):
+    if not (current_user.audits(assessment) or current_user.is_readonly):
         abort(403)
 
     context = dict(
@@ -286,32 +277,18 @@ def bulk_action_finding(assessment_id):
     return redirect_back('.findings', assessment_id=assessment_id)
 
 
-@blueprint.route('/<assessment_id>/actives', methods=("POST", "GET"))
-@auditor_required
+@blueprint.route('/<assessment_id>/actives', methods=("GET",))
+@trusted_required
 def actives(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.audits(assessment):
+    if not (current_user.audits(assessment) or current_user.is_readonly):
         abort(403)
 
-    form = ActiveCreateNewForm(request.form)
     list_actives = assessment.actives
     context = dict(
         assessment=assessment,
-        actives=list_actives,
-        form=form
+        actives=list_actives
     )
-
-    if form.validate_on_submit():
-        data = dict(form.data)
-        data.pop('csrf_token', None)
-        try:
-            active = Active[assessment, data['name']]
-        except:
-            active = Active(name=data['name'], assessment=assessment)
-
-        AffectedResource(active=active, route=data['route'])
-        db.session.commit()
-        return redirect_back('.actives', assessment_id=assessment_id)
 
     return render_template('assessments/panel/list_actives.html', **context)
 
@@ -401,7 +378,7 @@ def delete_evidence(assessment_id, evidence_name):
 @trusted_required
 def reports(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.audits(assessment):
+    if not (current_user.audits(assessment) or current_user.is_readonly):
         abort(403)
 
     context = dict(
@@ -414,7 +391,7 @@ def reports(assessment_id):
 @trusted_required
 def download_reports(assessment_id):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.audits(assessment):
+    if not (current_user.audits(assessment) or current_user.is_readonly):
         abort(403)
 
     data = request.form.to_dict()
@@ -449,7 +426,7 @@ def download_reports(assessment_id):
 @trusted_required
 def download_report(assessment_id, template_name):
     assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.audits(assessment):
+    if not (current_user.audits(assessment) or current_user.is_readonly):
         abort(403)
 
     template = Template.query.filter(
