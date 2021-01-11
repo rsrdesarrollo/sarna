@@ -1,6 +1,8 @@
 from datetime import datetime
 
 import pyotp
+from sqlalchemy import event, insert
+from sqlalchemy.orm.interfaces import EXT_CONTINUE, EXT_STOP
 from flask_login import login_user
 from werkzeug.security import generate_password_hash
 
@@ -9,11 +11,11 @@ from sarna.core.roles import valid_auditors, valid_managers, valid_admins
 from sarna.model.assessment import auditor_approval, assessment_audit, Assessment
 from sarna.model.base import Base, db
 from sarna.model.client import client_management, client_audit, Client
-from sarna.model.enums import UserType, AuthSource
+from sarna.model.enums import UserType, AuthSource, UserAction, AssessmentStatus
 from sarna.model.finding_template import FindingTemplate
 from sarna.model.sql_types import Enum
 
-__all__ = ['User']
+__all__ = ['User', 'UserAudit']
 
 
 class User(Base, db.Model):
@@ -75,12 +77,20 @@ class User(Base, db.Model):
     """
 
     def get_user_assessments(self):
-        return Assessment.query.filter(
-            (Assessment.creator == self) |
-            (Assessment.client_id.in_(map(lambda x: x.id, self.managed_clients))) |
-            (Assessment.client_id.in_(map(lambda x: x.id, self.audited_clients))) |
-            (Assessment.auditors.any(User.id == self.id))
-        ).all()
+        if self.is_admin:
+            return Assessment.query.all()
+        elif self.is_auditor:
+            return Assessment.query.filter(
+                (Assessment.creator == self) |
+                (Assessment.client_id.in_(map(lambda x: x.id, self.managed_clients))) |
+                (Assessment.client_id.in_(map(lambda x: x.id, self.audited_clients))) |
+                (Assessment.auditors.any(User.id == self.id))
+            ).all()
+        else:
+            return Assessment.query.filter(
+                Assessment.status.in_([AssessmentStatus.Open, AssessmentStatus.Closed])
+            )
+
 
     """
     Check permissions methods
@@ -125,7 +135,6 @@ class User(Base, db.Model):
     def login(self):
         self.last_access = datetime.now()
         self.login_try = 0
-        db.session.commit()
         login_user(self)
 
     def get_id(self):
@@ -216,3 +225,71 @@ class User(Base, db.Model):
         if isinstance(item, User):
             return item
         return cls.query.filter_by(username=item).first()
+
+
+class UserAudit(Base, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    action = db.Column(db.Integer, nullable=False)
+    username = db.Column(db.String(128), nullable=False)
+    user_type = db.Column(db.Integer, nullable=False)
+    source = db.Column(db.Integer, nullable=False)
+    creation_date = db.Column(db.String(50))
+    is_locked = db.Column(db.Boolean(), default=False, nullable=False)
+    otp_enabled = db.Column(db.Boolean(), default=False, nullable=False)
+    last_access = db.Column(db.String(50))
+
+    @classmethod
+    def build(cls, action: UserAction, instance: User):
+        return UserAudit(
+            user_id=instance.id,
+            action=action.value,
+            username=instance.username,
+            user_type=instance.user_type.value,
+            source=instance.source.value if instance.source else AuthSource.database.value,
+            creation_date=instance.creation_date,
+            is_locked=instance.is_locked if instance.is_locked is not None else False,
+            otp_enabled=instance.otp_enabled if instance.otp_enabled is not None else False,
+            last_access=instance.last_access
+        )
+
+
+@event.listens_for(User, 'before_insert', retval=True)
+def audit_before_insert(mapper, connection, target):
+    return create_audit(connection, target, UserAction.init)
+
+
+@event.listens_for(User, 'after_insert', retval=True)
+def audit_after_insert(mapper, connection, target):
+    return create_audit(connection, target, UserAction.create)
+
+
+@event.listens_for(User, 'before_update', retval=True)
+def audit_update(mapper, connection, target):
+    return create_audit(connection, target, UserAction.update)
+
+
+@event.listens_for(User, 'before_delete', retval=True)
+def audit_delete(mapper, connection, target):
+    return create_audit(connection, target, UserAction.delete)
+
+
+def create_audit(connection, target, action):
+    try:
+        reg = UserAudit.build(action=action, instance=target)
+        ins = UserAudit.__table__.insert().values(
+            user_id=reg.user_id,
+            action=action.value,
+            username=reg.username,
+            user_type=reg.user_type,
+            source=reg.source,
+            creation_date=reg.creation_date,
+            is_locked=reg.is_locked,
+            otp_enabled=reg.otp_enabled,
+            last_access=reg.last_access
+        )
+        connection.execute(ins)
+    except Exception as e:
+        #TODO: logger
+        raise e
+    return EXT_CONTINUE

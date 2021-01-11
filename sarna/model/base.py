@@ -15,6 +15,8 @@ migrate = Migrate(app, db)
 
 __all__ = ['db', 'Base', 'supported_serialization']
 
+__sensitive_fields__ = ['passwd', 'otp_seed']
+
 
 @app.after_request
 def auto_commit(resp):
@@ -39,10 +41,15 @@ class Base(object):
     def to_dict(self):
         d = {}
         for column in self.__table__.columns:
-            d[column.name] = getattr(self, column.name)
-
+            if column.name not in __sensitive_fields__:
+                d[column.name] = getattr(self, column.name)
         return d
 
+    """
+    This method does not trigger Mapper events. In order to do so, you should use the session:
+        db.session.delete(mapper)
+        db.session.commit()
+    """
     def delete(self, synchronize_session=False):
         pk = {
             k.name: getattr(self, k.name)

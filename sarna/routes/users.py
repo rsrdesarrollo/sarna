@@ -80,7 +80,8 @@ def del_user(username):
     if user == current_user:
         flash('You can not delete yourself', 'danger')
     else:
-        user.delete()
+        db.session.delete(user)
+        db.session.commit()
         flash("User {} deleted".format(username), 'success')
 
     return redirect_back('users.index')
