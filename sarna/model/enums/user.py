@@ -13,3 +13,11 @@ class UserType(BaseChoice):
     trusted_auditor = 2
     manager = 3
     admin = 4
+
+
+class UserAction(BaseChoice):
+    init = 1
+    create = 2
+    login = 3
+    update = 4
+    delete = 5

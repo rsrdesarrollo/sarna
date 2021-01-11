@@ -5,12 +5,12 @@ from .finding import Finding, Active, AffectedResource, FindingWebRequirement, F
     FindingMobileTest, FindingWebTest, FindingCWE
 from .finding_template import FindingTemplate, FindingTemplateTranslation, FindingTemplateWebRequirement, \
     FindingTemplateMobileRequirement, FindingTemplateMobileTest, FindingTemplateWebTest, FindingTemplateCWE
-from .user import User
+from .user import User, UserAudit
 
 __all__ = [
     'Assessment', 'Image', 'db', 'Client', 'Template', 'Finding', 'FindingTemplate',
     'FindingTemplateTranslation', 'User', 'Active', 'AffectedResource', 'FindingTemplateWebRequirement',
     'FindingTemplateMobileRequirement', 'FindingWebRequirement', 'FindingMobileRequirement',
     'FindingTemplateMobileTest', 'FindingTemplateWebTest', 'FindingMobileTest', 'FindingWebTest',
-    'FindingTemplateCWE', 'FindingCWE'
+    'FindingTemplateCWE', 'FindingCWE', 'UserAudit'
 ]
