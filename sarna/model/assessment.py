@@ -141,12 +141,6 @@ class Assessment(Base, db.Model):
     def auditors_list(self):
         return ", ".join([str(auditor) for auditor in self.auditors])
 
-    def aggregate_technical_risk(self):
-        return self._aggregate_score('tech_risk')
-
-    def aggregate_business_risk(self):
-        return self._aggregate_score('business_risk')
-
     def aggregate_cvss_severity(self):
         return self._aggregate_score('cvss_v3_severity')
 

@@ -33,12 +33,6 @@ def new():
     if form.validate_on_submit():
         data = dict(form.data)
         
-        data["tech_risk"] = Score.coerce(data["tech_risk"])
-        data["business_risk"] = Score.coerce(data["business_risk"])
-        data["exploitability"] = Score.coerce(data["exploitability"])
-        data["dissemination"] = Score.coerce(data["dissemination"])
-        data["solution_complexity"] = Score.coerce(data["solution_complexity"])
-        
         data_finding = {k: v for k, v in data.items() if k in FindingTemplate.__dict__}
         data_translation = {k: v for k, v in data.items() if k in FindingTemplateTranslation.__dict__}
         data_cwe = {k: v for k, v in data.items() if k in FindingTemplateCWE.__dict__}

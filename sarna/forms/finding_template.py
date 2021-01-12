@@ -10,8 +10,8 @@ from sarna.model.enums import Score, FindingStatus, FindingType, Language, WSTG,
 class FindingTemplateCreateNewForm(
     BaseEntityForm(
         FindingTemplate,
-        hide_attrs={'cvss_v3_score', 'cvss_v3_vector'},
-        skip_attrs={'owisam_category'}),
+        hide_attrs={'cvss_v3_score', 'cvss_v3_vector'}
+    ),
     BaseEntityForm(FindingTemplateTranslation, skip_pk=False),
     BaseEntityForm(FindingTemplateWebRequirement, skip_pk=False),
     BaseEntityForm(FindingTemplateMobileRequirement, skip_pk=False),
@@ -39,11 +39,6 @@ class FindingTemplateCreateNewForm(
         choices=Language.choices(),
         default=Language.Spanish,
         coerce=Language.coerce)
-    tech_risk = HiddenField(default=Score.NA)
-    business_risk = HiddenField(default=Score.NA)
-    exploitability = HiddenField(default=Score.NA)
-    dissemination = HiddenField(default=Score.NA)
-    solution_complexity = HiddenField(default=Score.NA)    
     asvs_req = SelectMultipleField(
         label="ASVS - OWASP Application Security Verification Standard Requirement #",
         choices=ASVS.choices(),
@@ -65,8 +60,7 @@ class FindingTemplateCreateNewForm(
 class FindingTemplateEditForm(
     BaseEntityForm(
         FindingTemplate,
-        hide_attrs={'cvss_v3_score', 'cvss_v3_vector'},
-        skip_attrs={'owisam_category'}
+        hide_attrs={'cvss_v3_score', 'cvss_v3_vector'}
     ),
     BaseEntityForm(FindingTemplateWebRequirement, skip_pk=False),
     BaseEntityForm(FindingTemplateMobileRequirement, skip_pk=False),
@@ -94,11 +88,6 @@ class FindingTemplateEditForm(
         choices=Language.choices(),
         default=Language.Spanish,
         coerce=Language.coerce)
-    tech_risk = HiddenField(default=Score.NA)
-    business_risk = HiddenField(default=Score.NA)
-    exploitability = HiddenField(default=Score.NA)
-    dissemination = HiddenField(default=Score.NA)
-    solution_complexity = HiddenField(default=Score.NA)
     asvs_req = SelectMultipleField(
         label="ASVS - OWASP Application Security Verification Standard Requirement #",
         choices=ASVS.choices(),

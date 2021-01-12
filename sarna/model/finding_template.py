@@ -1,5 +1,5 @@
 from sarna.model.base import Base, db
-from sarna.model.enums import Score, WSTG, MSTG, OWISAMCategory, FindingType, Language, CWE, ASVS, MASVS
+from sarna.model.enums import Score, WSTG, MSTG, FindingType, Language, CWE, ASVS, MASVS
 from sarna.model.sql_types import Enum
 from flask_wtf import FlaskForm
 
@@ -12,14 +12,6 @@ class FindingTemplate(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     type = db.Column(Enum(FindingType), nullable=False)
-
-    owisam_category = db.Column(Enum(OWISAMCategory))
-
-    tech_risk = db.Column(Enum(Score), default=Score.NA)
-    business_risk = db.Column(Enum(Score), default=Score.NA)
-    exploitability = db.Column(Enum(Score), default=Score.NA)
-    dissemination = db.Column(Enum(Score), default=Score.NA)
-    solution_complexity = db.Column(Enum(Score), default=Score.NA)
 
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
     creator = db.relationship('User', back_populates='created_findings', uselist=False)

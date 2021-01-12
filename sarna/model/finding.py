@@ -7,7 +7,7 @@ from sqlathanor import AttributeConfiguration
 
 from sarna.model.assessment import Assessment
 from sarna.model.base import Base, db, supported_serialization
-from sarna.model.enums import Score, WSTG, MSTG, OWISAMCategory, FindingType, FindingStatus, CWE, ASVS, MASVS
+from sarna.model.enums import Score, WSTG, MSTG, FindingType, FindingStatus, CWE, ASVS, MASVS
 from sarna.model.finding_template import FindingTemplate, FindingTemplateTranslation
 from sarna.model.sql_types import Enum
 
@@ -40,14 +40,8 @@ class Finding(Base, db.Model):
         AttributeConfiguration(name='title', **supported_serialization),
         AttributeConfiguration(name='type', **supported_serialization),
         AttributeConfiguration(name='status', **supported_serialization),
-        AttributeConfiguration(name='owisam_category', **supported_serialization),
         AttributeConfiguration(name='description', **supported_serialization),
         AttributeConfiguration(name='solution', **supported_serialization),
-        AttributeConfiguration(name='tech_risk', **supported_serialization),
-        AttributeConfiguration(name='business_risk', **supported_serialization),
-        AttributeConfiguration(name='exploitability', **supported_serialization),
-        AttributeConfiguration(name='dissemination', **supported_serialization),
-        AttributeConfiguration(name='solution_complexity', **supported_serialization),
         AttributeConfiguration(name='definition', **supported_serialization),
         AttributeConfiguration(name='references', **supported_serialization),
         AttributeConfiguration(name='affected_resources', **supported_serialization),
@@ -74,16 +68,8 @@ class Finding(Base, db.Model):
     title = db.Column(db.String(128), nullable=False)
     status = db.Column(Enum(FindingStatus), nullable=False, default=FindingStatus.Pending)
 
-    owisam_category = db.Column(Enum(OWISAMCategory))
-
     description = db.Column(db.String())
     solution = db.Column(db.String())
-
-    tech_risk = db.Column(Enum(Score), default=Score.NA)
-    business_risk = db.Column(Enum(Score), default=Score.NA)
-    exploitability = db.Column(Enum(Score), default=Score.NA)
-    dissemination = db.Column(Enum(Score), default=Score.NA)
-    solution_complexity = db.Column(Enum(Score), default=Score.NA)
 
     definition = db.Column(db.String(), nullable=False)
     references = db.Column(db.String(), nullable=False)
@@ -208,15 +194,7 @@ class Finding(Base, db.Model):
         new_finding = Finding(
             name=template.name,
             type=template.type,
-
-            tech_risk=template.tech_risk,
-            business_risk=template.business_risk,
-            exploitability=template.exploitability,
-            dissemination=template.dissemination,
-            solution_complexity=template.solution_complexity,
-
-            owisam_category=template.owisam_category,
-
+           
             template=template,
 
             title=translation.title,

@@ -42,8 +42,7 @@ class AssessmentForm(BaseEntityForm(Assessment,
 class FindingEditForm(
     BaseEntityForm(
         Finding,
-        skip_attrs={'name', 'client_finding_id', 'tech_risk', 'business_risk',
-                    'exploitability', 'dissemination', 'solution_complexity', 'owisam_category'},
+        skip_attrs={'name', 'client_finding_id'},
         hide_attrs={'cvss_v3_score', 'cvss_v3_vector'}
     ),
     BaseEntityForm(FindingWebRequirement, skip_pk=False),
