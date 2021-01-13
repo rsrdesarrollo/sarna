@@ -71,6 +71,16 @@ def new():
     return render_template('findings/new.html', **context)
 
 
+@blueprint.route('/<finding_id>/detail', methods=('GET',))
+@trusted_required
+def detail(finding_id: int):
+    finding = FindingTemplate.query.filter_by(id=finding_id).one()
+    context = dict(    
+        finding=finding
+    )        
+    return render_template('findings/detail.html', **context)
+
+
 @blueprint.route('/<finding_id>', methods=('POST', 'GET'))
 @auditor_required
 def edit(finding_id: int):
@@ -78,7 +88,7 @@ def edit(finding_id: int):
     finding = FindingTemplate.query.filter_by(id=finding_id).one()
 
     if request.method == 'POST':
-        if current_user.is_readonly():
+        if current_user.is_readonly:
             flash('Operation not allowed', 'warning')
             return redirect_back('.index')
         # Process form data to update
@@ -101,7 +111,7 @@ def edit(finding_id: int):
             form=form,
             finding=finding # Used to display solutions and translations
         )        
-        return render_template('findings/details.html', **context)
+        return render_template('findings/edit.html', **context)
 
 
 @blueprint.route('/<finding_id>/delete', methods=('POST',))

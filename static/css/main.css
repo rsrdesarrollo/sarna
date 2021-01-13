@@ -214,3 +214,19 @@
   background-color: #a41d27;
   color: white;
 }
+
+.card {
+    margin: .75rem;
+}
+
+.card-title {
+    padding-left: .75rem;
+}
+
+#cvssresults dl#base{
+    max-width: 90%!important;
+}
+
+span.vector {
+    width: 100%!important;
+}

@@ -1,0 +1,201 @@
+<div class="row mt-3 pb-3 pl-3">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-title">
+                    {% if finding.title %}
+                        <h2>[{{ finding.name }}] {{ finding.title }}</h2>
+                    {% else %}
+                        <h2>{{ finding.name }}</h2>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <p><b>Type: </b>{{ finding.type }}</p>
+                        </div>
+                        {% if finding.bugtracking %}
+                            <div class="col">
+                                <p><b>Ticket: </b>{{ finding.bugtracking }}</p>
+                            </div>
+                        {% endif %}
+                        <div class="col">
+                            <p><b>CWE: </b>{{ finding.get_cwe_refs() }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <p><b>Requirements: </b>{{ finding.get_requirements_string() }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <p><b>Testing guide: </b>{{ finding.get_testing_refs() }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if finding.description %}
+                <div class="card">
+                    <div class="card-title">
+                        <h2>Description</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ finding.description }}</p>
+                    </div>
+                </div>
+            {% endif %}
+            {% if finding.definition %}
+                <div class="card">
+                    <div class="card-title">
+                        <h2>Definition</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ finding.definition }}</p>
+                    </div>
+                </div>
+            {% endif %}
+            {% if finding.notes %}
+                <div class="card">
+                    <div class="card-title">
+                        <h2>Notes</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ finding.notes }}</p>
+                    </div>
+                </div>
+            {% endif %}
+            {% if finding.references %}
+                <div class="card">
+                    <div class="card-title">
+                        <h2>References</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ finding.references }}</p>
+                    </div>
+                </div>
+            {% endif %}
+            {% if finding.affected_resources %}
+                <div class="card">
+                    <div class="card-title">
+                        <h2>Affected resources</h2>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            {% for resource in finding.affected_resources %}
+                                <li class="list-group-item">{{ resource.uri }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+            <div class="card">
+                <div class="card-title">
+                    <h2>Solutions</h2>
+                </div>
+                <div class="card-body">
+                    {% if finding.solutions %}
+                        <table id="table_data" class="table table-striped">
+                            <thead class="thead-dark">
+                            <th>Name</th>
+                            <th>Language</th>
+                            </thead>
+                            <tbody>
+                            {% for solution in finding.solutions %}
+                                <tr>
+                                    <td>{{ solution.name }}</td>
+                                    <td>{{ solution.lang }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <h4 class="text-center">No Solutions!</h4>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">
+                    <h2>Translations</h2>
+                </div>
+                <div class="card-body">
+                    {% if finding.langs %}
+                        <table id="table_data" class="table table-striped">
+                            <thead class="thead-dark">
+                            <th>Title</th>
+                            <th>Language</th>
+                            </thead>
+                            <tbody>
+                            {% for translation in finding.translations %}
+                                <tr>
+                                    <td>{{ translation.title }}</td>
+                                    <td>{{ translation.lang }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <h4 class="text-center">No Translations!</h4>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="row">
+                <div class="col-9">
+                    <h2>CVSS Score</h2>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col">
+                    <div class="cvssjs pl-3" id="cvssresults">
+                        <div class="row">
+                            <dl id="base">
+                                <dt>Base Score</dt>
+                                <dd>
+                                    <label class="base-results">
+                                        <span class="severity"></span>
+                                        <span class="score"></span>
+                                        <span class="vector text-truncate" data-toggle="tooltip" data-placement="top"></>
+                                    </label>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="row">
+                            <dl>
+                                <dt>Temporal Score</dt>
+                                <dd>
+                                    <label class="temp-results">
+                                        <span class="severity"></span>
+                                        <span class="score"></span>
+                                    </label>
+                                </dd>
+                            </dl>
+                            <dl>
+                                <dt>Environmental Score</dt>
+                                <dd>
+                                    <label class="env-results">
+                                        <span class="severity"></span>
+                                        <span class="score"></span>
+                                    </label>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row" id="cvssboard"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            var cvss = new CVSS("cvssboard", {}, 2);
+            cvss.set('{{ finding.cvss_v3_vector }}');
+            $('#cvssboard input').attr('disabled', true);
+            
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+        });
+    </script>

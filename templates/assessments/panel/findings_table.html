@@ -39,7 +39,12 @@
                                 </label>
                             </td>
                         {% endif %}
-                        <td>{{ finding.title }}</td>
+                        <td>
+                            <a title="Details"
+                               href="{{ url_for('.detail_finding', assessment_id=assessment.id, finding_id=finding.id) }}">
+                                {{ finding.title }}
+                            </a>
+                        </td>
                         <td>{{ finding.get_cwe_refs() }}</td>
                         <td>{{ finding.get_requirements_string() }}</td>
                         <td>{{ finding.get_testing_refs() }}</td>

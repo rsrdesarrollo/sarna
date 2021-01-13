@@ -33,14 +33,10 @@
                     {% for finding in findings | sort(attribute='name') %}
                         <tr>
                             <td>
-                                {% if not current_user.is_readonly %}
-                                    <a title="Edit Finding"
-                                       href="{{ url_for('.edit', finding_id=finding.id, next=request.path) }}">
-                                        {{ finding.name }}
-                                    </a>
-                                {% else %}
+                                <a title="Details"
+                                   href="{{ url_for('.detail', finding_id=finding.id, next=request.path) }}">
                                     {{ finding.name }}
-                                {% endif %}
+                                </a>
                             </td>
                             <td>{{ finding.type }}</td>
                             <td>{{ finding.get_cwe_refs() }}</td>

@@ -640,7 +640,7 @@ CVSS.prototype.createDOMTags = function(id, options, groups, metrics) {
  * @param {options to customize events} options 
  */
 CVSS.prototype.locateScoreBox = function(f, options) {
-    this.vector = $("#cvssresults a.vector");
+    this.vector = $("#cvssresults span.vector");
 
     // Add onSubmit event if passed as argument
     if (options.onsubmit) {
@@ -740,7 +740,10 @@ CVSS.prototype.update = function(newVec) {
             .text(s31.environmentalSeverity);
     }
 
-    $("#cvssresults .base-results a.vector").text(s31.vectorString);
+    $("#cvssresults .base-results span.vector").text(s31.vectorString);
+    $("#cvssresults .base-results span.vector").attr('title', s31.vectorString);
+    $("#cvssresults .base-results span.vector").attr('data-original-title', s31.vectorString);
+    $('[data-toggle="tooltip"]').tooltip()
 
     /*const rating = this.severityRating(s);
     this.severity.className = rating.name + ' severity';

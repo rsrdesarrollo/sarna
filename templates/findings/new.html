@@ -10,31 +10,39 @@
             {{ render_form(form) }}
         </div>
         <div class="col-lg-7 mt-7">
-            <div class="row cvssjs" id="cvssresults">
-                <dl>
-                    <dt>Base Score</dt>
-                    <dd>
-                        <label class="base-results">
-                            <span class="severity"></span>                            
-                            <span class="score"></span>
-                            <a class="vector"></a>
-                        </label>
-                    </dd>
-                    <dt>Temporal Score</dt>
-                    <dd>
-                        <label class="temp-results">
-                            <span class="severity"></span>                            
-                            <span class="score"></span>
-                        </label>
-                    </dd>
-                    <dt>Environmental Score</dt>
-                    <dd>
-                        <label class="env-results">
-                            <span class="severity"></span>                            
-                            <span class="score"></span>
-                        </label>
-                    </dd>
-                </dl>
+            <div class="cvssjs pl-3" id="cvssresults">
+                <div class="row">
+                    <dl id="base">
+                        <dt>Base Score</dt>
+                        <dd>
+                            <label class="base-results">
+                                <span class="severity"></span>
+                                <span class="score"></span>
+                                <span class="vector text-truncate" data-toggle="tooltip" data-placement="top"></a>
+                            </label>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="row">
+                    <dl>
+                        <dt>Temporal Score</dt>
+                        <dd>
+                            <label class="temp-results">
+                                <span class="severity"></span>
+                                <span class="score"></span>
+                            </label>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>Environmental Score</dt>
+                        <dd>
+                            <label class="env-results">
+                                <span class="severity"></span>
+                                <span class="score"></span>
+                            </label>
+                        </dd>
+                    </dl>
+                </div>
             </div>            
             <hr>
             <div class="row" id="cvssboard"></div>
@@ -57,6 +65,11 @@
                 }
             }, 2);
             cvss.set($('#cvss_v3_vector').val());
+
+            
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
         });
     </script>
 {% endblock %}

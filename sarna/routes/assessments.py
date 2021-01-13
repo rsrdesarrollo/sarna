@@ -125,6 +125,30 @@ def findings(assessment_id):
     return render_template('assessments/panel/list_findings.html', **context)
 
 
+@blueprint.route('/<assessment_id>/findings/<finding_id>/detail', methods=('GET',))
+@trusted_required
+def detail_finding(assessment_id: int, finding_id: int):
+    finding = Finding.query.filter_by(id=finding_id).one()
+    assessment = Assessment.query.filter_by(id=assessment_id).one()
+
+    if finding.assessment.id != assessment.id:
+        abort(404)
+    elif current_user.is_readonly or current_user.is_admin:
+        pass
+    elif current_user.manages(assessment):
+        pass
+    elif current_user.audits(assessment):
+        pass
+    else:
+        abort(403)
+
+    context = dict(
+        finding=finding,
+        assessment=assessment
+    )
+    return render_template('assessments/panel/finding_detail.html', **context)
+
+
 @blueprint.route('/<assessment_id>/findings/<finding_id>', methods=('GET', 'POST'))
 @auditor_required
 def edit_finding(assessment_id, finding_id):

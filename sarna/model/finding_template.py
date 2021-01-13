@@ -166,6 +166,7 @@ class FindingTemplate(Base, db.Model):
         else:
             return None
 
+
 class FindingTemplateWebRequirement(Base, db.Model):
     finding_template_id = db.Column(
         db.Integer,
