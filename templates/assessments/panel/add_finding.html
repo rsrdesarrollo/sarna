@@ -37,7 +37,7 @@
                             <td>{{ finding.get_testing_refs() }}</td>
                             <td>{{ render_cvss_pill(finding.cvss_v3_severity, finding.cvss_v3_score) }}</td>
                             <td>
-                                <form action="{{ url_for('.add_finding', assessment_id=assessment.id, finding_id=finding.id, next=request.path) }}"
+                                <form action="{{ url_for('.add_finding', assessment_id=assessment.id, template_id=finding.id, next=request.path) }}"
                                       method="POST">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 

@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 from sarna.auxiliary import redirect_back, redirect_endpoint
 from sarna.bugtracking.jira import JiraAPI
 from sarna.core.auth import current_user
-from sarna.core.roles import auditor_required, trusted_required, manager_required
+from sarna.core.roles import auditor_required, trusted_required, manager_required, assessment_allowed
 from sarna.core.security import limiter
 from sarna.forms.assessment import AssessmentForm, FindingEditForm, EvidenceCreateNewForm
 from sarna.model import Assessment, Finding, FindingTemplate, db, Image, Template, \
@@ -32,8 +32,9 @@ def index():
 
 @blueprint.route('/<assessment_id>', methods=['GET'])
 @auditor_required
-def detail(assessment_id):    
-    assessment: Assessment = Assessment.query.filter_by(id=assessment_id).one()
+@assessment_allowed
+def detail(**kwargs):
+    assessment: Assessment = kwargs['assessment']
     form = AssessmentForm(**assessment.to_dict(), auditors=assessment.auditors)
     form.auditors.choices = assessment.client.get_auditor_choices()
 
@@ -46,10 +47,9 @@ def detail(assessment_id):
 
 @blueprint.route('/<assessment_id>', methods=['POST'])
 @manager_required
-def edit(assessment_id):
-    assessment: Assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.owns(assessment) and not current_user.manages(assessment.client):
-        abort(403)
+@assessment_allowed
+def edit(**kwargs):
+    assessment: Assessment = kwargs['assessment']
 
     form = AssessmentForm(request.form)
     form.auditors.choices = assessment.client.get_auditor_choices()
@@ -74,11 +74,9 @@ def edit(assessment_id):
 
 
 @blueprint.route('/<assessment_id>/export', methods=('GET',))
-@auditor_required
-def export(assessment_id):
-    assessment: Assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.owns(assessment) and not current_user.manages(assessment.client):
-        abort(403)
+@assessment_allowed
+def export(**kwargs):
+    assessment: Assessment = kwargs['assessment']
 
     return Response(
         assessment.to_json(max_nesting=5),
@@ -89,37 +87,29 @@ def export(assessment_id):
 
 @blueprint.route('/<assessment_id>/delete', methods=('POST',))
 @auditor_required
-def delete(assessment_id):
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.owns(assessment) and not current_user.manages(assessment.client):
-        abort(403)
-
+@assessment_allowed
+def delete(**kwargs):
+    assessment = kwargs['assessment']
     assessment.delete()
     return redirect_back('.index')
 
 
 @blueprint.route('/<assessment_id>/summary')
 @trusted_required
-def summary(assessment_id):
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.audits(assessment) and not current_user.is_readonly:
-        abort(403)
-
+@assessment_allowed
+def summary(**kwargs):
     context = dict(
-        assessment=assessment
+        assessment=kwargs['assessment']
     )
     return render_template('assessments/panel/summary.html', **context)
 
 
 @blueprint.route('/<assessment_id>/findings')
 @trusted_required
-def findings(assessment_id):
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not (current_user.audits(assessment) or current_user.is_readonly):
-        abort(403)
-
+@assessment_allowed
+def findings(**kwargs):
     context = dict(
-        assessment=assessment
+        assessment=kwargs['assessment']
     )
 
     return render_template('assessments/panel/list_findings.html', **context)
@@ -127,20 +117,10 @@ def findings(assessment_id):
 
 @blueprint.route('/<assessment_id>/findings/<finding_id>/detail', methods=('GET',))
 @trusted_required
-def detail_finding(assessment_id: int, finding_id: int):
-    finding = Finding.query.filter_by(id=finding_id).one()
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
-
-    if finding.assessment.id != assessment.id:
-        abort(404)
-    elif current_user.is_readonly or current_user.is_admin:
-        pass
-    elif current_user.manages(assessment):
-        pass
-    elif current_user.audits(assessment):
-        pass
-    else:
-        abort(403)
+@assessment_allowed
+def detail_finding(**kwargs):
+    finding = kwargs.get('finding')
+    assessment = kwargs.get('assessment')
 
     context = dict(
         finding=finding,
@@ -151,12 +131,11 @@ def detail_finding(assessment_id: int, finding_id: int):
 
 @blueprint.route('/<assessment_id>/findings/<finding_id>', methods=('GET', 'POST'))
 @auditor_required
-def edit_finding(assessment_id, finding_id):
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.audits(assessment):
-        abort(403)
-    
-    finding = Finding.query.filter_by(id=finding_id).one()
+@assessment_allowed
+def edit_finding(**kwargs):
+    assessment = kwargs['assessment']
+    finding = kwargs['finding']
+
     solutions = finding.template.solutions if finding.template else []
     context = dict(
             assessment=assessment,
@@ -186,7 +165,7 @@ def edit_finding(assessment_id, finding_id):
                 finding.update_affected_resources(affected_resources)  # TODO: Raise different exception
                 finding.update_one_to_manies(form)
                 finding.set(**data)
-                return redirect_back('.findings', assessment_id=assessment_id)
+                return redirect_back('.findings', assessment_id=kwargs['assessment_id'])
             except ValueError as ex:
                 form.affected_resources.errors.append(str(ex))
     
@@ -195,55 +174,47 @@ def edit_finding(assessment_id, finding_id):
 
 @blueprint.route('/<assessment_id>/findings/<finding_id>/delete', methods=('POST',))
 @auditor_required
-def delete_findings(assessment_id, finding_id):
-    finding = Finding.query.filter_by(id=finding_id).one()
-    if not current_user.audits(finding.assessment):
-        abort(403)
+@assessment_allowed
+def delete_findings(**kwargs):
+    finding = kwargs['finding']
 
     finding.update_affected_resources([])
     finding.delete()
     flash("Finding deleted", "success")
-    return redirect_back('.findings', assessment_id=assessment_id)
+    return redirect_back('.findings', assessment_id=kwargs['assessment_id'])
 
 
 @blueprint.route('/<assessment_id>/findings/<finding_id>/report', methods=('GET', 'POST'))
 @auditor_required
-def report_finding(assessment_id, finding_id):
-    finding = Finding.query.filter_by(id=finding_id).one()
-    if not current_user.audits(finding.assessment):
-        abort(403)
+def report_finding(**kwargs):
+    finding = kwargs['finding']
 
     JiraAPI().create_finding(finding)
 
-    return redirect_back('.findings', assessment_id=assessment_id)
+    return redirect_back('.findings', assessment_id=kwargs['assessment_id'])
 
 
 @blueprint.route('/<assessment_id>/add')
 @auditor_required
-def add_findings(assessment_id):
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.audits(assessment):
-        abort(403)
-
+@assessment_allowed
+def add_findings(**kwargs):
     context = dict(
-        assessment=assessment,
+        assessment=kwargs['assessment'],
         findings=FindingTemplate.query.all()
     )
     return render_template('assessments/panel/add_finding.html', **context)
 
 
-@blueprint.route('/<assessment_id>/add/<finding_id>', methods=('POST',))
+@blueprint.route('/<assessment_id>/add/<template_id>', methods=('POST',))
 @auditor_required
-def add_finding(assessment_id, finding_id):
+@assessment_allowed
+def add_finding(**kwargs):
     action = request.form.get('action', None)
     if not action or action not in {'add', 'edit_add'}:
         abort(400)
 
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.audits(assessment):
-        abort(403)
-
-    template = FindingTemplate.query.filter_by(id=finding_id).one()
+    assessment = kwargs['assessment']
+    template = FindingTemplate.query.filter_by(id=kwargs['template_id']).one()
 
     finding = Finding.build_from_template(template, assessment)
 
@@ -258,14 +229,13 @@ def add_finding(assessment_id, finding_id):
 
 @blueprint.route('/<assessment_id>/bulk_action', methods=("POST",))
 @auditor_required
-def bulk_action_finding(assessment_id):
+@assessment_allowed
+def bulk_action_finding(**kwargs):
     data = request.form.to_dict()
     action = data.pop('action', None)
     data.pop('csrf_token', None)
 
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.audits(assessment):
-        abort(403)
+    assessment = kwargs['assessment']
 
     set_findings = set(request.form.getlist('finding_id'))
 
@@ -298,15 +268,14 @@ def bulk_action_finding(assessment_id):
         db.session.commit()
         flash("{} items set to {} status successfully.".format(len(set_findings), status.name), "success")
 
-    return redirect_back('.findings', assessment_id=assessment_id)
+    return redirect_back('.findings', assessment_id=kwargs['assessment_id'])
 
 
 @blueprint.route('/<assessment_id>/actives', methods=("GET",))
 @trusted_required
-def actives(assessment_id):
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not (current_user.audits(assessment) or current_user.is_readonly):
-        abort(403)
+@assessment_allowed
+def actives(**kwargs):
+    assessment = kwargs['assessment']
 
     list_actives = assessment.actives
     context = dict(
@@ -320,10 +289,9 @@ def actives(assessment_id):
 @blueprint.route('/<assessment_id>/evidences', methods=("POST", "GET"))
 @limiter.exempt
 @auditor_required
-def evidences(assessment_id):
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.audits(assessment):
-        abort(403)
+@assessment_allowed
+def evidences(**kwargs):
+    assessment = kwargs['assessment']
 
     form = EvidenceCreateNewForm()
     context = dict(
@@ -359,14 +327,13 @@ def evidences(assessment_id):
 @blueprint.route('/<assessment_id>/evidences/<evidence_name>')
 @limiter.exempt
 @trusted_required
-def get_evidence(assessment_id, evidence_name):
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not current_user.audits(assessment):
-        abort(403)
+@assessment_allowed
+def get_evidence(**kwargs):
+    assessment = kwargs['assessment']
 
     image = Image.query.filter_by(
         assessment=assessment,
-        name=evidence_name
+        name=kwargs['evidence_name']
     ).one()
 
     return send_from_directory(
@@ -378,15 +345,16 @@ def get_evidence(assessment_id, evidence_name):
 
 @blueprint.route('/<assessment_id>/evidences/<evidence_name>/delete', methods=("POST",))
 @auditor_required
-def delete_evidence(assessment_id, evidence_name):
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
+@assessment_allowed
+def delete_evidence(**kwargs):
+    assessment = kwargs['assessment']
 
     if not current_user.audits(assessment):
         abort(403)
 
     image = Image.query.filter_by(
         assessment=assessment,
-        name=evidence_name
+        name=kwargs['evidence_name']
     ).one()
     image_name = image.name
     image.delete()
@@ -395,28 +363,24 @@ def delete_evidence(assessment_id, evidence_name):
 
     flash("Evidence deleted", "success")
 
-    return redirect_back(".evidences", assessment_id=assessment_id)
+    return redirect_back(".evidences", assessment_id=assessment.id)
 
 
 @blueprint.route('/<assessment_id>/reports')
 @trusted_required
-def reports(assessment_id):
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not (current_user.audits(assessment) or current_user.is_readonly):
-        abort(403)
-
+@assessment_allowed
+def reports(**kwargs):
     context = dict(
-        assessment=assessment
+        assessment=kwargs['assessment']
     )
     return render_template('assessments/panel/reports.html', **context)
 
 
 @blueprint.route('/<assessment_id>/reports/download', methods=('POST',))
 @trusted_required
-def download_reports(assessment_id):
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not (current_user.audits(assessment) or current_user.is_readonly):
-        abort(403)
+@assessment_allowed
+def download_reports(**kwargs):
+    assessment = kwargs['assessment']
 
     data = request.form.to_dict()
     data.pop('action', None)
@@ -432,7 +396,7 @@ def download_reports(assessment_id):
 
     if not templates:
         flash('No report selected', 'danger')
-        return redirect_back('.reports', assessment_id=assessment_id)
+        return redirect_back('.reports', assessment_id=assessment.id)
 
     report_path, report_file = generate_reports_bundle(assessment, templates)
     return send_from_directory(
@@ -448,15 +412,14 @@ def download_reports(assessment_id):
 
 @blueprint.route('/<assessment_id>/reports/download/<template_name>', methods=('GET',))
 @trusted_required
-def download_report(assessment_id, template_name):
-    assessment = Assessment.query.filter_by(id=assessment_id).one()
-    if not (current_user.audits(assessment) or current_user.is_readonly):
-        abort(403)
+@assessment_allowed
+def download_report(**kwargs):
+    assessment = kwargs['assessment']
 
     template = Template.query.filter(
         Template.clients.any(Client.id == assessment.client.id)
     ).filter_by(
-        name=template_name
+        name=kwargs['template_name']
     ).one()
 
     report_path, report_file = generate_reports_bundle(assessment, [template])
