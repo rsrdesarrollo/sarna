@@ -41,7 +41,7 @@ def index():
                 form.otp.data
             )
 
-            session.permanent = True
+            session.permanent = False
 
             flash('Logged in successfully.', 'success')
 
