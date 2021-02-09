@@ -1,5 +1,4 @@
 from sarna.model.enums.base_choice import BaseChoice
-from sarna.model.enums.language import Language
 
 
 class WSTG(BaseChoice):

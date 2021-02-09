@@ -1,10 +1,10 @@
-from wtforms import validators, StringField, HiddenField, SelectField, SelectMultipleField
+from wtforms import validators, SelectField, SelectMultipleField
 
 from sarna.forms.base_entity_form import BaseEntityForm
 from sarna.model.finding_template import FindingTemplate, FindingTemplateTranslation, Solution, \
     FindingTemplateWebRequirement, FindingTemplateMobileRequirement, FindingTemplateWebTest, \
     FindingTemplateMobileTest, FindingTemplateCWE
-from sarna.model.enums import Score, FindingStatus, FindingType, Language, WSTG, MSTG, CWE, ASVS, MASVS
+from sarna.model.enums import FindingStatus, FindingType, Language, WSTG, MSTG, CWE, ASVS, MASVS
 
 
 class FindingTemplateCreateNewForm(
@@ -21,40 +21,71 @@ class FindingTemplateCreateNewForm(
 ):
     cwe_ref = SelectMultipleField(
         "Common Weakness Enumeration",
-        choices=CWE.choices(),
+        choices=CWE.none_blank_choices(),
         coerce=CWE.coerce,
-        validators=[validators.DataRequired()])
+        validators=[
+            validators.DataRequired()
+        ]
+    )
     status = SelectField(
         "Status",
-        choices=FindingStatus.choices(),
+        choices=FindingStatus.none_blank_choices(),
         default=FindingStatus.Pending,
-        coerce=FindingStatus.coerce)
+        coerce=FindingStatus.coerce,
+        validators=[
+            validators.DataRequired()
+        ]
+    )
     type = SelectField(
         "Type",
-        choices=FindingType.choices(),
+        choices=FindingType.none_blank_choices(),
         default=FindingType.Web,
-        coerce=FindingType.coerce)
+        coerce=FindingType.coerce,
+        validators=[
+            validators.DataRequired()
+        ]
+    )
     lang = SelectField(
         "Language",
-        choices=Language.choices(),
+        choices=Language.none_blank_choices(),
         default=Language.Spanish,
-        coerce=Language.coerce)
+        coerce=Language.coerce,
+        validators=[
+            validators.DataRequired()
+        ]
+    )
     asvs_req = SelectMultipleField(
         label="ASVS - OWASP Application Security Verification Standard Requirement #",
-        choices=ASVS.choices(),
-        coerce=ASVS.coerce)
+        choices=ASVS.none_blank_choices(),
+        coerce=ASVS.coerce,
+        validators=[
+            validators.Optional()
+        ]
+    )
     masvs_req = SelectMultipleField(
         label="MASVS - OWASP Mobile Application Security Verification Standard Requirement #",
-        choices=MASVS.choices(),
-        coerce=MASVS.coerce)
+        choices=MASVS.none_blank_choices(),
+        coerce=MASVS.coerce,
+        validators=[
+            validators.Optional()
+        ]
+    )
     wstg_ref = SelectMultipleField(
         label="Web Security Testing Guide",
-        choices=WSTG.choices(),
-        coerce=WSTG.coerce)
+        choices=WSTG.none_blank_choices(),
+        coerce=WSTG.coerce,
+        validators=[
+            validators.Optional()
+        ]
+    )
     mstg_ref = SelectMultipleField(
         label="Mobile Security Testing Guide",
-        choices=MSTG.choices(),
-        coerce=MSTG.coerce)
+        choices=MSTG.none_blank_choices(),
+        coerce=MSTG.coerce,
+        validators=[
+            validators.Optional()
+        ]
+    )
 
 
 class FindingTemplateEditForm(
@@ -70,40 +101,71 @@ class FindingTemplateEditForm(
 ):
     cwe_ref = SelectMultipleField(
         "Common Weakness Enumeration",
-        choices=CWE.choices(),
+        choices=CWE.none_blank_choices(),
         coerce=CWE.coerce,
-        validators=[validators.DataRequired()])
+        validators=[
+            validators.DataRequired()
+        ]
+    )
     status = SelectField(
         "Status",
-        choices=FindingStatus.choices(),
+        choices=FindingStatus.none_blank_choices(),
         default=FindingStatus.Pending,
-        coerce=FindingStatus.coerce)
+        coerce=FindingStatus.coerce,
+        validators=[
+            validators.DataRequired()
+        ]
+    )
     type = SelectField(
         "Type",
-        choices=FindingType.choices(),
+        choices=FindingType.none_blank_choices(),
         default=FindingType.Web,
-        coerce=FindingType.coerce)
+        coerce=FindingType.coerce,
+        validators=[
+            validators.DataRequired()
+        ]
+    )
     lang = SelectField(
         "Language",
-        choices=Language.choices(),
+        choices=Language.none_blank_choices(),
         default=Language.Spanish,
-        coerce=Language.coerce)
+        coerce=Language.coerce,
+        validators=[
+            validators.DataRequired()
+        ]
+    )
     asvs_req = SelectMultipleField(
         label="ASVS - OWASP Application Security Verification Standard Requirement #",
-        choices=ASVS.choices(),
-        coerce=ASVS.coerce)
+        choices=ASVS.none_blank_choices(),
+        coerce=ASVS.coerce,
+        validators=[
+            validators.Optional()
+        ]
+    )
     masvs_req = SelectMultipleField(
         label="MASVS - OWASP Mobile Application Security Verification Standard Requirement #",
-        choices=MASVS.choices(),
-        coerce=MASVS.coerce)
+        choices=MASVS.none_blank_choices(),
+        coerce=MASVS.coerce,
+        validators=[
+            validators.Optional()
+        ]
+    )
     wstg_ref = SelectMultipleField(
         label="Web Security Testing Guide",
-        choices=WSTG.choices(),
-        coerce=WSTG.coerce)
+        choices=WSTG.none_blank_choices(),
+        coerce=WSTG.coerce,
+        validators=[
+            validators.Optional()
+        ]
+    )
     mstg_ref = SelectMultipleField(
         label="Mobile Security Testing Guide",
-        choices=MSTG.choices(),
-        coerce=MSTG.coerce)
+        choices=MSTG.none_blank_choices(),
+        coerce=MSTG.coerce,
+        validators=[
+            validators.Optional()
+        ]
+    )
 
 
 class FindingTemplateAddTranslationForm(BaseEntityForm(

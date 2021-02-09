@@ -14,5 +14,7 @@ class AddUserForm(FlaskForm):
     username = StringField(validators=[validators.DataRequired(), validators.Length(max=128)])
     type = SelectField(
         label="User role",
-        choices=UserType.choices(),
-        coerce=UserType.coerce)
+        choices=UserType.none_blank_choices(),
+        coerce=UserType.coerce,
+        validators=[validators.DataRequired()]
+    )

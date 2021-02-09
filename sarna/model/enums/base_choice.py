@@ -7,6 +7,10 @@ class BaseChoice(OrderedEnum):
         return [(None, "---")] + [cls.choice(elem) for elem in cls]
 
     @classmethod
+    def none_blank_choices(cls):
+        return [cls.choice(elem) for elem in cls]
+
+    @classmethod
     def choice(cls, elem):
         if isinstance(elem, cls):
             desc = getattr(elem, 'desc', None)

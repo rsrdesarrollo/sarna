@@ -53,7 +53,7 @@ class FindingTemplate(Base, db.Model):
             data_cwe = data_cwe['cwe_ref']
             # Delete current relation
             for ref in self.cwe_refs:
-                if not ref.cwe_ref in data_cwe:
+                if ref.cwe_ref not in data_cwe:
                     ref.delete()
                 else:
                     data_cwe.remove(ref.cwe_ref)

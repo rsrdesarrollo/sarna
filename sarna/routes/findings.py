@@ -100,6 +100,12 @@ def edit(finding_id: int):
             finding.set(**data)
             db.session.commit()
             return redirect_back('.index')
+        else:
+            context = dict(
+                form=form,
+                finding=finding  # Used to display solutions and translations
+            )
+            return render_template('findings/edit.html', **context)
     else:
         # Load from DB        
         data = finding.to_dict()
@@ -131,7 +137,7 @@ def add_translation(finding_id: int):
     current_langs = finding.langs
     # Skip langs already presents
     form.lang.choices = tuple(
-        choice for choice in Language.choices() if choice[0] not in current_langs
+        choice for choice in Language.none_blank_choices() if choice[0] not in current_langs
     )
 
     context = dict(

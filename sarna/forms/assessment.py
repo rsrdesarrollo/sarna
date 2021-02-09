@@ -6,7 +6,7 @@ from wtforms.validators import Optional
 from sarna.auxiliary.upload_helpers import is_valid_evidence
 from sarna.auxiliary.user_helpers import user_is_auditor
 from sarna.forms.base_entity_form import BaseEntityForm
-from sarna.model import Assessment, Active, AffectedResource
+from sarna.model import Assessment
 from sarna.model.finding import Finding, FindingWebRequirement, \
     FindingMobileRequirement, FindingWebTest, FindingMobileTest, FindingCWE
 from sarna.model.user import User
@@ -24,19 +24,22 @@ class AssessmentForm(BaseEntityForm(Assessment,
     riskprof_score = FloatField(label='Risk Profile Score', render_kw={'placeholder': '0.0'})
     status = SelectField(
         "Status",
-        choices=AssessmentStatus.choices(),
+        choices=AssessmentStatus.none_blank_choices(),
         default=AssessmentStatus.Open,
-        coerce=AssessmentStatus.coerce)
+        coerce=AssessmentStatus.coerce
+    )
     type = SelectField(
         "Type",
-        choices=AssessmentType.choices(),
+        choices=AssessmentType.none_blank_choices(),
         default=AssessmentType.Web,
-        coerce=AssessmentType.coerce)
+        coerce=AssessmentType.coerce
+    )
     lang = SelectField(
         "Language",
-        choices=Language.choices(),
+        choices=Language.none_blank_choices(),
         default=Language.Spanish,
-        coerce=Language.coerce)
+        coerce=Language.coerce
+    )
 
 
 class FindingEditForm(
@@ -54,27 +57,47 @@ class FindingEditForm(
     affected_resources = TextAreaField(description='List of affected resources. One per line.',
                                        render_kw=dict(class_='noMD', rows=5))
     notes = TextAreaField(render_kw={'class_': 'noMD', 'placeholder': 'Optional notes.'})
+
     cwe_ref = SelectMultipleField(
         "Common Weakness Enumeration",
-        choices=CWE.choices(),
+        choices=CWE.none_blank_choices(),
         coerce=CWE.coerce,
-        validators=[validators.DataRequired()])
+        validators=[
+            validators.DataRequired()
+        ]
+    )
     asvs_req = SelectMultipleField(
         label="ASVS - OWASP Application Security Verification Standard Requirement #",
-        choices=ASVS.choices(),
-        coerce=ASVS.coerce)
+        choices=ASVS.none_blank_choices(),
+        coerce=ASVS.coerce,
+        validators=[
+            validators.Optional()
+        ]
+    )
     masvs_req = SelectMultipleField(
         label="MASVS - OWASP Mobile Application Security Verification Standard Requirement #",
-        choices=MASVS.choices(),
-        coerce=MASVS.coerce)
+        choices=MASVS.none_blank_choices(),
+        coerce=MASVS.coerce,
+        validators=[
+            validators.Optional()
+        ]
+    )
     wstg_ref = SelectMultipleField(
         label="Web Security Testing Guide",
-        choices=WSTG.choices(),
-        coerce=WSTG.coerce)
+        choices=WSTG.none_blank_choices(),
+        coerce=WSTG.coerce,
+        validators=[
+            validators.Optional()
+        ]
+    )
     mstg_ref = SelectMultipleField(
         label="Mobile Security Testing Guide",
-        choices=MSTG.choices(),
-        coerce=MSTG.coerce)
+        choices=MSTG.none_blank_choices(),
+        coerce=MSTG.coerce,
+        validators=[
+            validators.Optional()
+        ]
+    )
 
 
 class EvidenceCreateNewForm(FlaskForm):

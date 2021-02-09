@@ -54,7 +54,7 @@ class BaseEntityForm(type):
                     t = SelectField(
                         " ".join(label.split('_')),
                         validators=vals,
-                        choices=colum.type.enum_class.choices(),
+                        choices=colum.type.enum_class.none_blank_choices(),
                         coerce=colum.type.enum_class.coerce,
                         **kwargs
                     )
