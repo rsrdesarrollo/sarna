@@ -1,7 +1,10 @@
-FROM python:3.6-alpine
+FROM python:alpine
 
 # Create a group and user
 RUN addgroup -S sarnag && adduser -S sarnau -G sarnag
+# cryptography module incompatibility with PEP517
+# https://github.com/pyca/cryptography/issues/5776
+ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
 RUN apk --update --no-cache add \
     yarn && \
