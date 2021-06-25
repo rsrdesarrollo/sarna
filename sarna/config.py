@@ -58,6 +58,10 @@ class BaseConfig:
     # User session protection based on a hash of the IP address and user agent.
     SESSION_PROTECTION = None
 
+    BROKEN_REFS_TOKEN = ' **BROKEN!!!**'
+    BROKEN_REFS_REQ_TIMEOUT = 30
+    BROKEN_REFS_INTERNET_CHECK_URL = 'https://www.google.com'
+
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True

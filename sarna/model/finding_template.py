@@ -1,7 +1,11 @@
+import re
+import requests
+
 from sarna.model.base import Base, db
 from sarna.model.enums import Score, OWASPCategory, OWISAMCategory, FindingType, Language
 from sarna.model.enums.category import OWASPMobileTop10Category
 from sarna.model.sql_types import Enum
+from sarna.core.config import config
 
 __all__ = ['FindingTemplateTranslation', 'FindingTemplate', 'Solution']
 
@@ -48,6 +52,10 @@ class FindingTemplate(Base, db.Model):
         else:
             return Score.Critical
 
+    def check_translations_references_urls(self):
+        for translation in self.translations:
+            translation.check_references_urls()
+
 
 class FindingTemplateTranslation(Base, db.Model):
     lang = db.Column(Enum(Language), primary_key=True)
@@ -62,6 +70,28 @@ class FindingTemplateTranslation(Base, db.Model):
     definition = db.Column(db.String(), nullable=False)
     references = db.Column(db.String(), nullable=False)
     description = db.Column(db.String())
+
+    def check_references_urls(self):
+        url_regex = r"\[.+\]\((.+)\)"
+        refs_lines = self.references.splitlines()
+
+        for i, ref_line in enumerate(refs_lines):
+            match_url = re.search(url_regex, ref_line)
+
+            if match_url:
+                ref = match_url.group(0)
+                url = match_url.group(1)
+                try:
+                    req = requests.head(url, allow_redirects=True, timeout=config.BROKEN_REFS_REQ_TIMEOUT)
+                    req.raise_for_status()
+
+                    refs_lines[i] = ref_line.replace(config.BROKEN_REFS_TOKEN, "", 1)
+                except:
+                    if config.BROKEN_REFS_TOKEN not in ref_line:
+                        refs_lines[i] = ref_line.replace(ref, f"{ref}{config.BROKEN_REFS_TOKEN}", 1)
+
+        self.references = "\r\n".join(refs_lines)
+        db.session.commit()
 
 
 class Solution(Base, db.Model):
