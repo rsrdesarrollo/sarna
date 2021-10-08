@@ -8,6 +8,7 @@ from sarna.forms.finding_template import *
 from sarna.model import FindingTemplate, FindingTemplateTranslation, db
 from sarna.model.enums import Language
 from sarna.model.finding_template import Solution
+from sarna.core.config import config
 
 blueprint = Blueprint('findings', __name__)
 
@@ -132,6 +133,9 @@ def edit_translation(finding_id: int, language: str):
         form=form,
         finding=translation.finding_template
     )
+
+    if config.BROKEN_REFS_TOKEN in translation.references:
+        form.references.errors = ('Possible broken references detected',)
 
     if form.validate_on_submit():
         if language in translation.finding_template.langs:

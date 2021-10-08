@@ -16,6 +16,7 @@ from sarna.model import Assessment, User, AffectedResource, Finding, FindingTemp
     Client
 from sarna.model.enums import FindingStatus
 from sarna.report_generator.engine import generate_reports_bundle
+from sarna.core.config import config
 
 blueprint = Blueprint('assessments', __name__)
 
@@ -141,6 +142,10 @@ def edit_finding(assessment_id, finding_id):
         },
         evidences=assessment.images
     )
+
+    if config.BROKEN_REFS_TOKEN in finding.references:
+        form.references.errors = ('Possible broken references detected',)
+
     if form.validate_on_submit():
         data = dict(form.data)
         data.pop('csrf_token', None)
