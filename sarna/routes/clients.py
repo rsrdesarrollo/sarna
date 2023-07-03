@@ -15,11 +15,14 @@ blueprint = Blueprint('clients', __name__)
 @blueprint.route('/')
 @manager_required
 def index():
-    clients = Client.query.filter(
-        (Client.creator == current_user) |
-        (Client.managers.any(User.id == current_user.id)) |
-        (Client.auditors.any(User.id == current_user.id))
-    ).all()
+    if current_user.is_admin:
+        clients = Client.query.all()
+    else:
+        clients = Client.query.filter(
+            (Client.creator == current_user) |
+            (Client.managers.any(User.id == current_user.id)) |
+            (Client.auditors.any(User.id == current_user.id))
+        ).all()
 
     context = dict(
         clients=clients
