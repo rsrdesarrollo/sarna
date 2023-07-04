@@ -71,6 +71,9 @@ class User(Base, db.Model):
     """
 
     def get_user_assessments(self):
+        if self.is_admin:
+            return Assessment.query.all()
+        
         return Assessment.query.filter(
             (Assessment.creator == self) |
             (Assessment.client_id.in_(map(lambda x: x.id, self.managed_clients))) |
@@ -83,6 +86,8 @@ class User(Base, db.Model):
     """
 
     def owns(self, obj):
+        if self.is_admin:
+            return True
         if isinstance(obj, Client):
             return obj in self.created_clients
         if isinstance(obj, Assessment):
