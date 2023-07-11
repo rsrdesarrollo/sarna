@@ -69,7 +69,7 @@
         function refresh_search() {
             function parse_tds(tds) {
                 return {
-                    long_name: tds[0].firstElementChild.innerText,
+                    long_name: tds[0].innerText,
                     creator_name: tds[1].textContent
                 };
             }
