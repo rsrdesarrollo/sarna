@@ -40,6 +40,7 @@ class Finding(Base, db.Model):
         AttributeConfiguration(name='owasp_mobile_category', **supported_serialization),
         AttributeConfiguration(name='owisam_category', **supported_serialization),
         AttributeConfiguration(name='description', **supported_serialization),
+        AttributeConfiguration(name='impact', **supported_serialization),
         AttributeConfiguration(name='solution', **supported_serialization),
         AttributeConfiguration(name='tech_risk', **supported_serialization),
         AttributeConfiguration(name='business_risk', **supported_serialization),
@@ -75,6 +76,7 @@ class Finding(Base, db.Model):
     owisam_category = db.Column(Enum(OWISAMCategory))
 
     description = db.Column(db.String())
+    impact = db.Column(db.String())
     solution = db.Column(db.String())
 
     tech_risk = db.Column(Enum(Score), nullable=False)
@@ -217,6 +219,7 @@ class Finding(Base, db.Model):
             definition=translation.definition,
             references=translation.references,
             description=translation.description,
+            impact=translation.impact,
 
             assessment=assessment,
 

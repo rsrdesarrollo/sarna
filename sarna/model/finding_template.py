@@ -70,6 +70,7 @@ class FindingTemplateTranslation(Base, db.Model):
     definition = db.Column(db.String(), nullable=False)
     references = db.Column(db.String(), nullable=False)
     description = db.Column(db.String())
+    impact = db.Column(db.String())
 
     def check_references_urls(self):
         url_regex = r"\[.+\]\((.+)\)"
